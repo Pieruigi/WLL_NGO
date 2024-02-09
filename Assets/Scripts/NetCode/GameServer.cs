@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Matchmaker.Models;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using WLL_NGO.Multiplay;
 using WLL_NGO.Services;
@@ -13,9 +14,11 @@ namespace WLL_NGO.Netcode
 {
     public class GameServer : MonoBehaviour
     {
+        public static UnityAction<ulong> OnClientConnected;
+        public static UnityAction<ulong> OnClientDisconnected;
+
         public static GameServer Instance { get; private set; }
 
-        ushort listeningPort;
         string internalIp = "0.0.0.0";
 
         private void Awake()
@@ -23,7 +26,7 @@ namespace WLL_NGO.Netcode
             if (!Instance)
             {
                 Instance = this;
-                listeningPort = ServerManager.Instance.ListeningPort;
+                
             }
             else
             {
@@ -40,17 +43,19 @@ namespace WLL_NGO.Netcode
 #endif
         }
 
-        private void OnEnable()
+        private void RegisterCallbacks()
         {
             NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
+            NetworkManager.Singleton.OnServerStopped += HandleOnServerStopped;
             NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnected;
             ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayoload;
         }
 
-        private void OnDisable()
+        private void UnregisterCallbacks()
         {
             NetworkManager.Singleton.OnServerStarted -= HandleOnServerStarted;
+            NetworkManager.Singleton.OnServerStopped -= HandleOnServerStopped;
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnected;
             ServerManager.OnMatchmakerPayload -= HandleOnMatchmakerPayoload;
@@ -66,14 +71,22 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Server listening on port:{NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port}");
         }
 
+        void HandleOnServerStopped(bool isHost)
+        {
+            Debug.Log($"Server has stopped");
+            UnregisterCallbacks();
+        }
+
         void HandleOnClientConnected(ulong clientId)
         {
             Debug.Log($"Client {clientId} connected.");
+            OnClientConnected?.Invoke(clientId);
         }
 
         void HandleOnClientDisconnected(ulong clientId)
         {
             Debug.Log($"Client {clientId} disconnected");
+            OnClientDisconnected?.Invoke(clientId);
         }
 
         async void StartServer()
@@ -110,8 +123,9 @@ namespace WLL_NGO.Netcode
                 {
                     if (op.isDone)
                     {
-                        Debug.Log($"Starting server on port {listeningPort}");
-                        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(internalIp, listeningPort);
+                        RegisterCallbacks();
+                        Debug.Log($"Starting server on port {ServerManager.Instance.ListeningPort}");
+                        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(internalIp, ServerManager.Instance.ListeningPort);
                         NetworkManager.Singleton.StartServer();
                     }
 
