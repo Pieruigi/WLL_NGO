@@ -24,6 +24,9 @@ namespace WLL_NGO
 
         public const string DefaultGameScene = "Game";
         public const string LobbyScene = "Lobby";
+        public const string ClientMainScene = "Client";
+        public const string ServerMainScene = "Server";
+
 
     }
 

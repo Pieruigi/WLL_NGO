@@ -1,34 +1,80 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-namespace WLL_NGO
+/*
+	Generic classes for the use of singleton
+	there are 3 types:
+	- MonoBehaviour -> for the use of singleton to normal MonoBehaviours
+	- NetworkBehaviour -> for the use of singleton that uses the NetworkBehaviours
+	- Persistent -> when we need to make sure the object is not destroyed during the session
+*/
+
+public class Singleton<T> : MonoBehaviour where T : Component
 {
-    public class Singleton<T> : MonoBehaviour where T : Component
+    public static T Instance { get; private set; }
+
+    protected virtual void Awake()
     {
-        public static T Instance { get; private set; }
-
-
-        [SerializeField]
-        bool persistent;
-
-        protected virtual void Awake()
+        if (Instance == null)
         {
-            if (Instance == null)
-            {
-                Instance = gameObject.GetComponent<T>();
-                if (persistent)
-                    DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                DestroyImmediate(gameObject);
-            }
-
-
+            Instance = this as T;
         }
-
-
+        else
+        {
+            Destroy(gameObject);
+        }
     }
+}
 
+public class SingletonPersistent<T> : MonoBehaviour where T : Component
+{
+    public static T Instance { get; private set; }
+
+    protected virtual void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this as T;
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+
+public class SingletonNetwork<T> : NetworkBehaviour where T : Component
+{
+    public static T Instance { get; private set; }
+
+    protected virtual void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this as T;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+
+public class SingletonNetworkPersistent<T> : NetworkBehaviour where T : Component
+{
+    public static T Instance { get; private set; }
+
+    protected virtual void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this as T;
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 }

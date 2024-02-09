@@ -10,38 +10,23 @@ namespace WLL_NGO
 {
     public class Launcher : MonoBehaviour
     {
-        [SerializeField]
-        string clientScene, serverScene;
-
+       
         //public bool IsServer { get; private set; } = false;
         
 
         private void Awake()
         {
-#if NO_MM
-#if UNITY_EDITOR
-            if (ClonesManager.GetArgument().Contains(Constants.DedicatedServerArg))
-#else
-            if (new List<string>(System.Environment.GetCommandLineArgs()).Contains(Constants.DedicatedServerArg))
-#endif
-#else
-            if (new List<string>(System.Environment.GetCommandLineArgs()).Contains(Constants.DedicatedServerArg))
-#endif
+            if(Utility.IsDedicatedServer())
             {
-                //IsServer = true;
-                LoadScene(serverScene);
+                SceneManager.LoadScene(Constants.ServerMainScene);
             }
             else
             {
-                LoadScene(clientScene);
+                SceneManager.LoadScene(Constants.ClientMainScene);
             }
         }
 
-        void LoadScene(string sceneName)
-        {
-            SceneManager.LoadScene(sceneName);
-        }
-
+       
     }
 
 }
