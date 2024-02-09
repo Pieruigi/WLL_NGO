@@ -22,24 +22,49 @@ namespace WLL_NGO.Netcode
         string ip = "0.0.0.0";
         ushort port;
 
+#if NO_MM
+        protected override void Awake()
+        {
+            base.Awake();
+            if (Instance == this)
+            {
+                dedicatedServer = Utility.IsDedicatedServer();
+                if (dedicatedServer)
+                {
+
+                    SceneManager.sceneLoaded += (s, m) =>
+                    {
+                        if (Constants.ServerMainScene.Equals(s.name))
+                            StartServer();
+                    };
+
+                }
+
+
+            }
+
+        }
+#endif
+
         private void Start()
         {
             dedicatedServer = Utility.IsDedicatedServer();
 
-            if (dedicatedServer)
+#if NO_MM
+            if (!dedicatedServer)
             {
-#if NO_MM
-                StartServer();
-#endif
-            }
-            else{ // Is client
-#if NO_MM
                 port = Constants.NoMatchmakingTestingPort;
                 ip = "127.0.0.1";
-                //StartClient();
-#endif
             }
+#else
+            if (!dedicatedServer)
+            {
+             ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayload;
+            }
+#endif
+
         }
+
 
         private void RegisterCallbacks()
         {
@@ -47,9 +72,6 @@ namespace WLL_NGO.Netcode
             {
                 NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
                 NetworkManager.Singleton.OnServerStopped += HandleOnServerStopped;
-                NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnected;
-                ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayoload;
             }
             else
             {
@@ -57,9 +79,10 @@ namespace WLL_NGO.Netcode
                 ClientManager.OnTicketFailed += HandleOnTicketFailed;
                 NetworkManager.Singleton.OnClientStarted += HandleOnClientStarted;
                 NetworkManager.Singleton.OnClientStopped += HandleOnClientStopped;
-                NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnected;
             }
+
+            NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnected;
         }
 
         private void UnregisterCallbacks()
@@ -68,9 +91,6 @@ namespace WLL_NGO.Netcode
             {
                 NetworkManager.Singleton.OnServerStarted -= HandleOnServerStarted;
                 NetworkManager.Singleton.OnServerStopped -= HandleOnServerStopped;
-                NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnected;
-                ServerManager.OnMatchmakerPayload -= HandleOnMatchmakerPayoload;
             }
             else
             {
@@ -78,19 +98,19 @@ namespace WLL_NGO.Netcode
                 ClientManager.OnTicketFailed -= HandleOnTicketFailed;
                 NetworkManager.Singleton.OnClientStarted -= HandleOnClientStarted;
                 NetworkManager.Singleton.OnClientStopped -= HandleOnClientStopped;
-                NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnected;
             }
+
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnected;
         }
-        #region server only
+#region server only
         /// <summary>
         /// Called on server
         /// </summary>
         /// <param name="payload"></param>
-        void HandleOnMatchmakerPayoload(MatchmakingResults payload)
+        void HandleOnMatchmakerPayload(MatchmakingResults payload)
         {
-            if(dedicatedServer)
-                StartServer();
+            StartServer();
         }
 
         void HandleOnServerStarted()
@@ -148,9 +168,9 @@ namespace WLL_NGO.Netcode
 
             }
         }
-        #endregion
+#endregion
 
-        #region client only
+#region client only
         void HandleOnTicketAssigned(MultiplayAssignment assignment)
         {
             port = (ushort)assignment.Port;
@@ -177,12 +197,14 @@ namespace WLL_NGO.Netcode
         void Shutdown()
         {
             NetworkManager.Singleton.Shutdown();
+            UnregisterCallbacks();
             SceneManager.LoadScene(Constants.ClientMainScene, LoadSceneMode.Single);
         }
 
         public void StartClient()
         {
             RegisterCallbacks();
+            Debug.Log($"ip:{ip}");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(ip, port);
             NetworkManager.Singleton.StartClient();
         }
@@ -191,9 +213,9 @@ namespace WLL_NGO.Netcode
         {
             NetworkManager.Singleton.StartHost();
         }
-        #endregion
+#endregion
 
-        #region both
+#region both
         void HandleOnClientConnected(ulong clientId)
         {
             if (dedicatedServer)
@@ -217,7 +239,7 @@ namespace WLL_NGO.Netcode
                 Shutdown();
             }
         }
-        #endregion
+#endregion
 
 
 

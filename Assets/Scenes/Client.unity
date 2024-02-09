@@ -206,8 +206,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1192968213}
-        m_TargetAssemblyTypeName: WLL_NGO.Netcode.NetworkLauncher, Assembly-CSharp
+      - m_Target: {fileID: 1692817252}
+        m_TargetAssemblyTypeName: WLL_NGO.UI.NetworkLauncherUI, Assembly-CSharp
         m_MethodName: StartHost
         m_Mode: 1
         m_Arguments:
@@ -705,50 +705,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1072455200}
   m_CullTransparentMesh: 1
---- !u!1 &1192968212
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1192968214}
-  - component: {fileID: 1192968213}
-  m_Layer: 0
-  m_Name: NetworkLauncher
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1192968213
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1192968212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02eefe75ee10eb2429265eca571978ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1192968214
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1192968212}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1241644807
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,50 +782,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1241644807}
   m_CullTransparentMesh: 1
---- !u!1 &1243994330
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1243994331}
-  - component: {fileID: 1243994332}
-  m_Layer: 0
-  m_Name: GameClient
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1243994331
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1243994330}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1243994332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1243994330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 222baca83d9885548a3164f326977b57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1445269006
 GameObject:
   m_ObjectHideFlags: 0
@@ -953,8 +865,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1192968213}
-        m_TargetAssemblyTypeName: WLL_NGO.Netcode.NetworkLauncher, Assembly-CSharp
+      - m_Target: {fileID: 1692817252}
+        m_TargetAssemblyTypeName: WLL_NGO.UI.NetworkLauncherUI, Assembly-CSharp
         m_MethodName: StartClient
         m_Mode: 1
         m_Arguments:
@@ -1083,8 +995,9 @@ GameObject:
   - component: {fileID: 1692817250}
   - component: {fileID: 1692817249}
   - component: {fileID: 1692817248}
+  - component: {fileID: 1692817252}
   m_Layer: 5
-  m_Name: Dashboard
+  m_Name: NetworkLauncherUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1173,6 +1086,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1692817252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692817247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b21adf65216545443b9b724181bb5181, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1180,6 +1105,4 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 1692817251}
   - {fileID: 1488146254}
-  - {fileID: 1243994331}
   - {fileID: 411130390}
-  - {fileID: 1192968214}

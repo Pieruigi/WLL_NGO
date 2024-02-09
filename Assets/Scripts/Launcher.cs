@@ -14,7 +14,7 @@ namespace WLL_NGO
         //public bool IsServer { get; private set; } = false;
         
 
-        private void Awake()
+        private void Start()
         {
             if(Utility.IsDedicatedServer())
             {
