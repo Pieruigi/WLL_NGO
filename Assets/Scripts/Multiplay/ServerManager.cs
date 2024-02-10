@@ -17,12 +17,7 @@ namespace WLL_NGO.Multiplay
         public static UnityAction OnMatchmakerFailed;
 
         int maxPlayers = 2;
-        ushort listeningPort;
-        public ushort ListeningPort
-        {
-            get { return listeningPort; }
-        }
-
+        
         private MatchmakingResults matchmakerPayload;
         private string allocationId;
         private MultiplayEventCallbacks serverCallbacks;
@@ -33,29 +28,12 @@ namespace WLL_NGO.Multiplay
         string serverName;
 
 
-        // Start is called before the first frame update
-#if NO_MM
-        void Start()
-#else
-        async void Start()
-#endif
+#if !NO_MM
+        public async void StartUp()
         {
-
-#if NO_MM
-            listeningPort = Constants.NoMatchmakingTestingPort;
-#else
-            string[] args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (Constants.ServerPortArg.Equals(args[i]) && args.Length > i + 1)
-                {
-                    internalPort = ushort.Parse(args[i + 1]); // Port number is sent via cmd by the matchmaking
-                }
-            }
-
             await StartServices();
-#endif
         }
+#endif
 
         /// <summary>
         /// Sugg: move this to a dedicated exception manager class

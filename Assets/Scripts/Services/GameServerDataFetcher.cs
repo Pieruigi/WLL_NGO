@@ -13,7 +13,7 @@ namespace WLL_NGO.Services
         /// This function returns the full game catalog as json
         /// </summary>
         /// <returns></returns>
-        public static async Task<FetchDataResponse<string>> FetchFullCatalog()
+        public static async Task<FetchDataResponse<string>> FetchAll()
         {
             await Task.Delay(System.TimeSpan.FromSeconds(1));
             return new FetchDataResponse<string>(true, "catalog-json");

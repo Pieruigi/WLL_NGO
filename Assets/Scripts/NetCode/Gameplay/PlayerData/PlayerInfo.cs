@@ -32,6 +32,9 @@ namespace WLL_NGO.Gameplay
             get { return home; }
         }
 
+        /// <summary>
+        /// True if this player loaded data from external source ( for example the teamroster from playfab )
+        /// </summary>
         bool initialized;
         public bool Initialized
         {
@@ -44,7 +47,16 @@ namespace WLL_NGO.Gameplay
             get { return data.ToString(); }
         }
 
+        /// <summary>
+        /// True when the player is ready to play ( for example the scene has been streamed from the addressables )
+        /// </summary>
         bool ready;
+        public bool Ready
+        {
+            get { return ready; }
+            set { ready = value; }
+        }
+
 
         /// <summary>
         /// Called by the server to create human player info.
@@ -95,7 +107,7 @@ namespace WLL_NGO.Gameplay
 
         public override string ToString()
         {
-            return $"[Player id:{id}, clientId:{clientId}, bot:{bot}, home:{home}, initialized:{initialized}, data:{data}]";
+            return $"[Player id:{id}, clientId:{clientId}, bot:{bot}, home:{home}, initialized:{initialized}, data:{data}, ready:{ready}]";
         }
 
         #region data serialization
@@ -117,6 +129,7 @@ namespace WLL_NGO.Gameplay
                 reader.ReadValueSafe(out home);
                 reader.ReadValueSafe(out initialized);
                 reader.ReadValueSafe(out data);
+                reader.ReadValueSafe(out ready);
             }
             else
             {
@@ -127,6 +140,7 @@ namespace WLL_NGO.Gameplay
                 writer.WriteValueSafe(home);
                 writer.WriteValueSafe(initialized);
                 writer.WriteValueSafe(data);
+                writer.WriteValueSafe(ready);
             }
         }
         #endregion

@@ -24,6 +24,25 @@ namespace WLL_NGO
             else
                 return false;
         }
+
+        public static ushort GetPortFromCommandLineArgs()
+        {
+#if !UNITY_EDITOR
+            string[] args = System.Environment.GetCommandLineArgs();
+#else
+            string[] args = ClonesManager.GetArgument().Split(" ");
+#endif
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (Constants.ServerPortArg.Equals(args[i]) && args.Length > i + 1)
+                {
+                    return ushort.Parse(args[i + 1]); // Port number is sent via cmd by the matchmaking
+                }
+            }
+
+            return 0;
+        }
     }
 
 }

@@ -22,47 +22,23 @@ namespace WLL_NGO.Netcode
         string ip = "0.0.0.0";
         ushort port;
 
-#if NO_MM
-        protected override void Awake()
-        {
-            base.Awake();
-            if (Instance == this)
-            {
-                dedicatedServer = Utility.IsDedicatedServer();
-                if (dedicatedServer)
-                {
-
-                    SceneManager.sceneLoaded += (s, m) =>
-                    {
-                        if (Constants.ServerMainScene.Equals(s.name))
-                            StartServer();
-                    };
-
-                }
-
-
-            }
-
-        }
-#endif
-
         private void Start()
         {
             dedicatedServer = Utility.IsDedicatedServer();
-
 #if NO_MM
-            if (!dedicatedServer)
-            {
+            if (!dedicatedServer) // For client
+            { 
+
                 port = Constants.NoMatchmakingTestingPort;
                 ip = "127.0.0.1";
-            }
-#else
-            if (!dedicatedServer)
-            {
-             ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayload;
+
             }
 #endif
 
+            if (dedicatedServer)
+            {
+                ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayload; // Wait for payload to set the connection ip and port
+            }
         }
 
 
@@ -103,6 +79,7 @@ namespace WLL_NGO.Netcode
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnected;
         }
+
 #region server only
         /// <summary>
         /// Called on server
@@ -110,6 +87,7 @@ namespace WLL_NGO.Netcode
         /// <param name="payload"></param>
         void HandleOnMatchmakerPayload(MatchmakingResults payload)
         {
+            SetIpAndPort("0.0.0.0", Utility.GetPortFromCommandLineArgs());
             StartServer();
         }
 
@@ -124,54 +102,25 @@ namespace WLL_NGO.Netcode
             UnregisterCallbacks();
         }
 
-        async void StartServer()
+        public void StartServer()
         {
-            // Prefetch data ( for example the full catalog )
-            // We load all needed data before we enter the lobby room
-            List<Task<FetchDataResponse<string>>> tasks = new List<Task<FetchDataResponse<string>>>();
-            tasks.Add(GameServerDataFetcher.FetchFullCatalog());
-            await Task.WhenAll(tasks.ToArray());
-            bool failed = false;
-            foreach (var t in tasks)
-            {
-                if (!t.Result.Succeeded)
-                {
-                    failed = true;
-                    break;
-                }
-                else
-                {
-                    Debug.Log($"Prefetch task result:{t.Result.Data}");
-                }
-            }
-
-            if (failed)
-            {
-                // Something goes wrong, shutdown
-                ServerManager.Instance.Shutdown();
-                Application.Quit();
-            }
-            else
-            {
-                // Everything has been loaded, entering the lobby and start server
 #if USE_LOBBY_SCENE
-                SceneManager.LoadSceneAsync(Constants.LobbyScene, LoadSceneMode.Single).completed += (op) =>
+            SceneManager.LoadSceneAsync(Constants.LobbyScene, LoadSceneMode.Single).completed += (op) =>
 #else
-                SceneManager.LoadSceneAsync(Constants.DefaultGameScene, LoadSceneMode.Single).completed += (op) =>
+            SceneManager.LoadSceneAsync(Constants.DefaultGameScene, LoadSceneMode.Single).completed += (op) =>
 #endif
+            {
+                if (op.isDone)
                 {
-                    if (op.isDone)
-                    {
-                        RegisterCallbacks();
-                        Debug.Log($"Starting server on port {ServerManager.Instance.ListeningPort}");
-                        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(ip, ServerManager.Instance.ListeningPort);
-                        NetworkManager.Singleton.StartServer();
-                    }
+                    RegisterCallbacks();
+                    Debug.Log($"Starting server on port {port}");
+                    NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(ip, port);
+                    NetworkManager.Singleton.StartServer();
+                }
 
-                };
-
-            }
+            };
         }
+
 #endregion
 
 #region client only
@@ -243,6 +192,13 @@ namespace WLL_NGO.Netcode
                 Shutdown();
             }
         }
+
+        public void SetIpAndPort(string ip, ushort port)
+        {
+            this.ip = ip;
+            this.port = port;
+        }
+
 #endregion
 
 
