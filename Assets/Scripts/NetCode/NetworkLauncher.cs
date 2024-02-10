@@ -154,7 +154,11 @@ namespace WLL_NGO.Netcode
             else
             {
                 // Everything has been loaded, entering the lobby and start server
+#if USE_LOBBY_SCENE
                 SceneManager.LoadSceneAsync(Constants.LobbyScene, LoadSceneMode.Single).completed += (op) =>
+#else
+                SceneManager.LoadSceneAsync(Constants.DefaultGameScene, LoadSceneMode.Single).completed += (op) =>
+#endif
                 {
                     if (op.isDone)
                     {

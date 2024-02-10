@@ -289,6 +289,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 576e5078a540fe142905dcdc5a4f3b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  numOfPlayers: 1
+  loadingGameScene: 0
 --- !u!4 &1641384783
 Transform:
   m_ObjectHideFlags: 0
@@ -371,11 +373,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerInfoManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 8068869004713430430, guid: 4b048c60a7632944c89810c0d0df3d83,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

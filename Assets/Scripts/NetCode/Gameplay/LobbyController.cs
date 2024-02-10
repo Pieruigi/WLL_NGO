@@ -1,3 +1,4 @@
+#if USE_LOBBY_SCENE
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -40,3 +41,4 @@ namespace WLL_NGO.Gameplay
     }
 
 }
+#endif

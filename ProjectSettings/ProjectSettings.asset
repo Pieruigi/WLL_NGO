@@ -800,7 +800,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: NO_MM
+    Standalone: NO_MM;_USE_LOBBY_SCENE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

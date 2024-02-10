@@ -9,7 +9,11 @@ namespace WLL_NGO.Gameplay
     /// <summary>
     /// Manager for player info 
     /// </summary>
+#if USE_LOBBY_SCENE
     public class PlayerInfoManager : SingletonNetworkPersistent<PlayerInfoManager>
+#else
+    public class PlayerInfoManager : SingletonNetwork<PlayerInfoManager>
+#endif
     {
         [SerializeField]
         NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
@@ -54,20 +58,26 @@ namespace WLL_NGO.Gameplay
             }
             if (IsClient)
             {
+#if USE_LOBBY_SCENE
                 NetworkLauncher.OnClientStopped += HandleOnShutdown;
+#endif
             }
             // Both client and server register to the player list changed callback
             players.OnListChanged += HandleOnPlayerInfoListChanged;
         }
 
-       
+
+#if USE_LOBBY_SCENE
+        /// <summary>
+        /// Using the lobby scene means we created this object in the lobby scene itself, forcing us to destroy it manually because
+        /// it's persistent through scenes.
+        /// </summary>
         void HandleOnShutdown()
         {
             if (IsClient)
             {
                 Destroy(gameObject);
             }
-            
         }
 
         public override void OnDestroy()
@@ -75,7 +85,7 @@ namespace WLL_NGO.Gameplay
             base.OnDestroy();
             NetworkLauncher.OnClientStopped -= HandleOnShutdown;
         }
-
+#endif
         void HandleOnPlayerInfoListChanged(NetworkListEvent<PlayerInfo> changeEvent)
         {
             
