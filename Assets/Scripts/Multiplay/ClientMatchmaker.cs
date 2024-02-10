@@ -20,7 +20,7 @@ using ParrelSync;
 
 namespace WLL_NGO.Multiplay
 {
-    public class ClientManager : Singleton<ClientManager>
+    public class ClientMatchmaker : Singleton<ClientMatchmaker>
     {
         public static UnityAction<MultiplayAssignment> OnTicketAssigned;
         public static UnityAction OnTicketFailed;

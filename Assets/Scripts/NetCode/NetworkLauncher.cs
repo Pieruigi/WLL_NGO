@@ -37,7 +37,7 @@ namespace WLL_NGO.Netcode
 
             if (dedicatedServer)
             {
-                ServerManager.OnMatchmakerPayload += HandleOnMatchmakerPayload; // Wait for payload to set the connection ip and port
+                ServerMatchmaker.OnMatchmakerPayload += HandleOnMatchmakerPayload; // Wait for payload to set the connection ip and port
             }
         }
 
@@ -51,8 +51,8 @@ namespace WLL_NGO.Netcode
             }
             else
             {
-                ClientManager.OnTicketAssigned += HandleOnTicketAssigned;
-                ClientManager.OnTicketFailed += HandleOnTicketFailed;
+                ClientMatchmaker.OnTicketAssigned += HandleOnTicketAssigned;
+                ClientMatchmaker.OnTicketFailed += HandleOnTicketFailed;
                 NetworkManager.Singleton.OnClientStarted += HandleOnClientStarted;
                 NetworkManager.Singleton.OnClientStopped += HandleOnClientStopped;
             }
@@ -70,8 +70,8 @@ namespace WLL_NGO.Netcode
             }
             else
             {
-                ClientManager.OnTicketAssigned -= HandleOnTicketAssigned;
-                ClientManager.OnTicketFailed -= HandleOnTicketFailed;
+                ClientMatchmaker.OnTicketAssigned -= HandleOnTicketAssigned;
+                ClientMatchmaker.OnTicketFailed -= HandleOnTicketFailed;
                 NetworkManager.Singleton.OnClientStarted -= HandleOnClientStarted;
                 NetworkManager.Singleton.OnClientStopped -= HandleOnClientStopped;
             }

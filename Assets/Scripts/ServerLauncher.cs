@@ -40,14 +40,14 @@ namespace WLL_NGO
             if (failed)
             {
                 // Something goes wrong, shutdown
-                ServerManager.Instance.Shutdown();
+                ServerMatchmaker.Instance.Shutdown();
                 Application.Quit();
             }
             else
             {
 #if NO_MM
                 // Just invoke the matchmaker payload result
-                ServerManager.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
+                ServerMatchmaker.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
 #else
                 // Start matchmaker manager
                 ServerManager.Instance.StartUp();

@@ -11,7 +11,7 @@ using UnityEngine.Events;
 
 namespace WLL_NGO.Multiplay
 {
-    public class ServerManager : Singleton<ServerManager>
+    public class ServerMatchmaker : Singleton<ServerMatchmaker>
     {
         public static UnityAction<MatchmakingResults> OnMatchmakerPayload;
         public static UnityAction OnMatchmakerFailed;
