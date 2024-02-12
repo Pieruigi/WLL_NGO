@@ -25,15 +25,18 @@ namespace WLL_NGO.Netcode
         private void Start()
         {
             dedicatedServer = Utility.IsDedicatedServer();
-#if NO_MM
-            if (!dedicatedServer) // For client
-            { 
 
+            if (!dedicatedServer) // For client
+            {
+#if NO_MM
                 port = Constants.NoMatchmakingTestingPort;
                 ip = "127.0.0.1";
 
-            }
+#else
+                ClientMatchmaker.OnTicketAssigned += HandleOnTicketAssigned;
 #endif
+            }
+
 
             if (dedicatedServer)
             {

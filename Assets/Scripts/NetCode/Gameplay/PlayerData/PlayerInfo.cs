@@ -48,7 +48,7 @@ namespace WLL_NGO.Gameplay
         }
 
         /// <summary>
-        /// True when the player is ready to play ( for example the scene has been streamed from the addressables )
+        /// True when client scene has been completely loaded ( addressables, etc. ) and the player is ready to play.
         /// </summary>
         bool ready;
         public bool Ready

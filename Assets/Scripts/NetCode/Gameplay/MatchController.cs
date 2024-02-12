@@ -9,9 +9,9 @@ namespace WLL_NGO.Gameplay
     /// <summary>
     /// NotReady: waiting for all players to be ready
     /// </summary>
-    public enum MatchState { NotReady }
+    public enum MatchState { NotReady, StartingMatch }
 
-    public class MatchController : NetworkBehaviour
+    public class MatchController : SingletonNetwork<MatchController>
     {
         //ushort numOfPlayers = 1;
         //public ushort NumberOfPlayers
@@ -68,13 +68,28 @@ namespace WLL_NGO.Gameplay
             switch (matchState.Value)
             {
                 case (byte)MatchState.NotReady:
-                    // If all players are ready we can start the game
-                    
+                    if(IsServer)
+                    {
+                        // If all players are ready we can start the game
+                        if (PlayerInfoManager.Instance.PlayerInitializedAll() && PlayerInfoManager.Instance.PlayerReadyAll())
+                        {
+                            SetMatchState(MatchState.StartingMatch);
+                        }
+                    }
+                   
                     break;
             }
         }
 
-       
+
+        public void SetMatchState(MatchState newMatchState)
+        {
+            if (!IsServer) return;
+
+            Debug.Log($"Server - Setting new match state: {newMatchState}");
+            matchState.Value = (byte)newMatchState;
+        }
+
     }
 
 }

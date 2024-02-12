@@ -18,35 +18,9 @@ namespace WLL_NGO.Gameplay
         [SerializeField]
         NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
 
-        int playersNeeded = 2;
+        int playersNeeded = 1;
 
-        //private void OnEnable()
-        //{
-        //    if (IsServer)
-        //    {
-        //        GameServer.OnClientConnected += AddPlayer;
-        //        GameServer.OnClientDisconnected += RemovePlayer;
-        //    }
-        //    if (IsClient)
-        //    {
-        //        //GameClient.OnClientStopped += HandleOnShutdown;
-        //        NetworkLauncher.OnClientStopped += HandleOnShutdown;
-        //    }
-        //}
-
-        //private void OnDisable()
-        //{
-        //    if (IsServer)
-        //    {
-        //        GameServer.OnClientConnected -= AddPlayer;
-        //        GameServer.OnClientDisconnected -= RemovePlayer;
-        //    }
-        //    if (IsClient)
-        //    {
-        //        //GameClient.OnClientStopped -= HandleOnShutdown;
-        //        NetworkLauncher.OnClientStopped -= HandleOnShutdown;
-        //    }
-        //}
+       
 
         public override void OnNetworkSpawn()
         {
@@ -94,7 +68,7 @@ namespace WLL_NGO.Gameplay
                 // Every time the server modifies the player list all the players are notified
                 if (changeEvent.Value.ClientId == NetworkManager.LocalClientId)
                 {
-                    Debug.Log($"Local PlayerInfo has been created by the server for local client (id:{NetworkManager.LocalClientId})");
+                    Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
                     PlayerInfo localPlayer = players[changeEvent.Index];
                     // The local player has been added, we need to send the server our initialization data ( ex. the teamroaster )
                     if(!localPlayer.Initialized)
@@ -133,6 +107,21 @@ namespace WLL_NGO.Gameplay
                 {
                     var p = players[i];
                     p.Initialize(data);
+                    players[i] = p;
+                    return;
+                }
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SetPlayerReadyServerRpc(ulong clientId)
+        {
+            for(int i=0; i<players.Count;i++)
+            {
+                if (players[i].ClientId == clientId)
+                {
+                    var p = players[i];
+                    p.Ready = true;
                     players[i] = p;
                     return;
                 }
@@ -192,6 +181,9 @@ namespace WLL_NGO.Gameplay
 
         public bool PlayerInitializedAll()
         {
+            if (players.Count < playersNeeded)
+                return false;
+
             foreach(var player in players)
             {
                 if (!player.Initialized)
@@ -199,6 +191,19 @@ namespace WLL_NGO.Gameplay
             }
             return true;
         }
+
+        public bool PlayerReadyAll()
+        {
+            if (players.Count < playersNeeded)
+                return false;
+
+            foreach (var player in players)
+            {
+                if(!player.Ready) return false;
+            }
+            return true;
+        }
+
         
     }
 

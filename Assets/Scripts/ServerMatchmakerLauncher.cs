@@ -9,7 +9,10 @@ using WLL_NGO.Services;
 
 namespace WLL_NGO
 {
-    public class ServerLauncher : MonoBehaviour
+    /// <summary>
+    /// Load data from external sources ( for example the whole catalog from playfab ) and then launch the matchmaker service on server.
+    /// </summary>
+    public class ServerMatchmakerLauncher : MonoBehaviour
     {
         void Start()
         {
@@ -50,17 +53,13 @@ namespace WLL_NGO
                 ServerMatchmaker.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
 #else
                 // Start matchmaker manager
-                ServerManager.Instance.StartUp();
+                ServerMatchmaker.Instance.StartUp();
 #endif
             }
 
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+  
     }
 
 }

@@ -1,4 +1,3 @@
-//#define NO_MM
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,8 +30,6 @@ namespace WLL_NGO.Multiplay
         string ticketId;
         MultiplayAssignment assignment; // Holds match information
 
-        
-
         protected override void Awake()
         {
             base.Awake();
@@ -63,7 +60,7 @@ namespace WLL_NGO.Multiplay
                     ticketName = Constants.ClassicQueueName;
                     break;
             }
-            CreateTicket(ticketName + regionArg);
+            CreateTicket(ticketName);
 #endif
         }
 
