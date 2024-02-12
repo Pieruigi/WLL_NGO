@@ -29,7 +29,7 @@ namespace WLL_NGO
 
         async void Initialize()
         {
-            await Task.Delay(10000); // Just for test
+            await Task.Delay(3000); // Just for test
 
             PlayerInfoManager.Instance.SetPlayerReadyServerRpc(NetworkManager.Singleton.LocalClientId);
         }

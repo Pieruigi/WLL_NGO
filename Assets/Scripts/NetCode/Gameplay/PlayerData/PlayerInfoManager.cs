@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using WLL_NGO.Netcode;
 
 namespace WLL_NGO.Gameplay
@@ -15,6 +16,8 @@ namespace WLL_NGO.Gameplay
     public class PlayerInfoManager : SingletonNetwork<PlayerInfoManager>
 #endif
     {
+        public UnityAction<PlayerInfo> OnPlayerInitialized;
+
         [SerializeField]
         NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
 
@@ -72,7 +75,7 @@ namespace WLL_NGO.Gameplay
                     PlayerInfo localPlayer = players[changeEvent.Index];
                     // The local player has been added, we need to send the server our initialization data ( ex. the teamroaster )
                     if(!localPlayer.Initialized)
-                        SetPlayerDataServerRpc(NetworkManager.LocalClientId, "json-data");
+                        InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
                 };
             }
 
@@ -99,7 +102,7 @@ namespace WLL_NGO.Gameplay
         /// <param name="clientId"></param>
         /// <param name="data"></param>
         [ServerRpc(RequireOwnership = false)]
-        void SetPlayerDataServerRpc(ulong clientId, string data)
+        void InizialitePlayerServerRpc(ulong clientId, string data)
         {
             for(int i=0; i<players.Count; i++)
             {
@@ -108,6 +111,9 @@ namespace WLL_NGO.Gameplay
                     var p = players[i];
                     p.Initialize(data);
                     players[i] = p;
+
+                    OnPlayerInitialized?.Invoke(p);
+
                     return;
                 }
             }
