@@ -167,14 +167,26 @@ namespace WLL_NGO.Netcode
 
         public void StartHost()
         {
-            NetworkManager.Singleton.StartHost();
+            // Load game scene
+            SceneManager.LoadSceneAsync(Constants.DefaultGameScene, LoadSceneMode.Single).completed += (op) =>
+            {
+                if (op.isDone)
+                {
+                    RegisterCallbacks();
+                    NetworkManager.Singleton.StartHost();
+                }
+
+            };
+
+            
         }
 #endregion
 
 #region both
         void HandleOnClientConnected(ulong clientId)
         {
-            if (dedicatedServer)
+            //if (dedicatedServer || NetworkManager.Singleton.IsHost)
+            if (NetworkManager.Singleton.IsServer)
             {
                 Debug.Log($"Client {clientId} connected.");
                 OnClientConnected?.Invoke(clientId);
@@ -184,7 +196,8 @@ namespace WLL_NGO.Netcode
 
         void HandleOnClientDisconnected(ulong clientId)
         {
-            if (dedicatedServer)
+            //if (dedicatedServer)
+            if(NetworkManager.Singleton.IsServer)
             {
                 Debug.Log($"Client {clientId} disconnected");
                 OnClientDisconnected?.Invoke(clientId);

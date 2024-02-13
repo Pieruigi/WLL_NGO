@@ -113,9 +113,7 @@ namespace WLL_NGO.Gameplay
         #region data serialization
         public bool Equals(PlayerInfo other)
         {
-            //return id == other.id && clientId == other.clientId && other.connected == connected && other.bot == bot && 
-            //       other.home == home && other.initialized == initialized && other.data == data;
-            return this.Equals(other);
+            return id == other.id && clientId == other.clientId && bot == other.bot;
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

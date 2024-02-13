@@ -16,7 +16,7 @@ namespace WLL_NGO.Gameplay
     public class PlayerInfoManager : SingletonNetwork<PlayerInfoManager>
 #endif
     {
-        public UnityAction<PlayerInfo> OnPlayerInitialized;
+        public static UnityAction<PlayerInfo> OnPlayerInitialized;
 
         [SerializeField]
         NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
@@ -112,7 +112,8 @@ namespace WLL_NGO.Gameplay
                     p.Initialize(data);
                     players[i] = p;
 
-                    OnPlayerInitialized?.Invoke(p);
+                    Debug.Log($"Player initialized, clientId:{p.ClientId}, isBot:{p.Bot}");
+                    OnPlayerInitialized?.Invoke(players[i]);
 
                     return;
                 }

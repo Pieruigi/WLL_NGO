@@ -43,7 +43,7 @@ namespace WLL_NGO
             if (failed)
             {
                 // Something goes wrong, shutdown
-                ServerMatchmaker.Instance.Shutdown();
+                //ServerMatchmaker.Instance.Shutdown();
                 Application.Quit();
             }
             else

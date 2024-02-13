@@ -31,7 +31,10 @@ namespace WLL_NGO.Gameplay
                 awayTeamController = this;
         }
 
-       
+        public static TeamController GetPlayerTeam(PlayerInfo player)
+        {
+            return player.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+        }
 
         
     }
