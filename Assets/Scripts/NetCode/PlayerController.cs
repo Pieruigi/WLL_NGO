@@ -79,6 +79,7 @@ namespace WLL_NGO.Gameplay
         CircularBuffer<StatePayload> clientStateBuffer;
         StatePayload lastServerState;
         StatePayload lastProcessedState;
+        float reconciliationThreshold = .5f;
 
         // Server
         CircularBuffer<StatePayload> serverStateBuffer;
@@ -147,9 +148,68 @@ namespace WLL_NGO.Gameplay
             // Process locally
             StatePayload statePayload = ProcessMove(input.inputVector, input.tick);
             clientStateBuffer.Add(statePayload, bufferIndex);
-                
+            UnityEngine.Debug.Log(statePayload);
 
-            // HandleReconciliation()
+            HandleReconciliation();
+        }
+
+        bool ReconciliationAllowed()
+        {
+            bool lastServerStateIsDefined = !lastServerState.Equals(default);
+            bool lastProcessedStateUndefinedOrDifferent = lastProcessedState.Equals(default) || !lastProcessedState.Equals(lastServerState);
+
+            return lastServerStateIsDefined && lastProcessedStateUndefinedOrDifferent;
+
+        }
+
+        void HandleReconciliation()
+        {
+            if (IsHost || !ReconciliationAllowed())
+                return;
+
+            float positionError;
+            int bufferIndex;
+            StatePayload rewindState = default;
+
+            // Get the last state buffer index
+            bufferIndex = lastServerState.tick % bufferSize;
+            
+            if (bufferIndex /*- 1*/ < 0) return; // Not enough data to reconcile
+
+            // If we are the host there is no latency, so the last server state has not been process
+            rewindState = /*IsHost ? serverStateBuffer.Get(bufferIndex - 1) :*/ lastServerState;
+
+            positionError = Vector3.Distance(rewindState.position, clientStateBuffer.Get(bufferIndex).position);
+            if(positionError > reconciliationThreshold)
+            {
+                ReconcileState(rewindState);
+            }
+
+            lastProcessedState = rewindState;
+        }
+
+        void ReconcileState(StatePayload state)
+        {
+            Debug.Log($"Reconciliation tick:{state.tick}");
+
+            rb.position = state.position;
+            transform.rotation = state.rotation;
+            rb.velocity  = state.velocity;
+
+            // Add the state to the client buffer
+            clientStateBuffer.Add(state, state.tick);
+
+            // Replay all the input from the rewind state to the current state
+            int tickToReplay = state.tick;
+            while(tickToReplay < timer.CurrentTick)
+            {
+                int bufferIndex = tickToReplay % bufferSize;
+                StatePayload clientState = ProcessMove(clientInputBuffer.Get(bufferIndex).inputVector, tickToReplay);
+                clientStateBuffer.Add(clientState, bufferIndex);
+                tickToReplay++;
+            }
+
+
         }
 
         void HandleServerTick()

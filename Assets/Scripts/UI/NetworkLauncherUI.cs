@@ -14,9 +14,8 @@ namespace WLL_NGO.UI
 
             NetworkLauncher.Instance.StartClient();
 
-
 #else
-            ClientMatchmaker.Instance.Play(Gameplay.GameMode.Classic);
+            ClientMatchmaker.Instance.Play(GameMode.Classic);
 #endif
         }
 
