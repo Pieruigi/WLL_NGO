@@ -29,6 +29,7 @@ namespace WLL_NGO.Netcode
             if (!dedicatedServer) // For client
             {
 #if NO_MM
+                // Local test with no matchmaking
                 port = Constants.NoMatchmakingTestingPort;
                 ip = "127.0.0.1";
 

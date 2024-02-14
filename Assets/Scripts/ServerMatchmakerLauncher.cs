@@ -42,17 +42,16 @@ namespace WLL_NGO
 
             if (failed)
             {
-                // Something goes wrong, shutdown
-                //ServerMatchmaker.Instance.Shutdown();
+                // Something goes wrong, just quit
                 Application.Quit();
             }
             else
             {
 #if NO_MM
-                // Just invoke the matchmaker payload result
+                // We are testing connecting directoy to a local server so we just simulate a matchmaking response
                 ServerMatchmaker.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
 #else
-                // Start matchmaker manager
+                // Start the matchmaker handler
                 ServerMatchmaker.Instance.StartUp();
 #endif
             }
