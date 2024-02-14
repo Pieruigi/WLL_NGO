@@ -4,10 +4,9 @@ using UnityEngine;
 
 namespace WLL_NGO.Interfaces
 {
-    public interface IExternalAuthenticator
+    public interface IInputHandler
     {
-        string GetPlayerId();
-        
+        public InputData GetInput();
     }
 
 }

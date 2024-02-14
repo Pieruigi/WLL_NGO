@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Netcode;
 
-namespace WLL_NGO.Gameplay
+namespace WLL_NGO.Netcode
 {
     /// <summary>
     /// Manager for player info 
@@ -209,6 +209,15 @@ namespace WLL_NGO.Gameplay
                 if(!player.Ready) return false;
             }
             return true;
+        }
+
+        public PlayerInfo GetLocalPlayerInfo(bool bot)
+        {
+            foreach(var player in players)
+            {
+                if(player.ClientId == NetworkManager.LocalClientId && bot) return player;
+            }
+            return default;
         }
 
         

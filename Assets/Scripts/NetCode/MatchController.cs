@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace WLL_NGO.Gameplay
+namespace WLL_NGO.Netcode
 {
     /// <summary>
     /// NotReady: waiting for all players to be ready

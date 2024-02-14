@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
-using WLL_NGO.Gameplay;
 
-namespace WLL_NGO.Gameplay
+namespace WLL_NGO.Netcode
 {
     public class PlayerControllerManager : SingletonNetwork<PlayerControllerManager>
     {
@@ -44,8 +43,9 @@ namespace WLL_NGO.Gameplay
             GameObject go = Instantiate(playerPrefabList.PrefabList[0].Prefab);
             PlayerController pc = go.GetComponent<PlayerController>();
             pc.Init(playerInfo);
-            pc.transform.position = Vector3.zero;
-            pc.transform.rotation = Quaternion.identity;
+            Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
+            pc.transform.position = spawnPoint.position;
+            pc.transform.rotation = spawnPoint.rotation;
             NetworkObject no = go.GetComponent<NetworkObject>();
             no.Spawn();
             
@@ -55,6 +55,18 @@ namespace WLL_NGO.Gameplay
         public void AddPlayerController(PlayerController playerController)
         {
             playerControllers.Add(playerController);
+        }
+
+        public List<PlayerController> GetLocalPlayerControllers(bool bot)
+        {
+            List<PlayerController> ret = new List<PlayerController>();
+            foreach(PlayerController playerController in playerControllers) 
+            {
+                if(playerController.PlayerInfo.IsLocal && playerController.PlayerInfo.Bot == bot)
+                    ret.Add(playerController);
+            }
+
+            return ret;
         }
     }
 

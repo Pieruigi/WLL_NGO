@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using WLL_NGO.Gameplay;
+using WLL_NGO.Netcode;
 
 namespace WLL_NGO
 {

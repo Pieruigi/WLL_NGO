@@ -8,7 +8,6 @@ using Unity.Services.Matchmaker;
 using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.Events;
-using WLL_NGO.Gameplay;
 
 #if NO_MM
 
@@ -207,10 +206,10 @@ namespace WLL_NGO.Multiplay
         string GetExternalPlayerId()
         {
             // Try to get the player id from the authentication manager ( ex playfab )
-            var authManager = new List<Transform>(FindObjectsOfType<Transform>()).Find(t => t.GetComponent<Services.Interfaces.IExternalAuthenticator>() != null);
+            var authManager = new List<Transform>(FindObjectsOfType<Transform>()).Find(t => t.GetComponent<Interfaces.IExternalAuthenticator>() != null);
             Debug.Log($"AuthManager:{authManager}");
             if (authManager)
-                return (authManager.GetComponent<Services.Interfaces.IExternalAuthenticator>()).GetPlayerId();
+                return (authManager.GetComponent<Interfaces.IExternalAuthenticator>()).GetPlayerId();
             else
                 return GetInternalPlayerId();
         }

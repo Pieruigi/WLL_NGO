@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using WLL_NGO.Services;
 
-namespace WLL_NGO.Gameplay
+namespace WLL_NGO.Netcode
 {
     public class TeamController : NetworkBehaviour
     {

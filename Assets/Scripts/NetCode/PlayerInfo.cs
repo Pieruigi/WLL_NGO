@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace WLL_NGO.Gameplay
+namespace WLL_NGO.Netcode
 {
     [System.Serializable]
     public struct PlayerInfo: INetworkSerializable, System.IEquatable<PlayerInfo>
@@ -57,6 +57,11 @@ namespace WLL_NGO.Gameplay
             set { ready = value; }
         }
 
+
+        public bool IsLocal
+        {
+            get { return clientId == NetworkManager.Singleton.LocalClientId; }
+        }
 
         /// <summary>
         /// Called by the server to create human player info.
