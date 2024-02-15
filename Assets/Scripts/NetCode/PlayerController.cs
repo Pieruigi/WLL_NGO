@@ -19,11 +19,13 @@ namespace WLL_NGO.Netcode
         {
             public int tick;
             public Vector2 inputVector;
+            public bool button1;
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref inputVector);
+                serializer.SerializeValue(ref button1);
             }
         }
 
@@ -84,7 +86,7 @@ namespace WLL_NGO.Netcode
         #region netcode prediction and reconciliation
         // General
         NetworkTimer timer;
-        float serverTickRate = 60f;
+        float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
         // Client
@@ -137,8 +139,6 @@ namespace WLL_NGO.Netcode
                 HandleClientTick();
                 HandleServerTick();
 
-                // Check buttons
-                CheckButtons();
             }
 
            
@@ -163,52 +163,49 @@ namespace WLL_NGO.Netcode
 
         #region buttons
         /// <summary>
-        /// Client only
+        /// Called on both client and server
         /// </summary>
-        void CheckButtons()
+        /// <param name="value"></param>
+        /// <param name="tick"></param>
+        /// <param name="client"></param>
+        void CheckButton1(bool value, int tick, bool client)
         {
-            int tick = timer.CurrentTick;
-            CheckButton1(tick);
-        }
-
-        void CheckButton1(int tick)
-        {
-            if (!IsOwner || !Selected)
+            if ((client && IsServer) || (!client && !IsServer))
                 return;
 
-            if(input.button1 != button1LastValue)
+            if(value != button1LastValue)
             {
-                if (input.button1)
+                if (value)
                 {
                     // Start charging
-                    Debug.Log("Start chargin shot");
+                    Debug.Log("Start charging...");
                 }
                 else
                 {
-                    Debug.Log("Shooting...");
+                    Debug.Log("Shoot");
                     // Shoot
-                    BallController.Instance.Shoot(this, new Vector3(0f, .5f, .5f).normalized * 5);
+                    Vector3 dir = new Vector3(0.5f, .5f, 0f);
+                    if (BallController.Instance.transform.position.x > 0)
+                        dir = new Vector3(-0.5f, .5f, 0f);
+                    BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + 32);
+                 
                 }
             }
             else
             {
-                if (input.button1)
+                if (value)
                 {
                     // Charge shot
-                    Debug.Log("Charging...");
+                    Debug.Log("Keep charging...");
                 }
             }
-            button1LastValue = input.button1;
+            button1LastValue = value;
         }
+
+        
         #endregion
 
-        #region buttons
-        [ServerRpc]
-        void Button1DownServerRpc(int tick, bool value)
-        {
 
-        }
-        #endregion
 
         #region predicted movement
         void HandleClientTick()
@@ -225,7 +222,8 @@ namespace WLL_NGO.Netcode
                 InputPaylod payload = new InputPaylod()
                 {
                     tick = currentTick,
-                    inputVector = input.joystick
+                    inputVector = input.joystick,
+                    button1 = input.button1
                 };
                 // Add the input to the buffer
                 clientInputBuffer.Add(payload, bufferIndex);
@@ -233,13 +231,22 @@ namespace WLL_NGO.Netcode
                 // Send the input to the server
                 SendToServerRpc(payload);
 
-                //
-                // Process movement locally
-                //
-                StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
-                clientStateBuffer.Add(statePayload, bufferIndex);
-                //UnityEngine.Debug.Log(statePayload);
-                HandleReconciliation();
+                if (!IsHost)
+                {
+                    //
+                    // Process movement locally
+                    //
+                    StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
+                    clientStateBuffer.Add(statePayload, bufferIndex);
+                    //UnityEngine.Debug.Log(statePayload);
+                    HandleReconciliation();
+
+                    //
+                    // Check buttons
+                    //
+                    CheckButton1(payload.button1, currentTick, true);
+                }
+                
             }
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
             {
@@ -268,7 +275,10 @@ namespace WLL_NGO.Netcode
                 //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
-
+                //
+                // Server check buttons
+                //
+                CheckButton1(input.button1, input.tick, false);
             }
 
             if (bufferIndex == -1) return; // No data
@@ -304,7 +314,7 @@ namespace WLL_NGO.Netcode
         void HandleReconciliation()
         {
             // If we are playing as the host we don't need reconciliation at all
-            if (IsHost || !ReconciliationAllowed())
+            if (!ReconciliationAllowed())
                 return;
 
             float positionError;
@@ -361,9 +371,10 @@ namespace WLL_NGO.Netcode
         void SendToServerRpc(InputPaylod input)
         {
             // We don't need to send data to the server if we are the host
-            if (IsHost) return;
+            //if (IsHost) return;
             // Put at the end of the queue
             serverInputQueue.Enqueue(input);
+            Debug.Log($"Server input:{input.button1}");
         }
 
         /// <summary>
@@ -459,17 +470,11 @@ namespace WLL_NGO.Netcode
         /// </summary>
         void CheckInput()
         {
-            //Debug.Log($"InputHandler:{inputHandler}");
-            //Debug.Log($"InputHandler:{Selected}");
-            //Debug.Log($"InputHandler:{IsOwner}");
-
-            if (inputHandler == null || !IsOwner || !Selected) return;
-
-
-
+            if (inputHandler == null || !IsOwner || !Selected) 
+                return;
+            
             input = inputHandler.GetInput();
-            
-            
+            Debug.Log($"Client input:{input}");
         }
 
         /// <summary>
