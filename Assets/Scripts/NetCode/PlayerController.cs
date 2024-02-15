@@ -33,6 +33,7 @@ namespace WLL_NGO.Netcode
             public Vector3 position;
             public Quaternion rotation;
             public Vector3 velocity;
+            public Vector3 angularVelocity;
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
@@ -40,11 +41,12 @@ namespace WLL_NGO.Netcode
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
                 serializer.SerializeValue(ref velocity);
+                serializer.SerializeValue(ref angularVelocity);
             }
 
             public override string ToString()
             {
-                return $"[StatePayload tick:{tick}, position:{position}, rotation:{rotation}, velocity:{velocity}]";
+                return $"[StatePayload tick:{tick}, position:{position}, rotation:{rotation}, velocity:{velocity}, angularVelocity:{angularVelocity}]";
             }
         }
 
@@ -73,10 +75,10 @@ namespace WLL_NGO.Netcode
         }
 
         #region input data
+        [SerializeField]
         IInputHandler inputHandler;
-        //Vector3 inputMove;
         InputData input;
-        bool shootInput, passInput;
+        bool button1LastValue, button2LastValue, button3LastValue;
         #endregion
 
         #region netcode prediction and reconciliation
@@ -124,6 +126,7 @@ namespace WLL_NGO.Netcode
             // Update the network timer 
             timer.Update(Time.deltaTime);
 
+            
         }
 
         private void FixedUpdate()
@@ -133,7 +136,12 @@ namespace WLL_NGO.Netcode
             {
                 HandleClientTick();
                 HandleServerTick();
+
+                // Check buttons
+                CheckButtons();
             }
+
+           
         }
 
         public override void OnNetworkSpawn()
@@ -153,6 +161,56 @@ namespace WLL_NGO.Netcode
             OnSpawned?.Invoke(this);
         }
 
+        #region buttons
+        /// <summary>
+        /// Client only
+        /// </summary>
+        void CheckButtons()
+        {
+            int tick = timer.CurrentTick;
+            CheckButton1(tick);
+        }
+
+        void CheckButton1(int tick)
+        {
+            if (!IsOwner || !Selected)
+                return;
+
+            if(input.button1 != button1LastValue)
+            {
+                if (input.button1)
+                {
+                    // Start charging
+                    Debug.Log("Start chargin shot");
+                }
+                else
+                {
+                    Debug.Log("Shooting...");
+                    // Shoot
+                    BallController.Instance.Shoot(this, new Vector3(0f, .5f, .5f).normalized * 5);
+                }
+            }
+            else
+            {
+                if (input.button1)
+                {
+                    // Charge shot
+                    Debug.Log("Charging...");
+                }
+            }
+            button1LastValue = input.button1;
+        }
+        #endregion
+
+        #region buttons
+        [ServerRpc]
+        void Button1DownServerRpc(int tick, bool value)
+        {
+
+        }
+        #endregion
+
+        #region predicted movement
         void HandleClientTick()
         {
             if (!IsClient) return;
@@ -175,11 +233,12 @@ namespace WLL_NGO.Netcode
                 // Send the input to the server
                 SendToServerRpc(payload);
 
-                // Process locally
+                //
+                // Process movement locally
+                //
                 StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                 clientStateBuffer.Add(statePayload, bufferIndex);
                 //UnityEngine.Debug.Log(statePayload);
-
                 HandleReconciliation();
             }
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
@@ -201,9 +260,15 @@ namespace WLL_NGO.Netcode
                 var input = serverInputQueue.Dequeue();
                 // Get the buffer index
                 bufferIndex = input.tick % bufferSize;
+
+                //
+                // Simulate movement
+                //
                 StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
                 //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
+
+
             }
 
             if (bufferIndex == -1) return; // No data
@@ -219,7 +284,7 @@ namespace WLL_NGO.Netcode
         {
             if (state.Equals(default))
                 return;
-            WriteTransform(state.position, state.rotation, state.velocity);
+            WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
             lastProcessedState = state;
         }
 
@@ -272,7 +337,7 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Reconciliation tick:{state.tick}");
 
             // Get the last server state data
-            WriteTransform(state.position, state.rotation, state.velocity);
+            WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
            
             // Add to the client buffer
             clientStateBuffer.Add(state, state.tick);
@@ -369,11 +434,12 @@ namespace WLL_NGO.Netcode
             rb.velocity = transform.forward * speed;
         }
 
-        void WriteTransform(Vector3 position, Quaternion rotation, Vector3 velocity)
+        void WriteTransform(Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity)
         {
             rb.position = position;
             rb.rotation = rotation.normalized;
             rb.velocity = velocity;
+            rb.angularVelocity = angularVelocity;
         }
 
         StatePayload ReadTransform()
@@ -382,18 +448,27 @@ namespace WLL_NGO.Netcode
             {
                 position = rb.position,
                 rotation = rb.rotation,
-                velocity = rb.velocity
+                velocity = rb.velocity,
+                angularVelocity = rb.angularVelocity
+                
             };
         }
-
+        #endregion
         /// <summary>
         /// To replace with an input handler ( in order to support AI )
         /// </summary>
         void CheckInput()
         {
-            if(inputHandler == null || !IsOwner || !Selected) return;
+            //Debug.Log($"InputHandler:{inputHandler}");
+            //Debug.Log($"InputHandler:{Selected}");
+            //Debug.Log($"InputHandler:{IsOwner}");
+
+            if (inputHandler == null || !IsOwner || !Selected) return;
+
+
 
             input = inputHandler.GetInput();
+            
             
         }
 
@@ -408,7 +483,7 @@ namespace WLL_NGO.Netcode
 
         public void SetInputHandler(IInputHandler inputHandler)
         {
-            Debug.Log("PlayerController setting input handler");
+            Debug.Log($"PlayerController setting input handler:{inputHandler}");
             this.inputHandler = inputHandler;
         }
 

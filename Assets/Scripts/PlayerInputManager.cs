@@ -8,13 +8,22 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO
 {
-
+    [System.Serializable]
     public struct InputData
     {
+        [SerializeField]
         public Vector2 joystick;
+        [SerializeField]
         public bool button1;
+        [SerializeField]
         public bool button2;
+        [SerializeField]
         public bool button3;
+
+        public override string ToString()
+        {
+            return $"[Input joystick:{joystick}, button1:{button1}, button2:{button2}, button3:{button3}]";
+        }
     }
 
     [System.Serializable]
@@ -25,7 +34,7 @@ namespace WLL_NGO
             return new InputData()
             {
                 joystick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized,
-                button1 = false,
+                button1 = Input.GetKeyDown(KeyCode.Keypad1),
                 button2 = false,
                 button3 = false
             };
@@ -40,16 +49,13 @@ namespace WLL_NGO
         protected override void Awake()
         {
             base.Awake();
-            if (NetworkManager.Singleton.IsClient)
-            {
-                Debug.Log("Creating the human input handler");
-                // Create a human input handler
-                humanInputHandler = new HumanInputHandler();
-            }
+
+            
         }
 
         private void OnEnable()
         {
+          
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
         }
 
@@ -59,6 +65,15 @@ namespace WLL_NGO
         /// <param name="pc"></param>
         void HandleOnPlayerControllerSpawned(PlayerController pc)
         {
+            if(humanInputHandler == null)
+            {
+                
+                if (NetworkManager.Singleton.IsClient)
+                {
+                    // Create a human input handler
+                    humanInputHandler = new HumanInputHandler();
+                }
+            }
             
             pc.SetInputHandler(humanInputHandler);
         }

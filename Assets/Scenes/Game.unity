@@ -1238,8 +1238,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22fca9e94a8f81848978417a2b8edc90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homeGroup: {fileID: 2109636328}
-  awayGroup: {fileID: 286054707}
+  homeList:
+  - {fileID: 1259510629}
+  - {fileID: 1534364524}
+  - {fileID: 751178377}
+  - {fileID: 1148083848}
+  - {fileID: 1688116509}
+  awayList:
+  - {fileID: 1239692423}
+  - {fileID: 1173141384}
+  - {fileID: 133058863}
+  - {fileID: 1293067341}
+  - {fileID: 1614645028}
 --- !u!4 &2138547940
 Transform:
   m_ObjectHideFlags: 0

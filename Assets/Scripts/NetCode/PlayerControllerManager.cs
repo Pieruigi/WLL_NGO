@@ -68,6 +68,16 @@ namespace WLL_NGO.Netcode
 
             return ret;
         }
+
+        public PlayerController GetPlayerCotrollerByNetworkObjectId(ulong networkObjectId)
+        {
+            foreach(PlayerController playerController in playerControllers)
+            {
+                if (playerController.NetworkObjectId == networkObjectId)
+                    return playerController;
+            }
+            return null;
+        }
     }
 
 }
