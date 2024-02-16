@@ -8,6 +8,13 @@ using static WLL_NGO.Netcode.PlayerController;
 
 namespace WLL_NGO.Netcode
 {
+    /// <summary>
+    /// The ball uses the same logic of the client controller but with a different implementation.
+    /// Basically the client reads the input and sends it to the server with the corresponding tick; the server then processes the input and, for example, tells the 
+    /// client to shoot, but since we have to play some animation bofore we can physically shoot, the server can tell all the clients that the player is shooting 
+    /// at a given tick; doing so all the clients and the server would be able to shoot at the same time ( if you have 1 second of lag this is not going to work 
+    /// for you of course, but in that case nothing is going to work ).
+    /// </summary>
     public class BallController : SingletonNetwork<BallController>
     {
         public struct StatePayload : INetworkSerializable
@@ -228,18 +235,26 @@ namespace WLL_NGO.Netcode
 
         #endregion
 
-       
-        public async void ShootAtTick(PlayerController player, Vector3 force, int tick)
+        [ClientRpc]
+        private void ShootAtTickClientRpc(ulong playerNetObjId, Vector3 force, int tick)
+        {
+            ShootAtTick(PlayerControllerManager.Instance.GetPlayerCotrollerByNetworkObjectId(playerNetObjId), force, tick);
+        }
+
+
+        public async void ShootAtTick(PlayerController player, Vector3 velocity, int tick)
         {
             Debug.Log($"Shoot at tick {tick}");
 
             // You can not shoot the ball it's controlled by another player
             if (owner != null && owner != player) return;
             
-
+            if(IsServer && !IsHost)
+                ShootAtTickClientRpc(player.NetworkObjectId, velocity, tick);
+            
             if(timer.CurrentTick > tick)
             {
-                rb.AddForce(force, ForceMode.VelocityChange);
+                rb.velocity = velocity;
             }
             else
             {
@@ -247,7 +262,8 @@ namespace WLL_NGO.Netcode
                 {
                     await Task.Delay(1000/Constants.ServerTickRate);
                 }
-                rb.AddForce(force, ForceMode.VelocityChange);
+                // Check if you can still shoot the ball first
+                rb.velocity = velocity;
             }
                 
         }

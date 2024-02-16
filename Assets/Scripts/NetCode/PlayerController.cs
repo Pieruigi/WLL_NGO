@@ -8,8 +8,29 @@ using WLL_NGO.Interfaces;
 
 namespace WLL_NGO.Netcode
 {
-    
 
+    /// <summary>
+    /// Player controller with server authority and client side prediction and reconciliation explained.
+    /// The game time is splitted in frames ( called ticks ) with length equal to 1/serverFrameRate ( ex: 1/60ms=1.67ms ) ( Check the NetworkTimer class ).
+    /// On each tick the client reads the input and moves the player accordingly storing the new state to the client state buffer; at the same time stores the input and 
+    /// the current tick in another buffer and sent it to the server ( check HandleClientTick() );. 
+    /// The server receives from the client the input which is used to move the player by simulating the physics tick by tick; each new state is then stored in a state 
+    /// buffer with the corresponding tick; the last processed state on server is then sent back to the client ( check HandleServerTick() ).
+    /// The client receives the last state from the server and compares it with the state having the same tick from its buffer: if these two states are not equal a 
+    /// reconciliation is needed.
+    /// If a reconciliation is needed the client sets the player back to the last received state resimulating the physics from that tick to the current tick ( the reason we
+    /// need to resimulate is that the state received by the server is behind the client current tick due to the lag ).
+    /// If a player is not a local player ( ex. the opponent team ) or is not selected ( you can select only one player at the time in your team ) we call the 
+    /// ApplyNotOwnedOrUnselectedClientState(lastServerState) with the last server state we just received ( basically is kind of a reconciliation without 
+    /// any prediction ); this happens because we don't have any input in order to make any prediction client side: if the player is owned by another client the input 
+    /// is from that client and if we owned the player but its not the selected one at this moment then the input is directly set on the server by the AI.
+    /// 
+    /// Input controller.
+    /// The player controller always receives input both from human and AI; this means that the AI never tells the player to move or shoot, instead sets the input 
+    /// like a human would do ( for example to shoot the AI sets the corresponding button to true and after a while sets it back to false thus triggering 
+    /// the shooting routine ).
+    /// 
+    /// </summary>
 
     public class PlayerController : NetworkBehaviour
     {
@@ -170,7 +191,10 @@ namespace WLL_NGO.Netcode
         /// <param name="client"></param>
         void CheckButton1(bool value, int tick, bool client)
         {
-            if ((client && IsServer) || (!client && !IsServer))
+            //if ((client && IsServer) || (!client && !IsServer))
+            //    return;
+
+            if (!IsServer)
                 return;
 
             if(value != button1LastValue)
@@ -182,12 +206,17 @@ namespace WLL_NGO.Netcode
                 }
                 else
                 {
-                    Debug.Log("Shoot");
-                    // Shoot
-                    Vector3 dir = new Vector3(0.5f, .5f, 0f);
-                    if (BallController.Instance.transform.position.x > 0)
-                        dir = new Vector3(-0.5f, .5f, 0f);
-                    BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + 32);
+                    //if (IsServer)
+                    {
+                        Debug.Log("Shoot");
+                        // Shoot
+                        Vector3 dir = new Vector3(0.5f, .5f, 0f);
+                        if (BallController.Instance.transform.position.x > 0)
+                            dir = new Vector3(-0.5f, .5f, 0f);
+                        int aheadTick = 32;
+                        BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + aheadTick);
+                    }
+                    
                  
                 }
             }
@@ -242,9 +271,9 @@ namespace WLL_NGO.Netcode
                     HandleReconciliation();
 
                     //
-                    // Check buttons
+                    // Check buttons ( we can check directly on server )
                     //
-                    CheckButton1(payload.button1, currentTick, true);
+                    //CheckButton1(payload.button1, currentTick, true); 
                 }
                 
             }
@@ -276,7 +305,7 @@ namespace WLL_NGO.Netcode
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
-                // Server check buttons
+                // Check buttons
                 //
                 CheckButton1(input.button1, input.tick, false);
             }
@@ -296,6 +325,7 @@ namespace WLL_NGO.Netcode
                 return;
             WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
             lastProcessedState = state;
+
         }
 
         /// <summary>
