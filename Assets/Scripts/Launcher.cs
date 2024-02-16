@@ -8,6 +8,9 @@ using ParrelSync;
 
 namespace WLL_NGO
 {
+    /// <summary>
+    /// The main launcher simply reads arguments to check whether the app is a client or the server.
+    /// </summary>
     public class Launcher : MonoBehaviour
     {
        
@@ -18,10 +21,12 @@ namespace WLL_NGO
         {
             if(Utility.IsDedicatedServer())
             {
+                // Server
                 SceneManager.LoadScene(Constants.ServerMainScene);
             }
             else
             {
+                // Client
                 SceneManager.LoadScene(Constants.ClientMainScene);
             }
         }

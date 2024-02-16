@@ -11,6 +11,11 @@ using UnityEngine.Events;
 
 namespace WLL_NGO.Multiplay
 {
+    /// <summary>
+    /// The server matchmaker handles the matchmaking payload from the Unity cloud matchmaking.
+    /// Once we received the assignement payload we call the OnMatchMakerPayload event that would be intercepted by the NetCode server manager.
+    /// If for some reason we receive an error or the timeout elapeses we just shutdown the application thus releasing the server on the cloud.
+    /// </summary>
     public class ServerMatchmaker : Singleton<ServerMatchmaker>
     {
         public static UnityAction<MatchmakingResults> OnMatchmakerPayload;
@@ -79,6 +84,8 @@ namespace WLL_NGO.Multiplay
 
                     await MultiplayService.Instance.ReadyServerForPlayersAsync();
                     StartCoroutine(QueryServer());
+
+                    // Matchmaking succeded, we call the event
                     OnMatchmakerPayload?.Invoke(matchmakerPayload);
 
                 }

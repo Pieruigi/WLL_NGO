@@ -18,6 +18,10 @@ using ParrelSync;
 
 namespace WLL_NGO.Multiplay
 {
+    /// <summary>
+    /// This class just handle the matchmaking process client side.
+    /// We just wait for the ticket; once ticket arrived we call the OnTicketAssigned event.
+    /// </summary>
     public class ClientMatchmaker : Singleton<ClientMatchmaker>
     {
         public static UnityAction<MultiplayAssignment> OnTicketAssigned;

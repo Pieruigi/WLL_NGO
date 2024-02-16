@@ -98,9 +98,9 @@ GameObject:
   - component: {fileID: 9086562094296644551}
   - component: {fileID: 8398768210163080331}
   - component: {fileID: 8400886149005878951}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ball
-  m_TagString: Untagged
+  m_TagString: Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -161,7 +161,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1

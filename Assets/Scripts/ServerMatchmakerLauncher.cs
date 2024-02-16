@@ -10,7 +10,7 @@ using WLL_NGO.Services;
 namespace WLL_NGO
 {
     /// <summary>
-    /// Load data from external sources ( for example the whole catalog from playfab ) and then launch the matchmaker service on server.
+    /// Before we can start the matchmaking listening routine we might need to load some data from extarnal sources ( for example the catalog from PlayFab ).
     /// </summary>
     public class ServerMatchmakerLauncher : MonoBehaviour
     {
@@ -21,8 +21,7 @@ namespace WLL_NGO
 
         async void Launch()
         {
-            // Prefetch data ( for example the full catalog )
-            // We load all needed data before we enter the lobby room
+            // We start loading data and wait for all the loading tasks to complete before we launch the matchmaking linstening routine.
             List<Task<FetchDataResponse<string>>> tasks = new List<Task<FetchDataResponse<string>>>();
             tasks.Add(GameServerDataFetcher.FetchAll());
             await Task.WhenAll(tasks.ToArray());
@@ -31,6 +30,7 @@ namespace WLL_NGO
             {
                 if (!t.Result.Succeeded)
                 {
+                    // We failed for some reason.
                     failed = true;
                     break;
                 }
@@ -42,13 +42,14 @@ namespace WLL_NGO
 
             if (failed)
             {
-                // Something goes wrong, just quit
+                // Something goes wrong, just quit the application and release the cloud server.
                 Application.Quit();
             }
             else
             {
+                // Ok, we loaded all we need, just start the matchmaking routine.
 #if NO_MM
-                // We are testing connecting directoy to a local server so we just simulate a matchmaking response
+                // We are testing connecting directly to a local server so we just simulate a matchmaking response
                 ServerMatchmaker.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
 #else
                 // Start the matchmaker handler

@@ -9,11 +9,11 @@ using static WLL_NGO.Netcode.PlayerController;
 namespace WLL_NGO.Netcode
 {
     /// <summary>
-    /// The ball uses the same logic of the client controller but with a different implementation.
-    /// Basically the client reads the input and sends it to the server with the corresponding tick; the server then processes the input and, for example, tells the 
-    /// client to shoot, but since we have to play some animation bofore we can physically shoot, the server can tell all the clients that the player is shooting 
-    /// at a given tick; doing so all the clients and the server would be able to shoot at the same time ( if you have 1 second of lag this is not going to work 
-    /// for you of course, but in that case nothing is going to work ).
+    /// The ball uses the same logic as the client controller but with a slightly different implementation.
+    /// Basically the client reads the input and sends it to the server with the corresponding tick ( in the HandleClientTick() method ); at this point the server 
+    /// processes the input and, for example, tells the client to shoot ( if the input was about shooting ), but since we have to play some animation before we can 
+    /// actually shoot, the server can tell all the clients that the player is shooting at a specific tick in the future; doing so all the clients and the server 
+    /// would be able to shoot at the same time ( if you have 1 second of lag this is not going to work for you of course, but in that case nothing is going to work ).
     /// </summary>
     public class BallController : SingletonNetwork<BallController>
     {
@@ -40,10 +40,8 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        /// <summary>
-        /// Stored value is the PlayerController.NetworkObjectId
-        /// </summary>
-        NetworkVariable<ulong> ownerNetObjId = new NetworkVariable<ulong>(0);
+
+        NetworkVariable<NetworkObjectReference> ownerReference = new NetworkVariable<NetworkObjectReference>(default);
 
         PlayerController owner = null;
 
@@ -85,16 +83,16 @@ namespace WLL_NGO.Netcode
             if (Input.GetKeyDown(KeyCode.Q))
             {
 
-                if(ownerNetObjId.Value == 0)
+                if (!owner)
                 {
-                    PlayerController pc = FindObjectsOfType<PlayerController>().Where(p=>p.OwnerClientId == NetworkManager.Singleton.LocalClientId).First();
+                    PlayerController pc = FindObjectsOfType<PlayerController>().Where(p => p.OwnerClientId == 1).First();
                     Debug.Log($"Ball - pc:{pc.PlayerInfo}");
-                    ownerNetObjId.Value = pc.NetworkObjectId;
+                    ownerReference.Value = pc.NetworkObject;
                 }
                 else
                 {
 
-                    ownerNetObjId.Value = 0;
+                    ownerReference.Value = default;
                 }
             }
 #endif
@@ -114,23 +112,37 @@ namespace WLL_NGO.Netcode
             base.OnNetworkSpawn();
 
             // Owner change event handler
-            ownerNetObjId.OnValueChanged += HandleOnOwnerChanged;
+            ownerReference.OnValueChanged += HandleOnOwnerReferenceChanged;
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
             // Owner change event handler
-            ownerNetObjId.OnValueChanged -= HandleOnOwnerChanged;
+            ownerReference.OnValueChanged -= HandleOnOwnerReferenceChanged;
         }
         
-        void HandleOnOwnerChanged(ulong oldValue, ulong newValue)
+        void HandleOnOwnerReferenceChanged(NetworkObjectReference oldRef, NetworkObjectReference newRef)
         {
-            Debug.Log($"Owner changed:{oldValue}->{newValue}");
-            owner = newValue > 0 ? PlayerControllerManager.Instance.GetPlayerCotrollerByNetworkObjectId(newValue) : null;
+            // Try get the controller and set the owner 
+            NetworkObject player = null;
+            owner = newRef.TryGet(out player) ? player.GetComponent<PlayerController>() : null;
+
+            // The owner must start handling the ball
+            if(owner != null) 
+                owner.StartHandlingTheBall();
+
+            // The old owner must eventually stop handling the ball
+            if(oldRef.TryGet(out player))
+                player.GetComponent<PlayerController>().StopHandlingTheBall();
+
         }
 
+
         #region prediction and reconciliation
+        /// <summary>
+        /// Executed on the client: simulates the physics, puts the state into a circular buffer and check for reconciliation on every tick.
+        /// </summary>
         void HandleClientTick()
         {
             if (!IsClient || IsHost)
@@ -144,6 +156,9 @@ namespace WLL_NGO.Netcode
             Reconciliate();
         }
 
+        /// <summary>
+        /// Executed on the server: simulates the physics and send the last state to all clients to allow reconciliation.
+        /// </summary>
         void HandleServerTick()
         {
             if(!IsServer)
@@ -235,12 +250,27 @@ namespace WLL_NGO.Netcode
 
         #endregion
 
+        #region gameplay
+
+        /// <summary>
+        /// Tell all the clients that a given player is going to shoot in few ticks ( in the future ); this way we can shoot the ball at the same tick on both server
+        /// and client.
+        /// </summary>
+        /// <param name="playerRef"></param>
+        /// <param name="force"></param>
+        /// <param name="tick"></param>
         [ClientRpc]
-        private void ShootAtTickClientRpc(ulong playerNetObjId, Vector3 force, int tick)
+        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, Vector3 force, int tick)
         {
-            ShootAtTick(PlayerControllerManager.Instance.GetPlayerCotrollerByNetworkObjectId(playerNetObjId), force, tick);
+            NetworkObject player = null;
+            if(playerRef.TryGet(out player))
+            {
+                ShootAtTick(player.GetComponent<PlayerController>(), force, tick);
+            }
+            
         }
 
+       
 
         public async void ShootAtTick(PlayerController player, Vector3 velocity, int tick)
         {
@@ -250,7 +280,7 @@ namespace WLL_NGO.Netcode
             if (owner != null && owner != player) return;
             
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(player.NetworkObjectId, velocity, tick);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), velocity, tick);
             
             if(timer.CurrentTick > tick)
             {
@@ -267,6 +297,59 @@ namespace WLL_NGO.Netcode
             }
                 
         }
+
+        /// <summary>
+        /// Evaluation function to decretate a winner during tackles
+        /// </summary>
+        /// <param name="playerA"></param>
+        /// <param name="playerB"></param>
+        /// <returns></returns>
+        PlayerController EvaluateTackleWinner(PlayerController playerA, PlayerController playerB)
+        {
+            return playerA;
+        }
+
+        /// <summary>
+        /// A player in on the ball, we must check if the player can handle it
+        /// </summary>
+        /// <param name="player"></param>
+        public void BallEnterTheHandleTrigger(PlayerController player)
+        {
+            if (IsServer)
+            {
+                PlayerController winner = player;
+                // If any opponent player is owning the ball we need to call the evaluate function to choose the winner
+                if (!owner)
+                {
+                    winner = EvaluateTackleWinner(player, owner);
+                    PlayerController loser = winner == player ? owner : player;
+
+                    // DoSomethingWithTheLoser();
+                }
+
+                // If the new player is the winner we change the ball ownership
+                if (winner != owner)
+                    ownerReference.Value = winner.NetworkObject;
+                
+            }
+        }
+
+        /// <summary>
+        /// Player off the ball, eventually loses controll.
+        /// </summary>
+        /// <param name="player"></param>
+        public void BallExitTheHandleTrigger(PlayerController player)
+        {
+            if(IsServer)
+            {
+                if(owner == player)
+                {
+                    ownerReference.Value = default;
+                }
+            }
+        }
+
+        #endregion
     }
 
 }

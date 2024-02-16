@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5021535250000037411}
   - component: {fileID: 4030349836265827069}
   - component: {fileID: 4811291496623610298}
+  - component: {fileID: 4740438017715738416}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -84,6 +85,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &4740438017715738416
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700231031890014880}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1791793885155437252
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,9 +121,9 @@ GameObject:
   - component: {fileID: 2077941696809860174}
   - component: {fileID: 7767129766027385350}
   - component: {fileID: 6351814172465425121}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136,6 +160,7 @@ MonoBehaviour:
   rotationSpeed: 720
   acceleration: 10
   deceleration: 30
+  ballHandleTrigger: {fileID: 4740438017715738416}
 --- !u!114 &2077941696809860174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +194,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0

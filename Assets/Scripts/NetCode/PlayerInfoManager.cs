@@ -8,7 +8,13 @@ using WLL_NGO.Netcode;
 namespace WLL_NGO.Netcode
 {
     /// <summary>
-    /// Manager for player info 
+    /// This class handles with the PlayerInfo class.
+    /// When a new client connects to the game server a new player info is created to the server and synchronized with all the clients.
+    /// The client owning the created player info sends all the needed info to the server ( for example the PlayFabId and the team roster ) that flags 
+    /// the player has 'initialized'.
+    /// The flag 'ready' instead means that the client has properly loaded the game scene ( I mean addressables and other needed stuff ) and works the same as the 
+    /// initialize flag. 
+    /// When all players are ready the match can finally start ( check the MatchHandler class for more info ).
     /// </summary>
 #if USE_LOBBY_SCENE
     public class PlayerInfoManager : SingletonNetworkPersistent<PlayerInfoManager>

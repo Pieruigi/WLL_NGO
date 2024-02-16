@@ -5,9 +5,11 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Interfaces;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace WLL_NGO.Netcode
 {
+    
 
     /// <summary>
     /// Player controller with server authority and client side prediction and reconciliation explained.
@@ -73,6 +75,9 @@ namespace WLL_NGO.Netcode
             }
         }
 
+        NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
+
+
 
         [SerializeField]
         float maxSpeed = 5f;
@@ -87,7 +92,13 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         float deceleration = 30f;
 
-        //CharacterController cc;
+        /// <summary>
+        /// When the ball enters this trigger the player can become the owner under certain conditions.
+        /// </summary>
+        [SerializeField]
+        Collider ballHandleTrigger;
+
+        bool canHandleTheBall = true;
         Rigidbody rb;
 
         bool moving = false;
@@ -178,6 +189,9 @@ namespace WLL_NGO.Netcode
                 NetworkObject no = GetComponent<NetworkObject>();
                 no.ChangeOwnership(PlayerInfo.ClientId);
             }
+
+            // Player state changed event handler
+            playerState.OnValueChanged += HandleOnPlayerStateChanged;
 
             OnSpawned?.Invoke(this);
         }
@@ -456,7 +470,21 @@ namespace WLL_NGO.Netcode
        
         private void Move(Vector2 moveInput)
         {
+            switch (playerState.Value)
+            {
+                case (byte)PlayerState.Normal:
+                    UpdateNormalMovement(moveInput);
+                    break;
+                case (byte)PlayerState.Stunned:
+                    UpdateStunnedMovement();
+                    break;
+            }
 
+            
+        }
+
+        void UpdateNormalMovement(Vector2 moveInput)
+        {
             // Normalize input 
             moveInput.Normalize();
             float speed = rb.velocity.magnitude;
@@ -469,10 +497,15 @@ namespace WLL_NGO.Netcode
             else
             {
                 speed -= deceleration * Time.fixedDeltaTime;
-                if(speed < 0) speed = 0;
+                if (speed < 0) speed = 0;
             }
-            
+
             rb.velocity = transform.forward * speed;
+        }
+
+        void UpdateStunnedMovement()
+        {
+
         }
 
         void WriteTransform(Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity)
@@ -495,6 +528,23 @@ namespace WLL_NGO.Netcode
             };
         }
         #endregion
+
+        #region networked variables
+        /// <summary>
+        /// Called on client
+        /// </summary>
+        /// <param name="oldState"></param>
+        /// <param name="newState"></param>
+        void HandleOnPlayerStateChanged(byte oldState, byte newState)
+        {
+            
+        }
+
+        
+
+        #endregion
+
+        #region misc
         /// <summary>
         /// To replace with an input handler ( in order to support AI )
         /// </summary>
@@ -506,6 +556,50 @@ namespace WLL_NGO.Netcode
             input = inputHandler.GetInput();
             Debug.Log($"Client input:{input}");
         }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (playerState.Value != (byte)PlayerState.Normal && playerState.Value != (byte)PlayerState.ReceivingPassage)
+                return;
+
+            // It's the ball
+            if (other.CompareTag(Tags.Ball))
+            {
+                if(canHandleTheBall) 
+                    BallController.Instance.BallEnterTheHandleTrigger(this);
+            }
+
+            
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            // It's the ball
+            if (other.CompareTag(Tags.Ball))
+            {
+                BallController.Instance.BallExitTheHandleTrigger(this);
+            }
+        }
+
+        /// <summary>
+        /// Called both on client and server
+        /// </summary>
+        public void StartHandlingTheBall()
+        {
+            canHandleTheBall = true;
+        }
+
+        /// <summary>
+        /// Called both on client and server
+        /// </summary>
+        public void StopHandlingTheBall()
+        {
+            canHandleTheBall = false;
+        }
+
+        #endregion
+
+        #region initialization
 
         /// <summary>
         /// Called by the server when a new player controller is spawned
@@ -521,6 +615,9 @@ namespace WLL_NGO.Netcode
             Debug.Log($"PlayerController setting input handler:{inputHandler}");
             this.inputHandler = inputHandler;
         }
+        #endregion
+
+
 
         //void DoUpdate(Vector2 moveInput, bool shootDown, bool passDown)
         //{
