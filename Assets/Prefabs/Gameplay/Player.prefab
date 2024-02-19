@@ -131,8 +131,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 913458671194727743}
-  - component: {fileID: 2954089118953585079}
   - component: {fileID: 2077941696809860174}
+  - component: {fileID: 2954089118953585079}
   - component: {fileID: 7767129766027385350}
   - component: {fileID: 6351814172465425121}
   m_Layer: 7
@@ -158,24 +158,6 @@ Transform:
   - {fileID: 2584126692251767088}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2954089118953585079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1791793885155437252}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08b080c00f9e8cd409b057fa9f9a0b2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxSpeed: 5
-  rotationSpeed: 720
-  acceleration: 10
-  deceleration: 30
-  ballHandlingTrigger: {fileID: 4246186199695800569}
-  ballHook: {fileID: 689867595230150792}
 --- !u!114 &2077941696809860174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 2450753999
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -196,6 +179,24 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &2954089118953585079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1791793885155437252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08b080c00f9e8cd409b057fa9f9a0b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSpeed: 2
+  rotationSpeed: 720
+  acceleration: 10
+  deceleration: 30
+  ballHandlingTrigger: {fileID: 4246186199695800569}
+  ballHook: {fileID: 689867595230150792}
 --- !u!136 &7767129766027385350
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -181,7 +181,9 @@ namespace WLL_NGO.Netcode
             if (!IsClient || IsHost)
                 return;
 
+            Physics.simulationMode = SimulationMode.Script;
             Physics.Simulate(Time.fixedDeltaTime);
+            Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload clientState = ReadTransform();
             clientState.tick = timer.CurrentTick;
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
@@ -197,7 +199,9 @@ namespace WLL_NGO.Netcode
             if(!IsServer)
                 return;
 
+            Physics.simulationMode = SimulationMode.Script;
             Physics.Simulate(Time.fixedDeltaTime);
+            Physics.simulationMode = SimulationMode.FixedUpdate;
             // Send the current state to the client
             StatePayload state = ReadTransform();
             state.tick = timer.CurrentTick;
@@ -312,6 +316,7 @@ namespace WLL_NGO.Netcode
             // You can not shoot the ball it's controlled by another player
             if (owner != null && owner != player) return;
             
+            // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
                 ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), velocity, tick);
             

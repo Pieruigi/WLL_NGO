@@ -92,6 +92,8 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         float deceleration = 30f;
 
+        float currentSpeed = 0;
+
         /// <summary>
         /// When the ball enters this trigger the player can become the owner under certain conditions.
         /// </summary>
@@ -132,13 +134,15 @@ namespace WLL_NGO.Netcode
         CircularBuffer<StatePayload> clientStateBuffer;
         StatePayload lastServerState = default;
         StatePayload lastProcessedState;
-        float reconciliationThreshold = .5f;
+        float reconciliationThreshold = 0.5f;
 
         // Server
         CircularBuffer<StatePayload> serverStateBuffer;
         Queue<InputPaylod> serverInputQueue;
 
         #endregion
+
+        
 
         NetworkVariable<PlayerInfo> playerInfo = new NetworkVariable<PlayerInfo>();
         public PlayerInfo PlayerInfo
@@ -150,7 +154,7 @@ namespace WLL_NGO.Netcode
         {
             // Set rigidbody
             rb = GetComponent<Rigidbody>();
-
+            
             // Set handling trigger callbacks
             ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
             ballHandlingTrigger.OnBallExit += HandleOnBallExit;
@@ -163,6 +167,8 @@ namespace WLL_NGO.Netcode
             timer = new NetworkTimer(serverTickRate);
         }
 
+       
+
         private void Update()
         {
             if (IsOwner && Selected)
@@ -171,7 +177,6 @@ namespace WLL_NGO.Netcode
             // Update the network timer 
             timer.Update(Time.deltaTime);
 
-            
         }
 
         private void FixedUpdate()
@@ -189,9 +194,11 @@ namespace WLL_NGO.Netcode
                 CheckForBallHandling();
             }
 
-           
+            if (IsServer)
+                Debug.Log($"CurrentSpeed:{rb.velocity.magnitude}");
         }
 
+          
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -297,7 +304,7 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    //UnityEngine.Debug.Log(statePayload);
+                    UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
 
                     //
@@ -320,6 +327,7 @@ namespace WLL_NGO.Netcode
             if (!IsServer) return;
 
             var bufferIndex = -1;
+       
             while (serverInputQueue.Count > 0)
             {
                 // Get the first input payload
@@ -331,7 +339,7 @@ namespace WLL_NGO.Netcode
                 // Simulate movement
                 //
                 StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
-                //UnityEngine.Debug.Log(state);
+                UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
@@ -339,7 +347,7 @@ namespace WLL_NGO.Netcode
                 //
                 CheckButton1(input.button1, input.tick, false);
             }
-
+          
             if (bufferIndex == -1) return; // No data
             // We send the all clients the last state processed by the server
             SendToClientRpc(serverStateBuffer.Get(bufferIndex));
@@ -434,7 +442,6 @@ namespace WLL_NGO.Netcode
             //if (IsHost) return;
             // Put at the end of the queue
             serverInputQueue.Enqueue(input);
-            Debug.Log($"Server input:{input.button1}");
         }
 
         /// <summary>
@@ -456,10 +463,10 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         StatePayload ServerSimulateMovement(Vector2 inputMove, int tick)
         {
-            //Physics.simulationMode = SimulationMode.Script;
+            Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
             Physics.Simulate(Time.fixedDeltaTime);
-            //Physics.simulationMode = SimulationMode.FixedUpdate;
+            Physics.simulationMode = SimulationMode.FixedUpdate;
 
             StatePayload state = ReadTransform();
             state.tick = tick;
@@ -476,7 +483,10 @@ namespace WLL_NGO.Netcode
         StatePayload ClientProcessMovement(Vector2 inputMove, int tick)
         {
             // Move player and return the state payload
+            Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
+            Physics.Simulate(Time.fixedDeltaTime);
+            Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload state = ReadTransform();
             state.tick = tick;
             return state;
@@ -503,7 +513,7 @@ namespace WLL_NGO.Netcode
         {
             // Normalize input 
             moveInput.Normalize();
-            float speed = rb.velocity.magnitude;
+            float speed = currentSpeed;
             if (moveInput.magnitude > 0)
             {
                 transform.forward = new Vector3(moveInput.x, 0f, moveInput.y);
@@ -515,8 +525,8 @@ namespace WLL_NGO.Netcode
                 speed -= deceleration * Time.fixedDeltaTime;
                 if (speed < 0) speed = 0;
             }
-
-            rb.velocity = transform.forward * speed;
+            currentSpeed = speed;
+            rb.velocity = transform.forward * currentSpeed;
         }
 
         void UpdateStunnedMovement()
@@ -570,7 +580,7 @@ namespace WLL_NGO.Netcode
                 return;
             
             input = inputHandler.GetInput();
-            Debug.Log($"Client input:{input}");
+            //Debug.Log($"Client input:{input}");
         }
 
         private void HandleOnBallEnter()
@@ -578,7 +588,6 @@ namespace WLL_NGO.Netcode
             if (playerState.Value != (byte)PlayerState.Normal && playerState.Value != (byte)PlayerState.ReceivingPassage)
                 return;
 
-            Debug.Log("Enter handling trigger");
             if (canHandleTheBall) 
                 BallController.Instance.BallEnterTheHandleTrigger(this);
             
@@ -588,7 +597,6 @@ namespace WLL_NGO.Netcode
         private void HandleOnBallExit()
         {
             // It's the ball
-            Debug.Log("Exit handling trigger");
             BallController.Instance.BallExitTheHandleTrigger(this);
             
         }

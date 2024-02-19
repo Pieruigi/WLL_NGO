@@ -48,8 +48,8 @@ namespace WLL_NGO.Netcode
             pc.transform.rotation = spawnPoint.rotation;
             NetworkObject no = go.GetComponent<NetworkObject>();
             no.Spawn();
-            
 
+            //NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>(), playerInfo.ClientId, true, false, false, spawnPoint.position, spawnPoint.rotation);
         }
 
         public void AddPlayerController(PlayerController playerController)
