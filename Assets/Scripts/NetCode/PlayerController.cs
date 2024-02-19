@@ -96,9 +96,15 @@ namespace WLL_NGO.Netcode
         /// When the ball enters this trigger the player can become the owner under certain conditions.
         /// </summary>
         [SerializeField]
-        Collider ballHandleTrigger;
+        BallHandlingTrigger ballHandlingTrigger;
+
+        [SerializeField]
+        Transform ballHook;
 
         bool canHandleTheBall = true;
+        bool handlingTheBall = false;
+        float ballHookLerpSpeed = 10f;
+
         Rigidbody rb;
 
         bool moving = false;
@@ -142,7 +148,12 @@ namespace WLL_NGO.Netcode
 
         private void Awake()
         {
+            // Set rigidbody
             rb = GetComponent<Rigidbody>();
+
+            // Set handling trigger callbacks
+            ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
+            ballHandlingTrigger.OnBallExit += HandleOnBallExit;
 
             // Init netcode for p&r
             clientInputBuffer = new CircularBuffer<InputPaylod> (bufferSize);
@@ -168,9 +179,14 @@ namespace WLL_NGO.Netcode
             // If time to tick then tick
             if (timer.TimeToTick())
             {
+                // Client side
                 HandleClientTick();
+
+                // Server side
                 HandleServerTick();
 
+                // Both
+                CheckForBallHandling();
             }
 
            
@@ -557,28 +573,24 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Client input:{input}");
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void HandleOnBallEnter()
         {
             if (playerState.Value != (byte)PlayerState.Normal && playerState.Value != (byte)PlayerState.ReceivingPassage)
                 return;
 
-            // It's the ball
-            if (other.CompareTag(Tags.Ball))
-            {
-                if(canHandleTheBall) 
-                    BallController.Instance.BallEnterTheHandleTrigger(this);
-            }
-
+            Debug.Log("Enter handling trigger");
+            if (canHandleTheBall) 
+                BallController.Instance.BallEnterTheHandleTrigger(this);
+            
             
         }
 
-        private void OnTriggerExit(Collider other)
+        private void HandleOnBallExit()
         {
             // It's the ball
-            if (other.CompareTag(Tags.Ball))
-            {
-                BallController.Instance.BallExitTheHandleTrigger(this);
-            }
+            Debug.Log("Exit handling trigger");
+            BallController.Instance.BallExitTheHandleTrigger(this);
+            
         }
 
         /// <summary>
@@ -586,7 +598,7 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StartHandlingTheBall()
         {
-            canHandleTheBall = true;
+            handlingTheBall = true;
         }
 
         /// <summary>
@@ -594,7 +606,18 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StopHandlingTheBall()
         {
-            canHandleTheBall = false;
+           handlingTheBall = false;
+        }
+
+        void CheckForBallHandling()
+        {
+            if (!handlingTheBall)
+                return;
+
+            // Set the ball position depending on the hook
+            BallController ball = BallController.Instance;
+            ball.Position = Vector3.MoveTowards(ball.Position, ballHook.position, ballHookLerpSpeed * Time.fixedDeltaTime);
+            
         }
 
         #endregion

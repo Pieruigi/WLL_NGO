@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4030349836265827069}
   - component: {fileID: 4811291496623610298}
   - component: {fileID: 4740438017715738416}
+  - component: {fileID: 4246186199695800569}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -33,6 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7184429214639328339}
+  - {fileID: 689867595230150792}
   m_Father: {fileID: 2584126692251767088}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4030349836265827069
@@ -108,6 +110,18 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4246186199695800569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700231031890014880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 170121a321d6ab141a6c43bfc0051f8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1791793885155437252
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,7 +174,8 @@ MonoBehaviour:
   rotationSpeed: 720
   acceleration: 10
   deceleration: 30
-  ballHandleTrigger: {fileID: 4740438017715738416}
+  ballHandlingTrigger: {fileID: 4246186199695800569}
+  ballHook: {fileID: 689867595230150792}
 --- !u!114 &2077941696809860174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,6 +246,37 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 1
+--- !u!1 &3185703323297390753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 689867595230150792}
+  m_Layer: 0
+  m_Name: Hook
+  m_TagString: Untagged
+  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &689867595230150792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3185703323297390753}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.553, z: 0.848}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5021535250000037411}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5666755828175910430
 GameObject:
   m_ObjectHideFlags: 0

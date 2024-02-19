@@ -9,11 +9,17 @@ using static WLL_NGO.Netcode.PlayerController;
 namespace WLL_NGO.Netcode
 {
     /// <summary>
+    /// - Ball Synchronization.
     /// The ball uses the same logic as the client controller but with a slightly different implementation.
     /// Basically the client reads the input and sends it to the server with the corresponding tick ( in the HandleClientTick() method ); at this point the server 
     /// processes the input and, for example, tells the client to shoot ( if the input was about shooting ), but since we have to play some animation before we can 
     /// actually shoot, the server can tell all the clients that the player is shooting at a specific tick in the future; doing so all the clients and the server 
     /// would be able to shoot at the same time ( if you have 1 second of lag this is not going to work for you of course, but in that case nothing is going to work ).
+    /// 
+    /// - Ball handling.
+    /// When the ball enters the player handling trigger the player tell the ball they to take control; the ball runs some evaluation function and eventually gives 
+    /// control to the player. When the player has given control over the ball the ball kinematic is set true and the ball is attached to the player's hook transform
+    /// which is handled by animations ( in this case we can for example move the ball back and forth while the player is moving ).
     /// </summary>
     public class BallController : SingletonNetwork<BallController>
     {
@@ -47,6 +53,13 @@ namespace WLL_NGO.Netcode
 
         Rigidbody rb;
 
+        public Vector3 Position
+        {
+            get { return rb.position; }
+            set { rb.position = value; }
+        }
+
+
         #region prediction and reconciliation
         // General
         NetworkTimer timer;
@@ -63,15 +76,23 @@ namespace WLL_NGO.Netcode
         CircularBuffer<StatePayload> serverStateBuffer;
         #endregion
 
+        #region misc fields
+        
+
+        #endregion
+
         protected override void Awake()
         {
             base.Awake();
+            // Rigidbody
             rb = GetComponent<Rigidbody>();
 
+       
             // Init netcode for p&r
             clientStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             timer = new NetworkTimer(serverTickRate);
+
         }
 
         private void Update()
@@ -102,7 +123,9 @@ namespace WLL_NGO.Netcode
         {
             if (timer.TimeToTick())
             {
+                // Client side
                 HandleClientTick();
+                // Server side
                 HandleServerTick();
             }
         }
@@ -128,9 +151,19 @@ namespace WLL_NGO.Netcode
             NetworkObject player = null;
             owner = newRef.TryGet(out player) ? player.GetComponent<PlayerController>() : null;
 
-            // The owner must start handling the ball
-            if(owner != null) 
+            
+            if(owner != null)
+            {
+                // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic at all
+                //rb.isKinematic = true;
+                rb.useGravity = false;
                 owner.StartHandlingTheBall();
+            }
+            else
+            {
+                //rb.isKinematic= false; 
+                rb.useGravity = true;
+            }
 
             // The old owner must eventually stop handling the ball
             if(oldRef.TryGet(out player))
@@ -306,6 +339,7 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         PlayerController EvaluateTackleWinner(PlayerController playerA, PlayerController playerB)
         {
+            Debug.Log($"Tackle evaluation - {playerA} VS {playerB}");
             return playerA;
         }
 
