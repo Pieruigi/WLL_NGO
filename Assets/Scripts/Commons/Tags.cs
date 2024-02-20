@@ -8,6 +8,7 @@ namespace WLL_NGO
     {
         public const string Player = "Player";
         public const string Ball = "Ball";
+        public const string TackleTrigger = "TackleTrigger";
     }
 
 }

@@ -93,6 +93,7 @@ namespace WLL_NGO.Netcode
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             timer = new NetworkTimer(serverTickRate);
 
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
         private void Update()
@@ -157,6 +158,10 @@ namespace WLL_NGO.Netcode
                 // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic at all
                 //rb.isKinematic = true;
                 rb.useGravity = false;
+                // Reset velocity and agular velocity
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                // Tell the player to take control of the ball
                 owner.StartHandlingTheBall();
             }
             else
@@ -181,9 +186,9 @@ namespace WLL_NGO.Netcode
             if (!IsClient || IsHost)
                 return;
 
-            Physics.simulationMode = SimulationMode.Script;
-            Physics.Simulate(Time.fixedDeltaTime);
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            //Physics.simulationMode = SimulationMode.Script;
+            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload clientState = ReadTransform();
             clientState.tick = timer.CurrentTick;
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
@@ -199,9 +204,9 @@ namespace WLL_NGO.Netcode
             if(!IsServer)
                 return;
 
-            Physics.simulationMode = SimulationMode.Script;
-            Physics.Simulate(Time.fixedDeltaTime);
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            //Physics.simulationMode = SimulationMode.Script;
+            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
             // Send the current state to the client
             StatePayload state = ReadTransform();
             state.tick = timer.CurrentTick;

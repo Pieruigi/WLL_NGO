@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Interfaces;
+using static UnityEngine.Rendering.DebugUI;
 using static UnityEngine.UI.GridLayoutGroup;
 
 namespace WLL_NGO.Netcode
@@ -31,6 +33,9 @@ namespace WLL_NGO.Netcode
     /// The player controller always receives input both from human and AI; this means that the AI never tells the player to move or shoot, instead sets the input 
     /// like a human would do ( for example to shoot the AI sets the corresponding button to true and after a while sets it back to false thus triggering 
     /// the shooting routine ).
+    /// 
+    /// Animations.
+    /// Server always has authority on animations so you can not play an animation on client.
     /// 
     /// </summary>
 
@@ -75,7 +80,7 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
+        
 
 
 
@@ -92,7 +97,24 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         float deceleration = 30f;
 
+
+        #region action fields
+        NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
+
+       
+
         float currentSpeed = 0;
+        /// <summary>
+        /// Used to give more detail about a specific state ( ex. what type of tackle the player is doing ).
+        /// </summary>
+        NetworkVariable<byte> actionType = new NetworkVariable<byte>(0);
+        //byte actionType = 0;
+        float actionCooldown = 0; // Server only
+        Animator animator;
+        string tackleAnimTrigger = "Tackle";
+        string stunAnimTrigger = "Stun";
+        string typeAnimParam = "Type";
+        #endregion
 
         /// <summary>
         /// When the ball enters this trigger the player can become the owner under certain conditions.
@@ -109,8 +131,7 @@ namespace WLL_NGO.Netcode
 
         Rigidbody rb;
 
-        bool moving = false;
-        Vector3 currentVelocity = Vector3.zero;
+        
         bool Selected 
         {
             get { return true; }
@@ -152,8 +173,11 @@ namespace WLL_NGO.Netcode
 
         private void Awake()
         {
-            // Set rigidbody
+            // Get the rigidbody
             rb = GetComponent<Rigidbody>();
+
+            // Get the animator
+            animator = GetComponent<Animator>();
             
             // Set handling trigger callbacks
             ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
@@ -177,10 +201,26 @@ namespace WLL_NGO.Netcode
             // Update the network timer 
             timer.Update(Time.deltaTime);
 
+            // Check the cooldown
+            UpdateActionCooldown();
+
+//#if UNITY_EDITOR
+//            if(Input.GetKeyDown(KeyCode.T))
+//            {
+//                if (IsServer)
+//                {
+//                    actionType.Value = 0;
+//                    GetComponent<Animator>().SetTrigger("Tackle");
+//                }
+                
+//            }
+
+//#endif
         }
 
         private void FixedUpdate()
         {
+
             // If time to tick then tick
             if (timer.TimeToTick())
             {
@@ -194,8 +234,6 @@ namespace WLL_NGO.Netcode
                 CheckForBallHandling();
             }
 
-            if (IsServer)
-                Debug.Log($"CurrentSpeed:{rb.velocity.magnitude}");
         }
 
           
@@ -234,41 +272,97 @@ namespace WLL_NGO.Netcode
             if (!IsServer)
                 return;
 
-            if(value != button1LastValue)
-            {
-                if (value)
-                {
-                    // Start charging
-                    Debug.Log("Start charging...");
-                }
-                else
-                {
-                    //if (IsServer)
-                    {
-                        Debug.Log("Shoot");
-                        // Shoot
-                        Vector3 dir = new Vector3(0.5f, .5f, 0f);
-                        if (BallController.Instance.transform.position.x > 0)
-                            dir = new Vector3(-0.5f, .5f, 0f);
-                        int aheadTick = 32;
-                        BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + aheadTick);
-                    }
-                    
-                 
-                }
-            }
+            if (handlingTheBall)
+                CheckForShootingInput(value, button1LastValue, tick);
             else
-            {
-                if (value)
-                {
-                    // Charge shot
-                    Debug.Log("Keep charging...");
-                }
-            }
+                CheckForTacklingInput(value, button1LastValue, tick);
+            
             button1LastValue = value;
         }
 
-        
+        void CheckForTacklingInput(bool buttonValue, bool buttonLastValue, int tick)
+        {
+            if (playerState.Value != (byte)PlayerState.Normal)
+                return;
+
+            int state = GetButtonState(buttonValue, buttonLastValue);
+            switch(state)
+            {
+                case 0:
+
+                    break;
+                case 1:
+                    Debug.Log("Start charging...");
+                    break;
+                case 2:
+                    Debug.Log("Keep charging...");
+                    break;
+                case 3:
+                    // Do tackle
+                    // Check opponent to choose the right action type
+                    actionType.Value = 0; // Slide
+                    playerState.Value = (byte)PlayerState.Tackling;
+                    break;
+            }
+        }
+
+        void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick)
+        {
+            int state = GetButtonState(buttonValue, buttonLastValue);
+            switch (state)
+            {
+                case 0:
+
+                    break;
+                case 1:
+                    Debug.Log("Start charging...");
+                    break;
+                case 2:
+                    Debug.Log("Keep charging...");
+                    break;
+                case 3:
+                    // Shoot
+                    Vector3 dir = new Vector3(0.5f, .5f, 0f);
+                    if (BallController.Instance.transform.position.x > 0)
+                        dir = new Vector3(-0.5f, .5f, 0f);
+                    int aheadTick = 32;
+                    StopHandlingTheBall();
+                    BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + aheadTick);
+                    break;
+            }
+
+        }
+
+        /// <summary>
+        /// 0: none
+        /// 1: down
+        /// 2: pressed
+        /// 3: up
+        /// </summary>
+        /// <param name="newValue"></param>
+        /// <param name="oldValue"></param>
+        /// <returns></returns>
+        int GetButtonState(bool newValue, bool oldValue)
+        {
+            if (newValue && !oldValue)
+                return 1;
+            if (newValue && oldValue)
+                return 2;
+            if(!newValue && oldValue)
+                return 3;
+            return 0;
+        }
+
+        public float GetTackleCooldown(byte type)
+        {
+            return 1.67f;
+        }
+
+        public float GetStunnedCooldown(byte type)
+        {
+            return 1.67f;
+        }
+
         #endregion
 
 
@@ -304,8 +398,13 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    UnityEngine.Debug.Log(statePayload);
+                    //UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
+
+                    //
+                    // Check ball handling eventually
+                    //
+                    CheckForBallHandling();
 
                     //
                     // Check buttons ( we can check directly on server )
@@ -317,7 +416,16 @@ namespace WLL_NGO.Netcode
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
             {
                 // Simply get the last state processed by the server and apply it
-                ApplyNotOwnedOrUnselectedClientState(lastServerState);
+                if (!lastServerState.Equals(default))
+                {
+                    WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
+                    lastProcessedState = lastServerState;
+                }
+                
+                //
+                // Check ball handling eventually
+                //
+                CheckForBallHandling();
             }
         }
 
@@ -339,13 +447,19 @@ namespace WLL_NGO.Netcode
                 // Simulate movement
                 //
                 StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
-                UnityEngine.Debug.Log(state);
+                //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
                 // Check buttons
                 //
                 CheckButton1(input.button1, input.tick, false);
+
+                //
+                // Check for ball handling eventually
+                //
+                CheckForBallHandling();
+
             }
           
             if (bufferIndex == -1) return; // No data
@@ -353,18 +467,6 @@ namespace WLL_NGO.Netcode
             SendToClientRpc(serverStateBuffer.Get(bufferIndex));
         }
 
-        /// <summary>
-        /// Called by the client to apply server state to every not owned or unselected player
-        /// </summary>
-        /// <param name="state"></param>
-        void ApplyNotOwnedOrUnselectedClientState(StatePayload state)
-        {
-            if (state.Equals(default))
-                return;
-            WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
-            lastProcessedState = state;
-
-        }
 
         /// <summary>
         /// If last state on server is not null and last processed state on client is null or different than last server state then we check for reconciliation
@@ -463,10 +565,10 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         StatePayload ServerSimulateMovement(Vector2 inputMove, int tick)
         {
-            Physics.simulationMode = SimulationMode.Script;
+            //Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
-            Physics.Simulate(Time.fixedDeltaTime);
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
 
             StatePayload state = ReadTransform();
             state.tick = tick;
@@ -483,10 +585,10 @@ namespace WLL_NGO.Netcode
         StatePayload ClientProcessMovement(Vector2 inputMove, int tick)
         {
             // Move player and return the state payload
-            Physics.simulationMode = SimulationMode.Script;
+            //Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
-            Physics.Simulate(Time.fixedDeltaTime);
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload state = ReadTransform();
             state.tick = tick;
             return state;
@@ -503,6 +605,9 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)PlayerState.Stunned:
                     UpdateStunnedMovement();
+                    break;
+                case (byte)PlayerState.Tackling:
+                    UpdateTackleMovement();
                     break;
             }
 
@@ -534,6 +639,46 @@ namespace WLL_NGO.Netcode
 
         }
 
+        void UpdateTackleMovement()
+        {
+            switch (actionType.Value)
+            {
+                case 0: // Slide
+                    Vector3 dir = transform.forward;
+
+                    float time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    float minSlideTime = 0.3f;
+                    float maxSlideTime = 0.75f;
+
+                    if (time < .8f)
+                    {
+                        float tackleSpeed = maxSpeed * 1f;
+
+                        currentSpeed += 10f * Time.fixedDeltaTime;
+                        currentSpeed = Mathf.Clamp(currentSpeed, 0f, tackleSpeed);
+                    }
+                    else
+                    {
+                        currentSpeed -= 10f * Time.fixedDeltaTime;
+                        if (currentSpeed < 0)
+                            currentSpeed = 0;
+                    }
+
+                    
+
+                    rb.velocity = dir * currentSpeed;
+                    break;
+
+                case 1: // Kick
+
+                    break;
+            }
+
+            
+        }
+
+        
+
         void WriteTransform(Vector3 position, Quaternion rotation, Vector3 velocity, Vector3 angularVelocity)
         {
             rb.position = position;
@@ -553,6 +698,7 @@ namespace WLL_NGO.Netcode
                 
             };
         }
+
         #endregion
 
         #region networked variables
@@ -563,11 +709,40 @@ namespace WLL_NGO.Netcode
         /// <param name="newState"></param>
         void HandleOnPlayerStateChanged(byte oldState, byte newState)
         {
-            
+            if(oldState == newState) return;
+
+            switch(newState)
+            {
+                case (byte)PlayerState.Tackling:
+                    if (IsServer)
+                    {
+                        // Get the action cooldown
+                        actionCooldown = GetTackleCooldown(actionType.Value);
+
+                        // Start animation on server
+                        animator.SetInteger(typeAnimParam, actionType.Value);
+                        animator.SetTrigger(tackleAnimTrigger);
+
+                    }
+                    
+                    break;
+
+                case (byte)PlayerState.Stunned:
+                    if (IsServer)
+                    {
+                        // Get the action cooldown
+                        actionCooldown = GetStunnedCooldown(actionType.Value);
+
+                        // Start animation on server
+                        // The action type depends on the opponent distance, for now we just test a basic tackle
+                        animator.SetInteger(typeAnimParam, actionType.Value);
+                        animator.SetTrigger(stunAnimTrigger);
+
+                    }
+
+                    break;
+            }
         }
-
-        
-
         #endregion
 
         #region misc
@@ -590,15 +765,12 @@ namespace WLL_NGO.Netcode
 
             if (canHandleTheBall) 
                 BallController.Instance.BallEnterTheHandleTrigger(this);
-            
-            
         }
 
         private void HandleOnBallExit()
         {
             // It's the ball
             BallController.Instance.BallExitTheHandleTrigger(this);
-            
         }
 
         /// <summary>
@@ -626,6 +798,44 @@ namespace WLL_NGO.Netcode
             BallController ball = BallController.Instance;
             ball.Position = Vector3.MoveTowards(ball.Position, ballHook.position, ballHookLerpSpeed * Time.fixedDeltaTime);
             
+        }
+
+
+        void UpdateActionCooldown()
+        {
+            if (!IsServer) 
+                return;
+
+            if(actionCooldown > 0)
+            {
+                actionCooldown -= Time.deltaTime;
+                if(actionCooldown < 0)
+                    playerState.Value = (byte)PlayerState.Normal;
+            }
+                
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if(other.CompareTag(Tags.TackleTrigger))
+            {
+                if(!IsServer || other.gameObject == gameObject || playerState.Value != (byte)PlayerState.Tackling) return;
+
+                PlayerController otherPC = other.GetComponentInParent<PlayerController>();
+                
+                if(otherPC.playerState.Value == (byte)PlayerState.Normal)
+                {
+                    // Stun the other player
+                    switch (actionType.Value)
+                    {
+                        case 0: // Slide
+                            otherPC.actionType.Value = 1; 
+                            break;
+                    }
+
+                    otherPC.playerState.Value = (byte)PlayerState.Stunned;
+                }
+            }
         }
 
         #endregion

@@ -12,5 +12,6 @@ namespace WLL_NGO
     /// Busy: you are busy in some way, for example on kick off
     /// Stunned: you are stunned, means you neither can't move nor shoot
     /// </summary>
-    public enum PlayerState : byte { Normal, ReceivingPassage, Busy, Stunned }
+    public enum PlayerState : byte { Normal, ReceivingPassage, Busy, Stunned, Tackling, Shooting }
+        
 }
