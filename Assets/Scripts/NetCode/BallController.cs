@@ -155,9 +155,10 @@ namespace WLL_NGO.Netcode
             
             if(owner != null)
             {
-                // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic at all
-                //rb.isKinematic = true;
-                rb.useGravity = false;
+                // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic unless we set 
+                // useTrigger to false in the handling trigger.
+                rb.isKinematic = true;
+                //rb.useGravity = false;
                 // Reset velocity and agular velocity
                 rb.velocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
@@ -166,8 +167,9 @@ namespace WLL_NGO.Netcode
             }
             else
             {
-                //rb.isKinematic= false; 
-                rb.useGravity = true;
+                if(rb.isKinematic)
+                    rb.isKinematic= false; 
+                //rb.useGravity = true;
             }
 
             // The old owner must eventually stop handling the ball
@@ -192,6 +194,7 @@ namespace WLL_NGO.Netcode
             StatePayload clientState = ReadTransform();
             clientState.tick = timer.CurrentTick;
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
+
             // Reconciliate
             Reconciliate();
         }
@@ -258,8 +261,9 @@ namespace WLL_NGO.Netcode
         {
             bool lastServerStateIsDefined = !lastServerState.Equals(default);
             bool lastProcessedStateUndefinedOrDifferent = lastProcessedState.Equals(default) || !lastProcessedState.Equals(lastServerState);
+            bool ownerIsNull = owner == null;
 
-            return lastServerStateIsDefined && lastProcessedStateUndefinedOrDifferent;
+            return lastServerStateIsDefined && lastProcessedStateUndefinedOrDifferent && ownerIsNull;
 
         }
 
@@ -327,7 +331,7 @@ namespace WLL_NGO.Netcode
             
             if(timer.CurrentTick > tick)
             {
-                rb.velocity = velocity;
+                Shoot(player, velocity);
             }
             else
             {
@@ -336,9 +340,20 @@ namespace WLL_NGO.Netcode
                     await Task.Delay(1000/Constants.ServerTickRate);
                 }
                 // Check if you can still shoot the ball first
-                rb.velocity = velocity;
+                if(owner == player)
+                {
+                    Shoot(player, velocity);
+                }
+                
             }
                 
+        }
+
+        void Shoot(PlayerController player, Vector3 velocity)
+        {
+            player.StopHandlingTheBall();
+            rb.isKinematic = false;
+            rb.velocity = velocity;
         }
 
         /// <summary>

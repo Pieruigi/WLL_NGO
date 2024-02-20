@@ -326,7 +326,6 @@ namespace WLL_NGO.Netcode
                     if (BallController.Instance.transform.position.x > 0)
                         dir = new Vector3(-0.5f, .5f, 0f);
                     int aheadTick = 32;
-                    StopHandlingTheBall();
                     BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + aheadTick);
                     break;
             }
@@ -760,6 +759,7 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnBallEnter()
         {
+            Debug.Log("Ball enter");
             if (playerState.Value != (byte)PlayerState.Normal && playerState.Value != (byte)PlayerState.ReceivingPassage)
                 return;
 
@@ -769,6 +769,7 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnBallExit()
         {
+            Debug.Log("Ball exit");
             // It's the ball
             BallController.Instance.BallExitTheHandleTrigger(this);
         }
@@ -778,6 +779,8 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StartHandlingTheBall()
         {
+            if (handlingTheBall)
+                return;
             handlingTheBall = true;
         }
 
@@ -786,6 +789,8 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StopHandlingTheBall()
         {
+            if(!handlingTheBall)
+                return;
            handlingTheBall = false;
         }
 
