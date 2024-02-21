@@ -208,18 +208,31 @@ namespace WLL_NGO.Netcode
             // Check the cooldown
             UpdateActionCooldown();
 
-//#if UNITY_EDITOR
-//            if(Input.GetKeyDown(KeyCode.T))
-//            {
-//                if (IsServer)
-//                {
-//                    actionType.Value = 0;
-//                    GetComponent<Animator>().SetTrigger("Tackle");
-//                }
-                
-//            }
+            // If time to tick then tick
+            //if (timer.TimeToTick())
+            //{
+            //    // Client side
+            //    HandleClientTick();
 
-//#endif
+            //    // Server side
+            //    HandleServerTick();
+
+            //    // Both
+            //    CheckForBallHandling();
+            //}
+
+            //#if UNITY_EDITOR
+            //            if(Input.GetKeyDown(KeyCode.T))
+            //            {
+            //                if (IsServer)
+            //                {
+            //                    actionType.Value = 0;
+            //                    GetComponent<Animator>().SetTrigger("Tackle");
+            //                }
+
+            //            }
+
+            //#endif
         }
 
         private void FixedUpdate()
@@ -240,7 +253,7 @@ namespace WLL_NGO.Netcode
 
         }
 
-          
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -296,11 +309,11 @@ namespace WLL_NGO.Netcode
 
                     break;
                 case (byte)ButtonState.Pressed: // Button down
-                    IncreaseCharge(timer.MinTimerBetweenTicks);
+                    IncreaseCharge(timer.DeltaTick);
                     Debug.Log($"Charge:{charge}");
                     break;
                 case (byte)ButtonState.Held: 
-                    IncreaseCharge(timer.MinTimerBetweenTicks);
+                    IncreaseCharge(timer.DeltaTick);
                     Debug.Log($"Charge:{charge}");
                     break;
                 case (byte)ButtonState.Released: // Button up
@@ -465,6 +478,7 @@ namespace WLL_NGO.Netcode
             }
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
             {
+                
                 // Simply get the last state processed by the server and apply it
                 if (!lastServerState.Equals(default))
                 {
@@ -513,7 +527,7 @@ namespace WLL_NGO.Netcode
             }
           
             if (bufferIndex == -1) return; // No data
-            // We send the all clients the last state processed by the server
+            // We send to all clients the last state processed by the server
             SendToClientRpc(serverStateBuffer.Get(bufferIndex));
         }
 
@@ -552,6 +566,7 @@ namespace WLL_NGO.Netcode
             positionError = Vector3.Distance(rewindState.position, clientStateBuffer.Get(bufferIndex).position);
             if(positionError > reconciliationThreshold)
             {
+                Debug.Log($"Reconciliation, tick:{lastServerState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 
@@ -617,7 +632,7 @@ namespace WLL_NGO.Netcode
         {
             //Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
-            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.Simulate(timer.DeltaTick);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
 
             StatePayload state = ReadTransform();
@@ -637,7 +652,7 @@ namespace WLL_NGO.Netcode
             // Move player and return the state payload
             //Physics.simulationMode = SimulationMode.Script;
             Move(inputMove);
-            //Physics.Simulate(Time.fixedDeltaTime);
+            //Physics.Simulate(timer.DeltaTick);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload state = ReadTransform();
             state.tick = tick;
@@ -673,13 +688,13 @@ namespace WLL_NGO.Netcode
             {
                 transform.forward = new Vector3(moveInput.x, 0f, moveInput.y);
                 //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
-                speed += acceleration * timer.MinTimerBetweenTicks; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
+                speed += acceleration * timer.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
                 if (speed > maxSpeed) speed = maxSpeed;
             }
             else
             {
                 //speed -= deceleration * Time.fixedDeltaTime;
-                speed -= deceleration * timer.MinTimerBetweenTicks;
+                speed -= deceleration * timer.DeltaTick;
                 if (speed < 0) speed = 0;
             }
             currentSpeed = speed;
@@ -701,13 +716,13 @@ namespace WLL_NGO.Netcode
                     if (time < .8f)
                     {
                         //currentSpeed += 10f * Time.fixedDeltaTime;
-                        currentSpeed += acc * timer.MinTimerBetweenTicks;
+                        currentSpeed += acc * timer.DeltaTick;
                         if(currentSpeed > maxSpeed) currentSpeed = maxSpeed;
                     }
                     else
                     {
                         //currentSpeed -= 10f * Time.fixedDeltaTime;
-                        currentSpeed -= acc * timer.MinTimerBetweenTicks;
+                        currentSpeed -= acc * timer.DeltaTick;
                         if (currentSpeed < 0)
                             currentSpeed = 0;
                     }
@@ -740,14 +755,14 @@ namespace WLL_NGO.Netcode
                     if (time < .8f)
                     {
                         //currentSpeed += 10f * Time.fixedDeltaTime;
-                        currentSpeed += acc * timer.MinTimerBetweenTicks;
+                        currentSpeed += acc * timer.DeltaTick;
                         if(currentSpeed > maxSpeed)
                             currentSpeed = maxSpeed;
                     }
                     else
                     {
                         //currentSpeed -= 10f * Time.fixedDeltaTime;
-                        currentSpeed -= acc * timer.MinTimerBetweenTicks;
+                        currentSpeed -= acc * timer.DeltaTick;
                         if (currentSpeed < 0)
                             currentSpeed = 0;
                     }

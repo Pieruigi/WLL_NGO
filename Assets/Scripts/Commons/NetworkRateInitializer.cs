@@ -19,8 +19,10 @@ namespace WLL_NGO.Netcode
         void Start()
         {
             Time.fixedDeltaTime = 1f / Constants.ServerTickRate;
-            NetworkManager.Singleton.NetworkConfig.TickRate = Constants.ServerTickRate;
+            //NetworkManager.Singleton.NetworkConfig.TickRate = Constants.ServerTickRate;
             Application.targetFrameRate = Constants.ServerTickRate;
+
+            //Physics.simulationMode = SimulationMode.Script;
         }
 
         // Update is called once per frame

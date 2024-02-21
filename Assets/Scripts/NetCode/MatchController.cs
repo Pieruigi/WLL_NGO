@@ -3,16 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace WLL_NGO.Netcode
 {
     /// <summary>
     /// NotReady: waiting for all players to be ready
     /// </summary>
-    public enum MatchState { NotReady, StartingMatch }
+    
 
     public class MatchController : SingletonNetwork<MatchController>
     {
+        /// <summary>
+        /// Param1: old value
+        /// Param2: new value
+        /// </summary>
+        public UnityAction<int, int> OnStateChanged;
+
         //ushort numOfPlayers = 1;
         //public ushort NumberOfPlayers
         //{
@@ -55,6 +62,7 @@ namespace WLL_NGO.Netcode
         private void HandleOnMatchStateChanged(byte previousValue, byte newValue)
         {
             // Do something
+            OnStateChanged?.Invoke(previousValue, newValue);
         }
 
 

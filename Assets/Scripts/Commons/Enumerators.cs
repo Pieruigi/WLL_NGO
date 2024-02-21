@@ -19,6 +19,8 @@ namespace WLL_NGO
     public enum StunType : byte { ByContrast, BySlideFront, BySlideBack, ByKickFront, ByKickBack, BySlapFront, BySlapBack, ByElbowFront, ByElbowBack, ElectrifiedFront, ElectrifiedBack }
 
     public enum ButtonState: byte { None, Pressed, Held, Released }
-    
+
+    public enum MatchState : byte { NotReady, StartingMatch }
+
 
 }

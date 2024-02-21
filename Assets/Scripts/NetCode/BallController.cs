@@ -92,15 +92,21 @@ namespace WLL_NGO.Netcode
             // Init netcode for p&r
             clientStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
-            timer = new NetworkTimer(serverTickRate);
+            
 
             //Physics.simulationMode = SimulationMode.FixedUpdate;
+        }
+
+        private void Start()
+        {
+            MatchController.Instance.OnStateChanged += (oldV, newV) => { if(newV == (byte)MatchState.StartingMatch ) timer = new NetworkTimer(serverTickRate); };
         }
 
         private void Update()
         {
             // Update timer
-            timer.Update(Time.deltaTime);
+            // The ball is already on scene when the server starts, so client and server ticks don't match.
+            timer?.Update(Time.deltaTime);
 
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Q))
@@ -138,6 +144,7 @@ namespace WLL_NGO.Netcode
 
             // Owner change event handler
             ownerReference.OnValueChanged += HandleOnOwnerReferenceChanged;
+
         }
 
         public override void OnNetworkDespawn()
@@ -193,7 +200,9 @@ namespace WLL_NGO.Netcode
             //Physics.Simulate(Time.fixedDeltaTime);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload clientState = ReadTransform();
+            
             clientState.tick = timer.CurrentTick;
+            Debug.Log($"Reconciliation - read client state, tick:{clientState.tick}, pos:{clientState.position}");
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
 
             // Reconciliate
@@ -227,8 +236,10 @@ namespace WLL_NGO.Netcode
             int bufferIndex = rewindState.tick % bufferSize;
 
             float positionError = Vector3.Distance(rewindState.position, clientStateBuffer.Get(bufferIndex).position);
+            
             if (positionError > reconciliationThreshold)
             {
+                Debug.Log($"Reconciliation - tick:{rewindState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 
@@ -238,25 +249,29 @@ namespace WLL_NGO.Netcode
 
         void ReconcileState(StatePayload state)
         {
-            Debug.Log($"Reconciliation tick:{state.tick}");
+            
 
             // Get the last server state data
             WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
-
+            Debug.Log($"Reconciliation - position:{rb.position}");
             // Add to the client buffer
             clientStateBuffer.Add(state, state.tick);
 
             // Replay all the input from the rewind state to the current state
             int tickToReplay = state.tick;
+            Physics.simulationMode = SimulationMode.Script;
             while (tickToReplay < timer.CurrentTick)
             {
                 int bufferIndex = tickToReplay % bufferSize;
-                Physics.Simulate(Time.fixedDeltaTime);
+
+                Physics.Simulate(timer.DeltaTick);
                 StatePayload clientState = ReadTransform();
+                
                 clientState.tick = tickToReplay;
                 clientStateBuffer.Add(clientState, bufferIndex);
                 tickToReplay++;
             }
+            Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
         bool ReconciliationAllowed()

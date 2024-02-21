@@ -7,13 +7,13 @@ namespace WLL_NGO
     public class NetworkTimer
     {
         float timer;
-        public float MinTimerBetweenTicks { get; private set; }
+        public float DeltaTick { get; private set; }
 
         public int CurrentTick { get; private set; }
 
         public NetworkTimer(float serverTickRate)
         {
-            MinTimerBetweenTicks = 1f / serverTickRate;
+            DeltaTick = 1f / serverTickRate;
         }
 
         public void Update(float deltaTime)
@@ -23,9 +23,9 @@ namespace WLL_NGO
 
         public bool TimeToTick()
         {
-            if(timer >= MinTimerBetweenTicks)
+            if(timer >= DeltaTick)
             {
-                timer -= MinTimerBetweenTicks;
+                timer -= DeltaTick;
                 CurrentTick++;
                 return true;
 
