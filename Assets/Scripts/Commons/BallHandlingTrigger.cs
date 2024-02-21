@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Playables;
@@ -7,17 +8,19 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO
 {
+    /// <summary>
+    /// Server only trigger.
+    /// We are using Physics.Overlap() rather than OnTriggerEnter() due to the fact that if we set the ball kinematic theexit trigger is called.
+    /// </summary>
     public class BallHandlingTrigger : MonoBehaviour
     {
         public UnityAction OnBallEnter;
         public UnityAction OnBallExit;
 
-        [SerializeField]
-        bool useTrigger = false;
-
         CapsuleCollider coll;
         bool inside = false;
-
+        bool disabled = false;
+      
         private void Awake()
         {
             coll = GetComponent<CapsuleCollider>();
@@ -26,7 +29,8 @@ namespace WLL_NGO
 
         private void FixedUpdate()
         {
-            if (useTrigger) return;
+            
+            if(!NetworkManager.Singleton.IsServer || disabled) return;
 
             Vector3 pointA = transform.position + Vector3.up * (transform.position.y + (coll.height / 2f - coll.radius));
             Vector3 pointB = transform.position - Vector3.up * ( transform.position.y - (coll.height / 2f - coll.radius));
@@ -50,27 +54,25 @@ namespace WLL_NGO
             }
         }
 
-        private void OnTriggerEnter(Collider other)
+      
+        /// <summary>
+        /// Set enable on/off.
+        /// If you disable the trigger the player will eventually lose ball control.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetEnable(bool value)
         {
-            if(!useTrigger) return;
-
-            // It's the ball
-            if (other.CompareTag(Tags.Ball))
-                OnBallEnter?.Invoke();
-
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (!useTrigger) return;
-
-            // It's the ball
-            if (other.CompareTag(Tags.Ball))
+            disabled = !value;
+            if(disabled)
             {
-                OnBallExit?.Invoke();
+                if (inside)
+                {
+                    // If inside set false and eventually release the ball is the player is the owner
+                    inside = false;
+                    OnBallExit.Invoke();
+                }
             }
         }
-
 
     }
 

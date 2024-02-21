@@ -125,7 +125,6 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         Transform ballHook;
 
-        bool canHandleTheBall = true;
         bool handlingTheBall = false;
         float ballHookLerpSpeed = 10f;
 
@@ -359,7 +358,7 @@ namespace WLL_NGO.Netcode
 
         public float GetStunnedCooldown(byte type)
         {
-            return 1.67f;
+            return 2f;
         }
 
         #endregion
@@ -630,7 +629,7 @@ namespace WLL_NGO.Netcode
                 if (speed < 0) speed = 0;
             }
             currentSpeed = speed;
-            rb.velocity = transform.forward * currentSpeed;
+            rb.velocity = transform.forward * currentSpeed + rb.velocity.y * Vector3.up;
         }
 
         void UpdateStunnedMovement()
@@ -712,6 +711,10 @@ namespace WLL_NGO.Netcode
 
             switch(newState)
             {
+                case (byte)PlayerState.Normal:
+                    ballHandlingTrigger.SetEnable(true);
+                    break;
+
                 case (byte)PlayerState.Tackling:
                     if (IsServer)
                     {
@@ -732,6 +735,9 @@ namespace WLL_NGO.Netcode
                         // Get the action cooldown
                         actionCooldown = GetStunnedCooldown(actionType.Value);
 
+                        // Disable the handling trigger
+                        ballHandlingTrigger.SetEnable(false);
+                     
                         // Start animation on server
                         // The action type depends on the opponent distance, for now we just test a basic tackle
                         animator.SetInteger(typeAnimParam, actionType.Value);
@@ -757,21 +763,25 @@ namespace WLL_NGO.Netcode
             //Debug.Log($"Client input:{input}");
         }
 
+        /// <summary>
+        /// Called by the ball handling trigger on enter.
+        /// </summary>
         private void HandleOnBallEnter()
         {
             Debug.Log("Ball enter");
-            if (playerState.Value != (byte)PlayerState.Normal && playerState.Value != (byte)PlayerState.ReceivingPassage)
-                return;
-
-            if (canHandleTheBall) 
-                BallController.Instance.BallEnterTheHandleTrigger(this);
+            
+            
+            BallController.Instance.BallEnterTheHandlingTrigger(this);
         }
 
+        /// <summary>
+        /// Called by the handling trigger on exit
+        /// </summary>
         private void HandleOnBallExit()
         {
             Debug.Log("Ball exit");
             // It's the ball
-            BallController.Instance.BallExitTheHandleTrigger(this);
+            BallController.Instance.BallExitTheHandlingTrigger(this);
         }
 
         /// <summary>
@@ -820,12 +830,15 @@ namespace WLL_NGO.Netcode
                 
         }
 
+
         private void OnTriggerEnter(Collider other)
         {
+            // Each player has a trigger in order to better handle tackles
             if(other.CompareTag(Tags.TackleTrigger))
             {
                 if(!IsServer || other.gameObject == gameObject || playerState.Value != (byte)PlayerState.Tackling) return;
 
+                // Tackle trigger only belongs to players, so we have a player controller for sure.
                 PlayerController otherPC = other.GetComponentInParent<PlayerController>();
                 
                 if(otherPC.playerState.Value == (byte)PlayerState.Normal)

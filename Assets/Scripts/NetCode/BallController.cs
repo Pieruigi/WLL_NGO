@@ -56,9 +56,10 @@ namespace WLL_NGO.Netcode
         public Vector3 Position
         {
             get { return rb.position; }
-            set { rb.position = value; }
+            set { rb.position = value; if (rb.position.y < coll.radius) rb.position = new Vector3(rb.position.x, coll.radius + 0.01f, rb.position.z); }
         }
 
+        SphereCollider coll; 
 
         #region prediction and reconciliation
         // General
@@ -86,7 +87,7 @@ namespace WLL_NGO.Netcode
             base.Awake();
             // Rigidbody
             rb = GetComponent<Rigidbody>();
-
+            coll = GetComponent<SphereCollider>();
        
             // Init netcode for p&r
             clientStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
@@ -211,6 +212,7 @@ namespace WLL_NGO.Netcode
             //Physics.Simulate(Time.fixedDeltaTime);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             // Send the current state to the client
+
             StatePayload state = ReadTransform();
             state.tick = timer.CurrentTick;
             SendToClientRpc(state);
@@ -368,11 +370,13 @@ namespace WLL_NGO.Netcode
             return playerA;
         }
 
+        
+
         /// <summary>
         /// A player in on the ball, we must check if the player can handle it
         /// </summary>
         /// <param name="player"></param>
-        public void BallEnterTheHandleTrigger(PlayerController player)
+        public void BallEnterTheHandlingTrigger(PlayerController player)
         {
             if (IsServer)
             {
@@ -397,7 +401,7 @@ namespace WLL_NGO.Netcode
         /// Player off the ball, eventually loses controll.
         /// </summary>
         /// <param name="player"></param>
-        public void BallExitTheHandleTrigger(PlayerController player)
+        public void BallExitTheHandlingTrigger(PlayerController player)
         {
             if(IsServer)
             {
