@@ -123,7 +123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170121a321d6ab141a6c43bfc0051f8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useTrigger: 0
 --- !u!1 &1791793885155437252
 GameObject:
   m_ObjectHideFlags: 0
@@ -195,10 +194,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08b080c00f9e8cd409b057fa9f9a0b2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 2
+  maxSpeed: 3.5
   rotationSpeed: 720
-  acceleration: 10
-  deceleration: 30
+  acceleration: 20
+  deceleration: 60
   ballHandlingTrigger: {fileID: 4246186199695800569}
   ballHook: {fileID: 689867595230150792}
 --- !u!136 &7767129766027385350
@@ -296,7 +295,7 @@ MonoBehaviour:
     Layer: 0
     OriginatingState: 2081823275
     DestinationState: -1440981379
-    TransitionDuration: 0.25
+    TransitionDuration: 0.042370975
     TriggerNameHash: 453933295
     TransitionIndex: 1
   m_Animator: {fileID: -1664083998021181684}

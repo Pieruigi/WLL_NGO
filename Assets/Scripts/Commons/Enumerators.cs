@@ -13,5 +13,12 @@ namespace WLL_NGO
     /// Stunned: you are stunned, means you neither can't move nor shoot
     /// </summary>
     public enum PlayerState : byte { Normal, ReceivingPassage, Busy, Stunned, Tackling, Shooting }
-        
+
+    public enum TackleType : byte { Slide, Kick, Slap, Elbow }
+
+    public enum StunType : byte { ByContrast, BySlideFront, BySlideBack, ByKickFront, ByKickBack, BySlapFront, BySlapBack, ByElbowFront, ByElbowBack, ElectrifiedFront, ElectrifiedBack }
+
+    public enum ButtonState: byte { None, Pressed, Held, Released }
+    
+
 }

@@ -107,9 +107,9 @@ namespace WLL_NGO.Netcode
         /// <summary>
         /// Used to give more detail about a specific state ( ex. what type of tackle the player is doing ).
         /// </summary>
-        NetworkVariable<byte> actionType = new NetworkVariable<byte>(0);
+        NetworkVariable<byte> playerSubState = new NetworkVariable<byte>(0);
         //byte actionType = 0;
-        float actionCooldown = 0; // Server only
+        float playerStateCooldown = 0; // Server only
         Animator animator;
         string tackleAnimTrigger = "Tackle";
         string stunAnimTrigger = "Stun";
@@ -141,6 +141,11 @@ namespace WLL_NGO.Netcode
         IInputHandler inputHandler;
         InputData input;
         bool button1LastValue, button2LastValue, button3LastValue;
+        
+        NetworkVariable<float> charge = new NetworkVariable<float>(0);
+        float chargingSpeed = 1;
+        float lightTackleChargeAmount = .2f;
+
         #endregion
 
         #region netcode prediction and reconciliation
@@ -272,7 +277,7 @@ namespace WLL_NGO.Netcode
                 return;
 
             if (handlingTheBall)
-                CheckForShootingInput(value, button1LastValue, tick);
+                CheckForShootingInput(value, button1LastValue, tick, true);
             else
                 CheckForTacklingInput(value, button1LastValue, tick);
             
@@ -287,39 +292,51 @@ namespace WLL_NGO.Netcode
             int state = GetButtonState(buttonValue, buttonLastValue);
             switch(state)
             {
-                case 0:
+                case (byte)ButtonState.None: // None
 
                     break;
-                case 1:
-                    Debug.Log("Start charging...");
+                case (byte)ButtonState.Pressed: // Button down
+                    IncreaseCharge(timer.MinTimerBetweenTicks);
+                    Debug.Log($"Charge:{charge}");
                     break;
-                case 2:
-                    Debug.Log("Keep charging...");
+                case (byte)ButtonState.Held: 
+                    IncreaseCharge(timer.MinTimerBetweenTicks);
+                    Debug.Log($"Charge:{charge}");
                     break;
-                case 3:
+                case (byte)ButtonState.Released: // Button up
                     // Do tackle
                     // Check opponent to choose the right action type
-                    actionType.Value = 0; // Slide
+                    if(charge.Value < lightTackleChargeAmount)
+                    {
+                        playerSubState.Value = (byte)TackleType.Slide;
+                    }
+                    else
+                    {
+                        playerSubState.Value = (byte)TackleType.Kick; 
+                    }
+                    Debug.Log($"Charge:{charge}");
+                    charge.Value = 0;
                     playerState.Value = (byte)PlayerState.Tackling;
                     break;
             }
         }
 
-        void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick)
+        void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
         {
             int state = GetButtonState(buttonValue, buttonLastValue);
             switch (state)
             {
-                case 0:
+                case (byte)ButtonState.None:
 
                     break;
-                case 1:
+                case (byte)ButtonState.Pressed:
                     Debug.Log("Start charging...");
+                    
                     break;
-                case 2:
+                case (byte)ButtonState.Held:
                     Debug.Log("Keep charging...");
                     break;
-                case 3:
+                case (byte)ButtonState.Released:
                     // Shoot
                     Vector3 dir = new Vector3(0.5f, .5f, 0f);
                     if (BallController.Instance.transform.position.x > 0)
@@ -353,12 +370,47 @@ namespace WLL_NGO.Netcode
 
         public float GetTackleCooldown(byte type)
         {
-            return 1.67f;
+            float ret = 0f;
+            switch (type)
+            {
+                case (byte)TackleType.Slide:
+                    ret = 1.67f;
+                    break;
+                case (byte)TackleType.Kick:
+                    ret = 1.67f;
+                    break;
+            }
+            
+            return ret;
+            
         }
 
         public float GetStunnedCooldown(byte type)
         {
-            return 2f;
+            float ret = 0;
+            switch (type)
+            {
+                case (byte)StunType.BySlideFront:
+                    ret = 2;
+                    break;
+                case (byte)StunType.BySlideBack:
+                    ret = 2;
+                    break;
+                case (byte)StunType.ByKickFront:
+                    ret = 4;
+                    break;
+                case (byte)StunType.ByKickBack:
+                    ret = 4;
+                    break;
+                case (byte)StunType.ElectrifiedFront:
+                    ret = 6;
+                    break;
+                case (byte)StunType.ElectrifiedBack:
+                    ret = 6;
+                    break;
+            }
+
+            return ret;
         }
 
         #endregion
@@ -620,12 +672,14 @@ namespace WLL_NGO.Netcode
             if (moveInput.magnitude > 0)
             {
                 transform.forward = new Vector3(moveInput.x, 0f, moveInput.y);
-                speed += acceleration * Time.fixedDeltaTime;
+                //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
+                speed += acceleration * timer.MinTimerBetweenTicks; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
                 if (speed > maxSpeed) speed = maxSpeed;
             }
             else
             {
-                speed -= deceleration * Time.fixedDeltaTime;
+                //speed -= deceleration * Time.fixedDeltaTime;
+                speed -= deceleration * timer.MinTimerBetweenTicks;
                 if (speed < 0) speed = 0;
             }
             currentSpeed = speed;
@@ -634,42 +688,74 @@ namespace WLL_NGO.Netcode
 
         void UpdateStunnedMovement()
         {
-
-        }
-
-        void UpdateTackleMovement()
-        {
-            switch (actionType.Value)
+            switch(playerSubState.Value)
             {
-                case 0: // Slide
+                case (byte)StunType.ByKickFront:
+                case (byte)StunType.ByKickBack:
                     Vector3 dir = transform.forward;
-
+                    if (playerSubState.Value == (byte)StunType.ByKickFront)
+                        dir *= -1;
                     float time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    float minSlideTime = 0.3f;
-                    float maxSlideTime = 0.75f;
-
+                    float maxSpeed = 5f;
+                    float acc = 30;
                     if (time < .8f)
                     {
-                        float tackleSpeed = maxSpeed * 1f;
-
-                        currentSpeed += 10f * Time.fixedDeltaTime;
-                        currentSpeed = Mathf.Clamp(currentSpeed, 0f, tackleSpeed);
+                        //currentSpeed += 10f * Time.fixedDeltaTime;
+                        currentSpeed += acc * timer.MinTimerBetweenTicks;
+                        if(currentSpeed > maxSpeed) currentSpeed = maxSpeed;
                     }
                     else
                     {
-                        currentSpeed -= 10f * Time.fixedDeltaTime;
+                        //currentSpeed -= 10f * Time.fixedDeltaTime;
+                        currentSpeed -= acc * timer.MinTimerBetweenTicks;
                         if (currentSpeed < 0)
                             currentSpeed = 0;
                     }
 
-                    
 
                     rb.velocity = dir * currentSpeed;
                     break;
 
-                case 1: // Kick
-
+                case (byte)StunType.ElectrifiedFront:
+                case (byte)StunType.ElectrifiedBack:
+                    currentSpeed = 0;
+                    rb.velocity = Vector3.zero; 
                     break;
+
+            }
+        }
+
+        void UpdateTackleMovement()
+        {
+            switch (playerSubState.Value)
+            {
+                case (byte)TackleType.Slide: 
+                case (byte)TackleType.Kick: 
+                    Vector3 dir = transform.forward;
+                    float time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    float acc = 10;
+                    if (playerSubState.Value == (byte)TackleType.Kick)
+                        acc = 15;
+                    maxSpeed = 3;
+                    if (time < .8f)
+                    {
+                        //currentSpeed += 10f * Time.fixedDeltaTime;
+                        currentSpeed += acc * timer.MinTimerBetweenTicks;
+                        if(currentSpeed > maxSpeed)
+                            currentSpeed = maxSpeed;
+                    }
+                    else
+                    {
+                        //currentSpeed -= 10f * Time.fixedDeltaTime;
+                        currentSpeed -= acc * timer.MinTimerBetweenTicks;
+                        if (currentSpeed < 0)
+                            currentSpeed = 0;
+                    }
+                                       
+
+                    rb.velocity = dir * currentSpeed;
+                    break;
+                                    
             }
 
             
@@ -719,10 +805,10 @@ namespace WLL_NGO.Netcode
                     if (IsServer)
                     {
                         // Get the action cooldown
-                        actionCooldown = GetTackleCooldown(actionType.Value);
+                        playerStateCooldown = GetTackleCooldown(playerSubState.Value);
 
                         // Start animation on server
-                        animator.SetInteger(typeAnimParam, actionType.Value);
+                        animator.SetInteger(typeAnimParam, playerSubState.Value);
                         animator.SetTrigger(tackleAnimTrigger);
 
                     }
@@ -733,14 +819,14 @@ namespace WLL_NGO.Netcode
                     if (IsServer)
                     {
                         // Get the action cooldown
-                        actionCooldown = GetStunnedCooldown(actionType.Value);
+                        playerStateCooldown = GetStunnedCooldown(playerSubState.Value);
 
                         // Disable the handling trigger
                         ballHandlingTrigger.SetEnable(false);
                      
                         // Start animation on server
                         // The action type depends on the opponent distance, for now we just test a basic tackle
-                        animator.SetInteger(typeAnimParam, actionType.Value);
+                        animator.SetInteger(typeAnimParam, playerSubState.Value);
                         animator.SetTrigger(stunAnimTrigger);
 
                     }
@@ -821,16 +907,27 @@ namespace WLL_NGO.Netcode
             if (!IsServer) 
                 return;
 
-            if(actionCooldown > 0)
+            if(playerStateCooldown > 0)
             {
-                actionCooldown -= Time.deltaTime;
-                if(actionCooldown < 0)
+                playerStateCooldown -= Time.deltaTime;
+                if(playerStateCooldown < 0)
                     playerState.Value = (byte)PlayerState.Normal;
             }
                 
         }
 
+        void IncreaseCharge(float time)
+        {
+            float ch = charge.Value;
+            ch += time * chargingSpeed;
+            ch = Mathf.Clamp01(ch);
+            charge.Value = ch;
+        }
 
+        /// <summary>
+        /// Called on this player when they are tackling.
+        /// </summary>
+        /// <param name="other"></param>
         private void OnTriggerEnter(Collider other)
         {
             // Each player has a trigger in order to better handle tackles
@@ -844,15 +941,55 @@ namespace WLL_NGO.Netcode
                 if(otherPC.playerState.Value == (byte)PlayerState.Normal)
                 {
                     // Stun the other player
-                    switch (actionType.Value)
+                    switch (playerSubState.Value)
                     {
-                        case 0: // Slide
-                            otherPC.actionType.Value = 1; 
+                        case (byte)TackleType.Slide:
+                            // Check whether the opponent is facing the player or not.
+                            // Player slides in the direction they are facing, so we just need the dot between the player and the opponent facing directions
+                            float dot = Vector3.Dot(transform.forward, other.transform.forward);
+                            if(dot < 0) // Facing
+                                otherPC.playerSubState.Value = (byte)StunType.BySlideFront; 
+                            else // Not facing
+                                otherPC.playerSubState.Value = (byte)StunType.BySlideBack;
+                            break;
+
+                        case (byte)TackleType.Kick:
+                            dot = Vector3.Dot(transform.forward, other.transform.forward);
+                            if (dot < 0) // Facing
+                                otherPC.playerSubState.Value = (byte)StunType.ByKickFront;
+                            else // Not facing
+                                otherPC.playerSubState.Value = (byte)StunType.ByKickBack;
                             break;
                     }
 
                     otherPC.playerState.Value = (byte)PlayerState.Stunned;
                 }
+            }
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            // Barrier collision
+            if (collision.gameObject.CompareTag(Tags.Barrier))
+            {
+                if(IsServer)
+                {
+                    // Electrify player
+                    Debug.Log($"Electrify player:{name}");
+                    // Get facing direction
+                    float dot = Vector3.Dot(transform.forward, collision.contacts[0].normal);
+                    if(dot < 0) // Front
+                    {
+                        playerSubState.Value = (byte)StunType.ElectrifiedFront;
+                    }
+                    else // Back
+                    {
+                        playerSubState.Value = (byte)StunType.ElectrifiedBack;
+                    }
+
+                    playerState.Value = (byte)PlayerState.Stunned;
+                }
+                
             }
         }
 

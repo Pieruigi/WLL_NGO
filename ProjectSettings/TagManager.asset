@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Ball
   - TackleTrigger
+  - Barrier
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Floor
   - Water
   - UI
   - Ball

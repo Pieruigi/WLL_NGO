@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace WLL_NGO.Netcode
 {
+    /// <summary>
+    /// We set the network tick rate exactly equal to the physics tick rate.
+    /// </summary>
     public class NetworkRateInitializer : MonoBehaviour
     {
         private void Awake()
@@ -17,6 +20,7 @@ namespace WLL_NGO.Netcode
         {
             Time.fixedDeltaTime = 1f / Constants.ServerTickRate;
             NetworkManager.Singleton.NetworkConfig.TickRate = Constants.ServerTickRate;
+            Application.targetFrameRate = Constants.ServerTickRate;
         }
 
         // Update is called once per frame
