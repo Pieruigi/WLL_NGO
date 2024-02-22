@@ -80,7 +80,48 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        
+
+        struct PlayerStateInfo : INetworkSerializable
+        {
+            public byte state; // The main state ( ex. 'stunned' )
+            public byte subState; // The substate ( ex. stunned by 'drop kick' )
+            public byte detail; // Some detail ( ex. 'back' stunned by drop kick )
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref state);
+                serializer.SerializeValue(ref subState);
+                serializer.SerializeValue(ref detail);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if(obj == null)
+                    return false;   
+
+                if(System.Object.ReferenceEquals(this, obj)) 
+                    return true;  
+
+                if(this.GetType() != obj.GetType()) 
+                    return false;
+
+
+
+                if (this.state != ((PlayerStateInfo)obj).state || this.subState != ((PlayerStateInfo)obj).subState || this.detail != ((PlayerStateInfo)obj).detail)
+                    return false;
+
+                return true;
+            }
+
+            public static bool operator ==(PlayerStateInfo l, PlayerStateInfo r)
+            {
+                return l.Equals(r);
+            }
+            public static bool operator !=(PlayerStateInfo l, PlayerStateInfo r) => !(l == r);
+
+            public override int GetHashCode() => (state, subState, detail).GetHashCode();
+
+        }
 
 
 
@@ -99,21 +140,23 @@ namespace WLL_NGO.Netcode
 
 
         #region action fields
-        NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
+        //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
+        NetworkVariable<PlayerStateInfo> playerStateInfo = new NetworkVariable<PlayerStateInfo>(new PlayerStateInfo() { state = (byte)PlayerState.Normal, subState = 0, detail = 0 });
 
-       
+
 
         float currentSpeed = 0;
         /// <summary>
         /// Used to give more detail about a specific state ( ex. what type of tackle the player is doing ).
         /// </summary>
-        NetworkVariable<byte> playerSubState = new NetworkVariable<byte>(0);
+        //NetworkVariable<byte> playerSubState = new NetworkVariable<byte>(0);
         //byte actionType = 0;
         float playerStateCooldown = 0; // Server only
         Animator animator;
         string tackleAnimTrigger = "Tackle";
         string stunAnimTrigger = "Stun";
         string typeAnimParam = "Type";
+        string detailAnimParam = "Detail";
         #endregion
 
         /// <summary>
@@ -150,7 +193,7 @@ namespace WLL_NGO.Netcode
 
         #region netcode prediction and reconciliation
         // General
-        NetworkTimer timer;
+        NetworkTimer timer = NetworkTimer.Instance;
         float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
@@ -192,7 +235,8 @@ namespace WLL_NGO.Netcode
             clientStateBuffer = new CircularBuffer<StatePayload> (bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverInputQueue = new Queue<InputPaylod> ();
-            timer = new NetworkTimer(serverTickRate);
+            //timer = new NetworkTimer(serverTickRate);
+            //timer = NetworkTimer.Instance;
         }
 
        
@@ -269,7 +313,7 @@ namespace WLL_NGO.Netcode
             }
 
             // Player state changed event handler
-            playerState.OnValueChanged += HandleOnPlayerStateChanged;
+            playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
 
             OnSpawned?.Invoke(this);
         }
@@ -299,7 +343,7 @@ namespace WLL_NGO.Netcode
 
         void CheckForTacklingInput(bool buttonValue, bool buttonLastValue, int tick)
         {
-            if (playerState.Value != (byte)PlayerState.Normal)
+            if (playerStateInfo.Value.state != (byte)PlayerState.Normal)
                 return;
 
             int state = GetButtonState(buttonValue, buttonLastValue);
@@ -310,26 +354,28 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Pressed: // Button down
                     IncreaseCharge(timer.DeltaTick);
-                    Debug.Log($"Charge:{charge}");
                     break;
                 case (byte)ButtonState.Held: 
                     IncreaseCharge(timer.DeltaTick);
-                    Debug.Log($"Charge:{charge}");
                     break;
                 case (byte)ButtonState.Released: // Button up
                     // Do tackle
                     // Check opponent to choose the right action type
-                    if(charge.Value < lightTackleChargeAmount)
+                    var ps = playerStateInfo.Value;
+                    if (charge.Value < lightTackleChargeAmount)
                     {
-                        playerSubState.Value = (byte)TackleType.Slide;
+                        //playerSubState.Value = (byte)TackleType.Slide;
+                        ps.subState = (byte)TackleType.Slide;
+                        //playerState.Value = ps;
                     }
                     else
                     {
-                        playerSubState.Value = (byte)TackleType.Kick; 
+                        ps.subState = (byte)TackleType.Kick;
+                        //playerState.Value = ps; 
                     }
-                    Debug.Log($"Charge:{charge}");
                     charge.Value = 0;
-                    playerState.Value = (byte)PlayerState.Tackling;
+                    ps.state = (byte)PlayerState.Tackling;
+                    playerStateInfo.Value = ps;
                     break;
             }
         }
@@ -343,11 +389,10 @@ namespace WLL_NGO.Netcode
 
                     break;
                 case (byte)ButtonState.Pressed:
-                    Debug.Log("Start charging...");
                     
                     break;
                 case (byte)ButtonState.Held:
-                    Debug.Log("Keep charging...");
+                  
                     break;
                 case (byte)ButtonState.Released:
                     // Shoot
@@ -398,28 +443,29 @@ namespace WLL_NGO.Netcode
             
         }
 
-        public float GetStunnedCooldown(byte type)
+        public float GetStunnedCooldown(byte type, byte detail)
         {
             float ret = 0;
             switch (type)
             {
-                case (byte)StunType.BySlideFront:
-                    ret = 2;
+                case (byte)StunType.BySlide:
+                    if(detail == (byte)StunDetail.Front)
+                        ret = 2;
+                    else
+                        ret = 2;
                     break;
-                case (byte)StunType.BySlideBack:
-                    ret = 2;
+                case (byte)StunType.ByKick:
+                    if (detail == (byte)StunDetail.Front)
+                        ret = 4;
+                    else
+                        ret = 4;
                     break;
-                case (byte)StunType.ByKickFront:
-                    ret = 4;
-                    break;
-                case (byte)StunType.ByKickBack:
-                    ret = 4;
-                    break;
-                case (byte)StunType.ElectrifiedFront:
-                    ret = 6;
-                    break;
-                case (byte)StunType.ElectrifiedBack:
-                    ret = 6;
+                case (byte)StunType.Electrified:
+                    if (detail == (byte)StunDetail.Front)
+                        ret = 6;
+                    else
+                        ret = 6;
+                    
                     break;
             }
 
@@ -461,7 +507,7 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    //UnityEngine.Debug.Log(statePayload);
+                    UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
 
                     //
@@ -511,7 +557,7 @@ namespace WLL_NGO.Netcode
                 // Simulate movement
                 //
                 StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
-                //UnityEngine.Debug.Log(state);
+                UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
@@ -663,7 +709,7 @@ namespace WLL_NGO.Netcode
        
         private void Move(Vector2 moveInput)
         {
-            switch (playerState.Value)
+            switch (playerStateInfo.Value.state)
             {
                 case (byte)PlayerState.Normal:
                     UpdateNormalMovement(moveInput);
@@ -703,12 +749,12 @@ namespace WLL_NGO.Netcode
 
         void UpdateStunnedMovement()
         {
-            switch(playerSubState.Value)
+            switch(playerStateInfo.Value.subState)
             {
-                case (byte)StunType.ByKickFront:
-                case (byte)StunType.ByKickBack:
+                case (byte)StunType.ByKick:
+                //case (byte)StunType.ByKickBack:
                     Vector3 dir = transform.forward;
-                    if (playerSubState.Value == (byte)StunType.ByKickFront)
+                    if (playerStateInfo.Value.detail == (byte)StunDetail.Front)
                         dir *= -1;
                     float time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
                     float maxSpeed = 5f;
@@ -731,8 +777,7 @@ namespace WLL_NGO.Netcode
                     rb.velocity = dir * currentSpeed;
                     break;
 
-                case (byte)StunType.ElectrifiedFront:
-                case (byte)StunType.ElectrifiedBack:
+                case (byte)StunType.Electrified:
                     currentSpeed = 0;
                     rb.velocity = Vector3.zero; 
                     break;
@@ -742,14 +787,14 @@ namespace WLL_NGO.Netcode
 
         void UpdateTackleMovement()
         {
-            switch (playerSubState.Value)
+            switch (playerStateInfo.Value.subState)
             {
                 case (byte)TackleType.Slide: 
                 case (byte)TackleType.Kick: 
                     Vector3 dir = transform.forward;
                     float time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
                     float acc = 10;
-                    if (playerSubState.Value == (byte)TackleType.Kick)
+                    if (playerStateInfo.Value.subState == (byte)TackleType.Kick)
                         acc = 15;
                     maxSpeed = 3;
                     if (time < .8f)
@@ -806,11 +851,12 @@ namespace WLL_NGO.Netcode
         /// </summary>
         /// <param name="oldState"></param>
         /// <param name="newState"></param>
-        void HandleOnPlayerStateChanged(byte oldState, byte newState)
+        void HandleOnPlayerStateInfoChanged(PlayerStateInfo oldState, PlayerStateInfo newState)
         {
             if(oldState == newState) return;
+            Debug.Log($"Change state:{newState}");
 
-            switch(newState)
+            switch(newState.state)
             {
                 case (byte)PlayerState.Normal:
                     ballHandlingTrigger.SetEnable(true);
@@ -820,10 +866,10 @@ namespace WLL_NGO.Netcode
                     if (IsServer)
                     {
                         // Get the action cooldown
-                        playerStateCooldown = GetTackleCooldown(playerSubState.Value);
+                        playerStateCooldown = GetTackleCooldown(newState.subState);
 
                         // Start animation on server
-                        animator.SetInteger(typeAnimParam, playerSubState.Value);
+                        animator.SetInteger(typeAnimParam, newState.subState);
                         animator.SetTrigger(tackleAnimTrigger);
 
                     }
@@ -834,14 +880,15 @@ namespace WLL_NGO.Netcode
                     if (IsServer)
                     {
                         // Get the action cooldown
-                        playerStateCooldown = GetStunnedCooldown(playerSubState.Value);
+                        playerStateCooldown = GetStunnedCooldown(newState.subState, newState.detail);
 
                         // Disable the handling trigger
                         ballHandlingTrigger.SetEnable(false);
-                     
+
                         // Start animation on server
                         // The action type depends on the opponent distance, for now we just test a basic tackle
-                        animator.SetInteger(typeAnimParam, playerSubState.Value);
+                        animator.SetInteger(detailAnimParam, newState.detail);
+                        animator.SetInteger(typeAnimParam, newState.subState);
                         animator.SetTrigger(stunAnimTrigger);
 
                     }
@@ -926,7 +973,14 @@ namespace WLL_NGO.Netcode
             {
                 playerStateCooldown -= Time.deltaTime;
                 if(playerStateCooldown < 0)
-                    playerState.Value = (byte)PlayerState.Normal;
+                {
+                    var ps = playerStateInfo.Value;
+                    ps.state = (byte)PlayerState.Normal;
+                    ps.subState = 0;
+                    ps.detail = 0;
+                    playerStateInfo.Value = ps;
+                }
+                    
             }
                 
         }
@@ -948,36 +1002,46 @@ namespace WLL_NGO.Netcode
             // Each player has a trigger in order to better handle tackles
             if(other.CompareTag(Tags.TackleTrigger))
             {
-                if(!IsServer || other.gameObject == gameObject || playerState.Value != (byte)PlayerState.Tackling) return;
+                if(!IsServer || other.gameObject == gameObject || playerStateInfo.Value.state != (byte)PlayerState.Tackling) return;
 
                 // Tackle trigger only belongs to players, so we have a player controller for sure.
                 PlayerController otherPC = other.GetComponentInParent<PlayerController>();
                 
-                if(otherPC.playerState.Value == (byte)PlayerState.Normal)
+                if(otherPC.playerStateInfo.Value.state == (byte)PlayerState.Normal)
                 {
+                    var ps = otherPC.playerStateInfo.Value;
                     // Stun the other player
-                    switch (playerSubState.Value)
+                    switch (playerStateInfo.Value.subState)
                     {
                         case (byte)TackleType.Slide:
                             // Check whether the opponent is facing the player or not.
                             // Player slides in the direction they are facing, so we just need the dot between the player and the opponent facing directions
                             float dot = Vector3.Dot(transform.forward, other.transform.forward);
-                            if(dot < 0) // Facing
-                                otherPC.playerSubState.Value = (byte)StunType.BySlideFront; 
+                            ps.subState = (byte)StunType.BySlide;
+                            if (dot < 0) // Facing
+                                ps.detail = (byte)StunDetail.Front; 
                             else // Not facing
-                                otherPC.playerSubState.Value = (byte)StunType.BySlideBack;
+                                ps.detail = (byte)StunDetail.Back;
+
+                            ps.state = (byte)PlayerState.Stunned;
+                            
                             break;
 
                         case (byte)TackleType.Kick:
                             dot = Vector3.Dot(transform.forward, other.transform.forward);
+                            //var ps = otherPC.playerState.Value;
+                            ps.subState = (byte)StunType.ByKick;
                             if (dot < 0) // Facing
-                                otherPC.playerSubState.Value = (byte)StunType.ByKickFront;
+                                ps.detail = (byte)StunDetail.Front;
                             else // Not facing
-                                otherPC.playerSubState.Value = (byte)StunType.ByKickBack;
+                                ps.detail = (byte)StunDetail.Back;
+
+                            ps.state = (byte)PlayerState.Stunned;
+                            
                             break;
                     }
 
-                    otherPC.playerState.Value = (byte)PlayerState.Stunned;
+                    otherPC.playerStateInfo.Value = ps;
                 }
             }
         }
@@ -990,19 +1054,26 @@ namespace WLL_NGO.Netcode
                 if(IsServer)
                 {
                     // Electrify player
-                    Debug.Log($"Electrify player:{name}");
+                    
                     // Get facing direction
                     float dot = Vector3.Dot(transform.forward, collision.contacts[0].normal);
-                    if(dot < 0) // Front
+                    var ps = playerStateInfo.Value;
+                    ps.subState = (byte)StunType.Electrified;
+                    if (dot < 0) // Front
                     {
-                        playerSubState.Value = (byte)StunType.ElectrifiedFront;
+                        Debug.Log($"Electrify front, player:{name}");
+                        
+                        ps.detail = (byte)StunDetail.Front;
+
                     }
                     else // Back
                     {
-                        playerSubState.Value = (byte)StunType.ElectrifiedBack;
+                        Debug.Log($"Electrify back, player:{name}");
+                        ps.detail = (byte)StunDetail.Back;
                     }
 
-                    playerState.Value = (byte)PlayerState.Stunned;
+                    ps.state = (byte)PlayerState.Stunned;
+                    playerStateInfo.Value = ps;
                 }
                 
             }

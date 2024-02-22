@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -61,6 +62,14 @@ namespace WLL_NGO.Netcode
         /// <param name="newValue"></param>
         private void HandleOnMatchStateChanged(byte previousValue, byte newValue)
         {
+            switch (newValue)
+            {
+                case (byte)MatchState.StartingMatch:
+                    // Reset the tick timer
+                    NetworkTimer.Instance.Reset();
+                    break;
+            }
+
             // Do something
             OnStateChanged?.Invoke(previousValue, newValue);
         }

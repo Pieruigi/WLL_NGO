@@ -16,7 +16,9 @@ namespace WLL_NGO
 
     public enum TackleType : byte { Slide, Kick, Slap, Elbow }
 
-    public enum StunType : byte { ByContrast, BySlideFront, BySlideBack, ByKickFront, ByKickBack, BySlapFront, BySlapBack, ByElbowFront, ByElbowBack, ElectrifiedFront, ElectrifiedBack }
+    public enum StunType : byte { ByContrast, BySlide, ByKick, BySlap, ByElbow, Electrified }
+
+    public enum StunDetail : byte { Front, Back }
 
     public enum ButtonState: byte { None, Pressed, Held, Released }
 

@@ -63,7 +63,7 @@ namespace WLL_NGO.Netcode
 
         #region prediction and reconciliation
         // General
-        NetworkTimer timer;
+        NetworkTimer timer = NetworkTimer.Instance;
         float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
@@ -97,16 +97,15 @@ namespace WLL_NGO.Netcode
             //Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
-        private void Start()
-        {
-            MatchController.Instance.OnStateChanged += (oldV, newV) => { if(newV == (byte)MatchState.StartingMatch ) timer = new NetworkTimer(serverTickRate); };
-        }
-
+        
         private void Update()
         {
+            if (timer == null)
+                return;
+
             // Update timer
             // The ball is already on scene when the server starts, so client and server ticks don't match.
-            timer?.Update(Time.deltaTime);
+            timer.Update(Time.deltaTime);
 
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Q))
@@ -129,6 +128,9 @@ namespace WLL_NGO.Netcode
 
         private void FixedUpdate()
         {
+            if(timer==null) 
+                return;
+
             if (timer.TimeToTick())
             {
                 // Client side
@@ -202,7 +204,7 @@ namespace WLL_NGO.Netcode
             StatePayload clientState = ReadTransform();
             
             clientState.tick = timer.CurrentTick;
-            Debug.Log($"Reconciliation - read client state, tick:{clientState.tick}, pos:{clientState.position}");
+            //Debug.Log($"Reconciliation - read client state, tick:{clientState.tick}, pos:{clientState.position}");
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
 
             // Reconciliate
@@ -337,7 +339,7 @@ namespace WLL_NGO.Netcode
 
         public async void ShootAtTick(PlayerController player, Vector3 velocity, int tick)
         {
-            Debug.Log($"Shoot at tick {tick}");
+            Debug.Log($"Shoot at tick {tick}, currentTick:{timer.CurrentTick}");
 
             // You can not shoot the ball it's controlled by another player
             if (owner != null && owner != player) return;
