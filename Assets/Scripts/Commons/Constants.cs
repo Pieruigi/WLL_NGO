@@ -16,7 +16,7 @@ namespace WLL_NGO
         public const int MatchmakerTimeout = 20000; // In millis
         public const int BoltSessionJoinAttempts = 10;
         public const ushort NoMatchmakingTestingPort = 9797;
-        public const int ServerTickRate = 30;
+        public const int ServerTickRate = 60;
         
         public const string PoweredQueueName = "1VS1-Powered";
         public const string GoldenGoalQueueName = "1VS1-GoldenGoal";

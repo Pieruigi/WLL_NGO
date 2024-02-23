@@ -333,11 +333,12 @@ namespace WLL_NGO.Netcode
             if (!IsServer)
                 return;
 
+
             if (handlingTheBall)
                 CheckForShootingInput(value, button1LastValue, tick, true);
             else
                 CheckForTacklingInput(value, button1LastValue, tick);
-            
+
             button1LastValue = value;
         }
 
@@ -396,11 +397,13 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Released:
                     // Shoot
-                    Vector3 dir = new Vector3(0.5f, .5f, 0f);
-                    if (BallController.Instance.transform.position.x > 0)
-                        dir = new Vector3(-0.5f, .5f, 0f);
+                    // Calculate velocity and effect
+                    float speed = 22;
+                    float effectSpeed = 5;
+                    Vector3 targetPosition = rb.position + transform.forward * 20.6f + Vector3.up * 2;
+
                     int aheadTick = 32;
-                    BallController.Instance.ShootAtTick(this, dir.normalized * 10, tick + aheadTick);
+                    BallController.Instance.ShootAtTick(this, targetPosition, speed, effectSpeed , tick + aheadTick);
                     break;
             }
 
@@ -507,7 +510,7 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    UnityEngine.Debug.Log(statePayload);
+                    //UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
 
                     //
@@ -557,7 +560,7 @@ namespace WLL_NGO.Netcode
                 // Simulate movement
                 //
                 StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
-                UnityEngine.Debug.Log(state);
+                //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //

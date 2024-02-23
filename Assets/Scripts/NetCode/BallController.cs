@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.Image;
 using static WLL_NGO.Netcode.PlayerController;
 
 namespace WLL_NGO.Netcode
@@ -46,6 +53,22 @@ namespace WLL_NGO.Netcode
             }
         }
 
+        struct ShootingData
+        {
+            public Vector3 InitialPosition;
+            public Vector3 TargetPosition;
+            public Vector3 Velocity; // Velocity with no effect applied
+            public Vector3 InitialEffectVelocity, CurrentEffectVelocity; // Effect velocities
+            public float EffectTime, CurrentEffectTime;
+            public int InitialTick;
+            public PlayerController Shooter;
+
+            public override string ToString()
+            {
+                return $"[ShootingData Position:{InitialPosition}, Target:{TargetPosition}, StraightVelocity:{Velocity}, InitialEffectVelocity:{InitialEffectVelocity}, CurrentEffectVelocity:{CurrentEffectVelocity}, EffectTime:{EffectTime}, CurrentEffectTime:{CurrentEffectTime}]";
+            }
+        }
+
 
         NetworkVariable<NetworkObjectReference> ownerReference = new NetworkVariable<NetworkObjectReference>(default);
 
@@ -78,7 +101,7 @@ namespace WLL_NGO.Netcode
         #endregion
 
         #region misc fields
-        
+        ShootingData shootingData = default;
 
         #endregion
 
@@ -138,6 +161,8 @@ namespace WLL_NGO.Netcode
                 // Server side
                 HandleServerTick();
             }
+
+            
         }
 
         public override void OnNetworkSpawn()
@@ -207,6 +232,9 @@ namespace WLL_NGO.Netcode
             //Debug.Log($"Reconciliation - read client state, tick:{clientState.tick}, pos:{clientState.position}");
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
 
+            // Handle effect
+            HandleEffect();
+
             // Reconciliate
             Reconciliate();
         }
@@ -223,10 +251,33 @@ namespace WLL_NGO.Netcode
             //Physics.Simulate(Time.fixedDeltaTime);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             // Send the current state to the client
+            
+            // Handle effect
+            HandleEffect();
+
+
 
             StatePayload state = ReadTransform();
             state.tick = timer.CurrentTick;
             SendToClientRpc(state);
+        }
+
+        void HandleEffect()
+        {
+            if (shootingData.EffectTime > 0)
+            {
+                // Remove the old effect velocity
+                rb.velocity -= shootingData.CurrentEffectVelocity;
+                shootingData.CurrentEffectVelocity = shootingData.InitialEffectVelocity * (1f - 2f * shootingData.CurrentEffectTime / shootingData.EffectTime);
+                shootingData.CurrentEffectTime += timer.DeltaTick;
+                // Add the updated effect velocity
+                rb.velocity += shootingData.CurrentEffectVelocity;
+                if (shootingData.CurrentEffectTime >= shootingData.EffectTime)
+                    shootingData.EffectTime = 0;
+
+
+                Debug.Log(shootingData);
+            }
         }
 
         void Reconciliate()
@@ -318,6 +369,64 @@ namespace WLL_NGO.Netcode
         #region gameplay
 
         /// <summary>
+        /// If we want to reach a target T we must aim to T1 higher than T because of the gravity.
+        /// We apply the formula V(y) = (1 / 2 * g* t) +/ -(d* sin(b)) / t(sign depending whether the ball is higher or lower than the target)
+        /// - V(y) is the vertical velocity taking into account the gravity(towards T1)
+        /// - g is the gravity acceleration
+        /// - t is the time it will take to reach the original target T depending on the speed
+        /// - b is the angle between the original direction(towards T) and the horizontal plane
+        /// Basically our vertical velocity will be made by two components: one to reach the target and anothersla to contrast the gravity
+        /// </summary>
+        /// <param name="targetPosition"></param>
+        /// <param name="speed"></param>
+        /// <param name="effectSpeed"></param>
+        ShootingData ComputeVelocity(Vector3 targetPosition, float speed, float effectSpeed)
+        {
+            ShootingData sData = default;
+            sData.InitialTick = NetworkTimer.Instance.CurrentTick;
+            sData.TargetPosition = targetPosition;
+            sData.InitialPosition = rb.position;
+            
+            // Get the original direction
+            Vector3 direction = targetPosition - rb.position;
+            // Project the direction on the floor
+            Vector3 dirOnFloor = Vector3.ProjectOnPlane(direction, Vector3.up);
+            // Get the angle between original direction and its projection
+            float b = Vector3.Angle(direction, dirOnFloor);
+
+            // Get the time it takes to reach the original target 
+            float t = direction.magnitude / speed;
+
+            // Invert the sign of the first component of the velocity if the ball is higher than the target ( we must move down )
+            float sign = rb.position.y > targetPosition.y ? -1 : 1;
+
+            // Compute horizontal and vertical components: the first term is the velocity to reach the original target, the second contrasts the gravity
+            Vector3 velY = (sign * (direction.magnitude * math.sin(math.radians(b)) / t) + (.5f * math.abs(Physics.gravity.y) * t)) * Vector3.up;
+            Vector3 velH = dirOnFloor.normalized * (dirOnFloor.magnitude / t);
+            Vector3 velE = Vector3.zero;
+
+            
+            
+            // We apply some effect to the ball if needed
+            if (effectSpeed != 0)
+            {
+                //eSpeed = eSpeed * (1f - 2f * t);
+                Vector3 eDir = Vector3.Cross(direction, dirOnFloor).normalized;
+                velE = eDir * effectSpeed;
+
+                sData.EffectTime = t;
+                sData.InitialEffectVelocity = velE;
+                sData.CurrentEffectTime = 0;
+                sData.CurrentEffectVelocity = velE;
+            }
+            
+            sData.Velocity = velH + velY + velE;
+
+            // Apply shooting data
+            return sData;
+        }
+
+        /// <summary>
         /// Tell all the clients that a given player is going to shoot in few ticks ( in the future ); this way we can shoot the ball at the same tick on both server
         /// and client.
         /// </summary>
@@ -325,32 +434,44 @@ namespace WLL_NGO.Netcode
         /// <param name="force"></param>
         /// <param name="tick"></param>
         [ClientRpc]
-        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, Vector3 force, int tick)
+        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
             NetworkObject player = null;
             if(playerRef.TryGet(out player))
             {
-                ShootAtTick(player.GetComponent<PlayerController>(), force, tick);
+                
+
+                ShootAtTick(player.GetComponent<PlayerController>(), targetPosition, speed, effectSpeed, tick);
             }
             
         }
 
        
 
-        public async void ShootAtTick(PlayerController player, Vector3 velocity, int tick)
+        public async void ShootAtTick(PlayerController player, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
             Debug.Log($"Shoot at tick {tick}, currentTick:{timer.CurrentTick}");
+
+            //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
 
             // You can not shoot the ball it's controlled by another player
             if (owner != null && owner != player) return;
             
             // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), velocity, tick);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), targetPosition, speed, effectSpeed, tick);
             
             if(timer.CurrentTick > tick)
             {
-                Shoot(player, velocity);
+                //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
+                shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
+                shootingData.Shooter = player;
+                // Adjust elapsed time
+                if(shootingData.EffectTime > 0)
+                    shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
+    
+
+                Shoot(player, shootingData);
             }
             else
             {
@@ -359,21 +480,29 @@ namespace WLL_NGO.Netcode
                     await Task.Delay(1000/Constants.ServerTickRate);
                 }
                 // Check if you can still shoot the ball first
-                if(owner == player)
+                if(owner == null || owner == player)
                 {
-                    Shoot(player, velocity);
+                    //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
+                    shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
+                    shootingData.Shooter = player;
+                    // Adjust elapsed time ( it should be the same tick at this point, but... who knows )
+                    if (shootingData.EffectTime > 0)
+                        shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
+
+                    Shoot(player, shootingData);
                 }
                 
             }
                 
         }
 
-        void Shoot(PlayerController player, Vector3 velocity)
+        void Shoot(PlayerController player, ShootingData shootingData)
         {
             player.StopHandlingTheBall();
             rb.isKinematic = false;
-            rb.velocity = velocity;
+            rb.velocity = shootingData.Velocity;
         }
+                
 
         /// <summary>
         /// Evaluation function to decretate a winner during tackles
@@ -430,6 +559,9 @@ namespace WLL_NGO.Netcode
         }
 
         #endregion
+
+
+       
     }
 
 }
