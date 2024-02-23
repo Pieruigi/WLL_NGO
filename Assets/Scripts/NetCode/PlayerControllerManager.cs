@@ -44,8 +44,9 @@ namespace WLL_NGO.Netcode
             PlayerController pc = go.GetComponent<PlayerController>();
             pc.Init(playerInfo);
             Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
-            pc.transform.position = spawnPoint.position;
-            pc.transform.rotation = spawnPoint.rotation;
+            Rigidbody rb = go.GetComponent<Rigidbody>();
+            rb.position = spawnPoint.position;
+            rb.rotation = spawnPoint.rotation;
             NetworkObject no = go.GetComponent<NetworkObject>();
             no.Spawn();
 
