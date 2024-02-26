@@ -55,6 +55,7 @@ namespace WLL_NGO.Netcode
                 rb.rotation = spawnPoint.rotation;
                 NetworkObject no = go.GetComponent<NetworkObject>();
                 no.Spawn();
+                
             }
 
             //Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);

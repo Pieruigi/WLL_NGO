@@ -75,7 +75,7 @@ namespace WLL_NGO.Netcode
             {
                 clientId = clientId,
                 bot = false,
-                id = "",
+                id = $"h_{clientId}",
                 initialized = false,
                 home = home,
                 data = ""

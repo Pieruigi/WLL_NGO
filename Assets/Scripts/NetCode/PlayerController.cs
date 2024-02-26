@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -212,11 +213,13 @@ namespace WLL_NGO.Netcode
         #endregion
 
         //NetworkVariable<NetworkObjectReference> playerInfoRef = new NetworkVariable<NetworkObjectReference>(default);
+        NetworkVariable<FixedString32Bytes> playerInfoId = new NetworkVariable<FixedString32Bytes>(default);
 
-        NetworkVariable<PlayerInfo> playerInfo = new NetworkVariable<PlayerInfo>();
+        //NetworkVariable<PlayerInfo> playerInfo = new NetworkVariable<PlayerInfo>();
+        PlayerInfo playerInfo;
         public PlayerInfo PlayerInfo
         {
-            get { return playerInfo.Value; }
+            get { return playerInfo; }
         }
 
         private void Awake()
@@ -313,12 +316,23 @@ namespace WLL_NGO.Netcode
             PlayerControllerManager.Instance.AddPlayerController(this);
             if (IsServer)
             {
+                
                 // Server must set the player ownership
                 NetworkObject no = GetComponent<NetworkObject>();
                 no.ChangeOwnership(PlayerInfo.ClientId);
 
-                Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
+                //Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
+                Debug.Log($"Spawned player controller, playerInfoId:{playerInfoId.Value}");
+                
+
             }
+
+            // Set player info on both client and server
+            playerInfo = PlayerInfoManager.Instance.GetPlayerInfoById(playerInfoId.Value.ToString());
+
+            // Change object name on both client and server
+            name = $"Player_{PlayerControllerManager.Instance.PlayerControllers.Count}_{playerInfo.Home}";
+
 
             // Player state changed event handler
             playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
@@ -442,6 +456,8 @@ namespace WLL_NGO.Netcode
 
         void ProcessPassage()
         {
+            Debug.Log($"Pass:{name}");
+
             // You can only pass the ball if you are in the normal or receiver state
             if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
             {
@@ -454,6 +470,8 @@ namespace WLL_NGO.Netcode
                     PlayerController receiver = null;
                     if (TryGetAvailableReceiver(out receiver, maxAngle))
                     {
+                        Debug.Log($"Receiver:{receiver.name}");
+
                         // Get the target 
                         Vector3 targetPosition;
                         if (charge.Value > 0.5f)
@@ -475,13 +493,26 @@ namespace WLL_NGO.Netcode
 
                         // Shoot
                         BallController.Instance.ShootAtTick(this, targetPosition, speed, 0, timer.CurrentTick + aheadTick);
-                    }
 
+                        // Flag target as receiver
+                        receiver.SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Receiver });
+
+                        // Set target as the selected player
+                        TeamController.GetPlayerTeam(this).SetPlayerSelected(receiver);
+                        
+                        
+                    }
+                    else
+                    {
+                        Debug.Log("No receiver found");
+
+                    }
                 }
                 else
                 {
                     // Check the input axis
                 }
+
 
                 
                 //float effectSpeed = 5;
@@ -497,9 +528,8 @@ namespace WLL_NGO.Netcode
         bool TryGetAvailableReceiver(out PlayerController teammate, float angle)
         {
             teammate = null;
-            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
+            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver) // Using the forward axis
             {
-                // Look for the closest teammate along the current player forward axis
                 float distance = 0;
                 List<PlayerController> teammates = TeamController.GetPlayerTeam(this).GetPlayers();
                 foreach (PlayerController player in teammates)
@@ -527,12 +557,12 @@ namespace WLL_NGO.Netcode
                         
                 }
             }
-            else
+            else // Using the input direction
             {
-
+                
             }
 
-            return false;
+            return teammate;
         }
 
         public float GetTackleCooldown(byte type)
@@ -1031,8 +1061,8 @@ namespace WLL_NGO.Netcode
         private void HandleOnBallEnter()
         {
             Debug.Log("Ball enter");
-            
-            
+            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
+
             BallController.Instance.BallEnterTheHandlingTrigger(this);
         }
 
@@ -1088,15 +1118,21 @@ namespace WLL_NGO.Netcode
                 playerStateCooldown -= Time.deltaTime;
                 if(playerStateCooldown < 0)
                 {
-                    var ps = playerStateInfo.Value;
-                    ps.state = (byte)PlayerState.Normal;
-                    ps.subState = 0;
-                    ps.detail = 0;
-                    playerStateInfo.Value = ps;
+                    //var ps = playerStateInfo.Value;
+                    //ps.state = (byte)PlayerState.Normal;
+                    //ps.subState = 0;
+                    //ps.detail = 0;
+                    //playerStateInfo.Value = ps;
+                    SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
                 }
                     
             }
                 
+        }
+
+        void SetPlayerStateInfo(PlayerStateInfo playerStateInfo)
+        {
+            this.playerStateInfo.Value = playerStateInfo;
         }
 
         void IncreaseCharge(float time)
@@ -1203,7 +1239,8 @@ namespace WLL_NGO.Netcode
         /// <param name="owner"></param>
         public void Init(PlayerInfo owner)
         {
-            this.playerInfo.Value = owner;
+            //this.playerInfo.Value = owner;
+            this.playerInfoId.Value = owner.Id;
         }
 
         public void SetInputHandler(IInputHandler inputHandler)

@@ -96,7 +96,6 @@ namespace WLL_NGO.Netcode
             List<PlayerController> ret = new List <PlayerController>();
             foreach(PlayerController player in PlayerControllerManager.Instance.PlayerControllers)
             {
-                Debug.Log($"{player.PlayerInfo}");
                 if(player.PlayerInfo.Home == home)
                     ret.Add(player);
             }

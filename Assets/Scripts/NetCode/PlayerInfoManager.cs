@@ -226,6 +226,15 @@ namespace WLL_NGO.Netcode
             return default;
         }
 
+        public PlayerInfo GetPlayerInfoById(string playerInfoId)
+        {
+            foreach(PlayerInfo player in players)
+            {
+                if(player.Id == playerInfoId) return player;
+            }
+
+            return default;
+        }
         
     }
 
