@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -176,7 +177,7 @@ namespace WLL_NGO.Netcode
         
         bool Selected 
         {
-            get { return true; }
+            get { return TeamController.GetPlayerTeam(this).SelectedPlayer == this; }
         }
 
         #region input data
@@ -210,7 +211,7 @@ namespace WLL_NGO.Netcode
 
         #endregion
 
-        
+        //NetworkVariable<NetworkObjectReference> playerInfoRef = new NetworkVariable<NetworkObjectReference>(default);
 
         NetworkVariable<PlayerInfo> playerInfo = new NetworkVariable<PlayerInfo>();
         public PlayerInfo PlayerInfo
@@ -243,6 +244,9 @@ namespace WLL_NGO.Netcode
 
         private void Update()
         {
+            if (!IsSpawned)
+                return;
+
             if (IsOwner && Selected)
                 CheckInput();
 
@@ -281,6 +285,8 @@ namespace WLL_NGO.Netcode
 
         private void FixedUpdate()
         {
+            if (!IsSpawned)
+                return;
 
             // If time to tick then tick
             if (timer.TimeToTick())
@@ -310,6 +316,8 @@ namespace WLL_NGO.Netcode
                 // Server must set the player ownership
                 NetworkObject no = GetComponent<NetworkObject>();
                 no.ChangeOwnership(PlayerInfo.ClientId);
+
+                Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
             }
 
             // Player state changed event handler
@@ -341,6 +349,8 @@ namespace WLL_NGO.Netcode
 
             button1LastValue = value;
         }
+
+
 
         void CheckForTacklingInput(bool buttonValue, bool buttonLastValue, int tick)
         {
@@ -396,14 +406,15 @@ namespace WLL_NGO.Netcode
                   
                     break;
                 case (byte)ButtonState.Released:
-                    // Shoot
-                    // Calculate velocity and effect
-                    float speed = 22;
-                    float effectSpeed = 5;
-                    Vector3 targetPosition = rb.position + transform.forward * 20.6f + Vector3.up * 2;
 
-                    int aheadTick = 32;
-                    BallController.Instance.ShootAtTick(this, targetPosition, speed, effectSpeed , tick + aheadTick);
+                    if (isPassage)
+                        ProcessPassage();
+                    else
+                        ProcessShotOnGoal();
+                    
+                    
+
+                    
                     break;
             }
 
@@ -427,6 +438,101 @@ namespace WLL_NGO.Netcode
             if(!newValue && oldValue)
                 return 3;
             return 0;
+        }
+
+        void ProcessPassage()
+        {
+            // You can only pass the ball if you are in the normal or receiver state
+            if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+            {
+                // We just want to reach the target in a given time 
+                float passageTime = UnityEngine.Random.Range(.8f, 1.2f);
+                if (playerStateInfo.Value.state == (byte)PlayerState.Normal)
+                {
+                    float maxAngle = 40f;
+                    // Check for an available receiver
+                    PlayerController receiver = null;
+                    if (TryGetAvailableReceiver(out receiver, maxAngle))
+                    {
+                        // Get the target 
+                        Vector3 targetPosition;
+                        if (charge.Value > 0.5f)
+                        {
+                            // High passage
+                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(2.5f, 3.5f);
+                        }
+                        else
+                        {
+                            // Low passage
+                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
+                        }
+
+                        int aheadTick = 32;
+                        Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(timer.CurrentTick + aheadTick);
+
+                        // Compute estimated speed
+                        float speed = Vector3.Distance(estimatedBallPos, targetPosition);
+
+                        // Shoot
+                        BallController.Instance.ShootAtTick(this, targetPosition, speed, 0, timer.CurrentTick + aheadTick);
+                    }
+
+                }
+                else
+                {
+                    // Check the input axis
+                }
+
+                
+                //float effectSpeed = 5;
+                //Vector3 targetPosition = rb.position + transform.forward * 20.6f + Vector3.up * 2;
+
+                //int aheadTick = 32;
+                //BallController.Instance.ShootAtTick(this, targetPosition, speed, effectSpeed, tick + aheadTick);
+            }
+        }
+
+        void ProcessShotOnGoal() { }
+
+        bool TryGetAvailableReceiver(out PlayerController teammate, float angle)
+        {
+            teammate = null;
+            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
+            {
+                // Look for the closest teammate along the current player forward axis
+                float distance = 0;
+                List<PlayerController> teammates = TeamController.GetPlayerTeam(this).GetPlayers();
+                foreach (PlayerController player in teammates)
+                {
+                    if(player == this) continue;
+                    if (player.playerStateInfo.Value.state != (byte)PlayerState.Normal) continue;
+
+                    // Get the vector from the current player to the candidate receiver
+                    Vector3 distV = player.rb.position - rb.position;
+                    // If a candidate teammate already exists and it's closer then skip
+                    if (teammate != null && distance < distV.magnitude)
+                        continue;
+                    // Get the angle between the direction and the current player forward
+                    Vector3 distProj = Vector3.ProjectOnPlane(distV.normalized, Vector3.up);
+                    if(Vector3.Angle(distProj, rb.transform.forward) < angle) 
+                    {
+                        // It's a valid target, check the distance
+                        if(!teammate || distance > distV.magnitude)
+                        {
+                            // Set the current candidate as the target
+                            teammate=player;
+                            distance=distV.magnitude;
+                        }
+                    }
+                        
+                }
+            }
+            else
+            {
+
+            }
+
+            return false;
         }
 
         public float GetTackleCooldown(byte type)
@@ -527,18 +633,23 @@ namespace WLL_NGO.Netcode
             }
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
             {
-                
-                // Simply get the last state processed by the server and apply it
-                if (!lastServerState.Equals(default))
+                // If we are playing singleplayer mode then we are the host and we don't need synchronization at all.
+                // If we are playing multiplayer mode then we need to receive synch data from the dedicated server, both for opponents and our teammates.
+                if (!IsHost) 
                 {
-                    WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
-                    lastProcessedState = lastServerState;
+                    // Simply get the last state processed by the server and apply it
+                    if (!lastServerState.Equals(default))
+                    {
+                        WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
+                        lastProcessedState = lastServerState;
+                    }
+
+                    //
+                    // Check ball handling eventually
+                    //
+                    CheckForBallHandling();
                 }
                 
-                //
-                // Check ball handling eventually
-                //
-                CheckForBallHandling();
             }
         }
 
@@ -1102,6 +1213,7 @@ namespace WLL_NGO.Netcode
         }
         #endregion
 
+        
 
 
         //void DoUpdate(Vector2 moveInput, bool shootDown, bool passDown)

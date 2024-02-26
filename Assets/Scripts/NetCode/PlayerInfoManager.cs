@@ -118,7 +118,7 @@ namespace WLL_NGO.Netcode
                     p.Initialize(data);
                     players[i] = p;
 
-                    Debug.Log($"Player initialized, clientId:{p.ClientId}, isBot:{p.Bot}");
+                    Debug.Log($"Player initialized {p}");
                     OnPlayerInitialized?.Invoke(players[i]);
 
                     return;

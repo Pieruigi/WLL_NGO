@@ -70,6 +70,7 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         public static PlayerInfo CreateHumanPlayer(ulong clientId, bool home)
         {
+            Debug.Log($"Creating player info, isHome:{home}");
             return new PlayerInfo()
             {
                 clientId = clientId,
@@ -147,7 +148,8 @@ namespace WLL_NGO.Netcode
             }
         }
         #endregion
-        
+
+
     }
 
 }

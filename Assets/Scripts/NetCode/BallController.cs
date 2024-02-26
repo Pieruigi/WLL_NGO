@@ -558,6 +558,11 @@ namespace WLL_NGO.Netcode
             }
         }
 
+        public Vector3 GetEstimatedPosition(int tick)
+        {
+            return rb.position + rb.velocity * tick * timer.DeltaTick;
+        }
+
         #endregion
 
 

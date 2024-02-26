@@ -29,6 +29,12 @@ namespace WLL_NGO.Netcode
 
         NetworkVariable<byte> matchState = new NetworkVariable<byte>((byte)MatchState.NotReady);
 
+        int playerPerTeam = 5;
+        public int PlayerPerTeam
+        {
+            get { return playerPerTeam; }
+        }
+
         private void Update()
         {
             if (IsServer)
@@ -67,6 +73,11 @@ namespace WLL_NGO.Netcode
                 case (byte)MatchState.StartingMatch:
                     // Reset the tick timer
                     NetworkTimer.Instance.Reset();
+                    // Select the last player
+                    //foreach(PlayerController p in )
+                    List<PlayerController> players = TeamController.HomeTeam.GetPlayers();
+                    Debug.Log($"PlayerController.Count:{players.Count}");
+                    TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam-1]);
                     break;
             }
 

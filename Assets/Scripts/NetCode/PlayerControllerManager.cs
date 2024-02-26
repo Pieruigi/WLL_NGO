@@ -11,7 +11,10 @@ namespace WLL_NGO.Netcode
         [SerializeField] NetworkPrefabsList playerPrefabList;
 
         List<PlayerController> playerControllers = new List<PlayerController>();
-
+        public ICollection<PlayerController> PlayerControllers
+        {
+            get { Debug.Log($"Returning players, count:{playerControllers.Count}"); return playerControllers.AsReadOnly(); }
+        }
         
         public override void OnNetworkSpawn()
         {
@@ -37,25 +40,31 @@ namespace WLL_NGO.Netcode
         /// <param name="player"></param>
         void HandleOnPlayerInitialized(PlayerInfo playerInfo)
         {
-            Debug.Log("Player initialized, spawn controllers");
+            Debug.Log($"Player initialized, spawn controllers, player info:{playerInfo}");
 
             // Spawn the team using the team roster
-            GameObject go = Instantiate(playerPrefabList.PrefabList[0].Prefab);
-            PlayerController pc = go.GetComponent<PlayerController>();
-            pc.Init(playerInfo);
-            Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
-            Rigidbody rb = go.GetComponent<Rigidbody>();
-            rb.position = spawnPoint.position;
-            rb.rotation = spawnPoint.rotation;
-            NetworkObject no = go.GetComponent<NetworkObject>();
-            no.Spawn();
+            for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
+            {
+                GameObject go = Instantiate(playerPrefabList.PrefabList[0].Prefab);
+                PlayerController pc = go.GetComponent<PlayerController>();
 
+                pc.Init(playerInfo);
+                Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(i) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(i);
+                Rigidbody rb = go.GetComponent<Rigidbody>();
+                rb.position = spawnPoint.position;
+                rb.rotation = spawnPoint.rotation;
+                NetworkObject no = go.GetComponent<NetworkObject>();
+                no.Spawn();
+            }
+
+            //Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
             //NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>(), playerInfo.ClientId, true, false, false, spawnPoint.position, spawnPoint.rotation);
         }
 
         public void AddPlayerController(PlayerController playerController)
         {
             playerControllers.Add(playerController);
+            Debug.Log($"Added new player controller, player count:{playerControllers.Count}");
         }
 
         public List<PlayerController> GetLocalPlayerControllers(bool bot)
