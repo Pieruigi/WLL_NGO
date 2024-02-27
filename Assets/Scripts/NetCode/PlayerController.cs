@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Interfaces;
@@ -34,7 +37,7 @@ namespace WLL_NGO.Netcode
     /// Input controller.
     /// The player controller always receives input both from human and AI; this means that the AI never tells the player to move or shoot, instead sets the input 
     /// like a human would do ( for example to shoot the AI sets the corresponding button to true and after a while sets it back to false thus triggering 
-    /// the shooting routine ).
+    /// the shooting routine ). Since the IA only works on server, the input will be enqued in the server input queue without being passed by the client.
     /// 
     /// Animations.
     /// Server always has authority on animations so you can not play an animation on client.
@@ -250,8 +253,17 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
+            if (Input.GetKeyDown(KeyCode.J))
+                Jump(10, 2f);
+
+
             if (IsOwner && Selected)
                 CheckInput();
+            else if (!IsOwner && !Selected)
+            {
+                // Simulating AI controller ( to remove )
+                serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = timer.CurrentTick });
+            }
 
             // Update the network timer 
             timer.Update(Time.deltaTime);
@@ -314,6 +326,10 @@ namespace WLL_NGO.Netcode
             //Debug.Log($"New player spawned, owner:{playerInfo.Value}");
 
             PlayerControllerManager.Instance.AddPlayerController(this);
+
+            // Set player info on both client and server
+            playerInfo = PlayerInfoManager.Instance.GetPlayerInfoById(playerInfoId.Value.ToString());
+
             if (IsServer)
             {
                 
@@ -324,11 +340,9 @@ namespace WLL_NGO.Netcode
                 //Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
                 Debug.Log($"Spawned player controller, playerInfoId:{playerInfoId.Value}");
                 
-
             }
 
-            // Set player info on both client and server
-            playerInfo = PlayerInfoManager.Instance.GetPlayerInfoById(playerInfoId.Value.ToString());
+            
 
             // Change object name on both client and server
             name = $"Player_{PlayerControllerManager.Instance.PlayerControllers.Count}_{playerInfo.Home}";
@@ -358,13 +372,40 @@ namespace WLL_NGO.Netcode
 
             if (handlingTheBall)
                 CheckForShootingInput(value, button1LastValue, tick, true);
-            else
+            else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+                CheckForShootingInputAsReceiver(value, button1LastValue, tick, true);
+            else                 
                 CheckForTacklingInput(value, button1LastValue, tick);
 
             button1LastValue = value;
         }
 
+        private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
+        {
+            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
+                return;
 
+            int state = GetButtonState(buttonValue, buttonLastValue);
+
+            switch (state)
+            {
+                case (byte)ButtonState.None:
+                    break;
+                case (byte)ButtonState.Pressed:
+                    ResetCharge();
+                    IncreaseCharge(timer.DeltaTick);
+                    break;
+                case (byte)ButtonState.Held:
+                    IncreaseCharge(timer.DeltaTick);
+                    break;
+                case (byte)ButtonState.Released:
+                    if (isPassage)
+                        ProcessPassage();
+                    else
+                        ProcessShotOnGoal();
+                    break;
+            }
+        }
 
         void CheckForTacklingInput(bool buttonValue, bool buttonLastValue, int tick)
         {
@@ -378,6 +419,7 @@ namespace WLL_NGO.Netcode
 
                     break;
                 case (byte)ButtonState.Pressed: // Button down
+                    ResetCharge();
                     IncreaseCharge(timer.DeltaTick);
                     break;
                 case (byte)ButtonState.Held: 
@@ -414,10 +456,11 @@ namespace WLL_NGO.Netcode
 
                     break;
                 case (byte)ButtonState.Pressed:
-                    
+                    ResetCharge();
+                    IncreaseCharge(timer.DeltaTick);
                     break;
                 case (byte)ButtonState.Held:
-                  
+                    IncreaseCharge(timer.DeltaTick);
                     break;
                 case (byte)ButtonState.Released:
 
@@ -425,9 +468,6 @@ namespace WLL_NGO.Netcode
                         ProcessPassage();
                     else
                         ProcessShotOnGoal();
-                    
-                    
-
                     
                     break;
             }
@@ -462,7 +502,7 @@ namespace WLL_NGO.Netcode
             if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
             {
                 // We just want to reach the target in a given time 
-                float passageTime = UnityEngine.Random.Range(.8f, 1.2f);
+                float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
                 if (playerStateInfo.Value.state == (byte)PlayerState.Normal)
                 {
                     float maxAngle = 40f;
@@ -474,32 +514,31 @@ namespace WLL_NGO.Netcode
 
                         // Get the target 
                         Vector3 targetPosition;
+                        float maxError = 1.5f;
                         if (charge.Value > 0.5f)
                         {
                             // High passage
-                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(2.5f, 3.5f);
+                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(4f, 7f);
                         }
                         else
                         {
                             // Low passage
                             targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
+                            
                         }
+
+                        targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
                         int aheadTick = 32;
                         Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(timer.CurrentTick + aheadTick);
 
                         // Compute estimated speed
-                        float speed = Vector3.Distance(estimatedBallPos, targetPosition);
+                        float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
                         // Shoot
-                        BallController.Instance.ShootAtTick(this, targetPosition, speed, 0, timer.CurrentTick + aheadTick);
+                        BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, timer.CurrentTick + aheadTick);
 
-                        // Flag target as receiver
-                        receiver.SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Receiver });
-
-                        // Set target as the selected player
-                        TeamController.GetPlayerTeam(this).SetPlayerSelected(receiver);
-                        
+                                               
                         
                     }
                     else
@@ -508,9 +547,10 @@ namespace WLL_NGO.Netcode
 
                     }
                 }
-                else
+                else // Receiver
                 {
                     // Check the input axis
+                   // Jump(10f, 1f);
                 }
 
 
@@ -521,6 +561,14 @@ namespace WLL_NGO.Netcode
                 //int aheadTick = 32;
                 //BallController.Instance.ShootAtTick(this, targetPosition, speed, effectSpeed, tick + aheadTick);
             }
+        }
+
+        async void Jump(float speed, float time)
+        {
+            //rb.useGravity = false;
+            rb.velocity += Vector3.up * speed;
+            await Task.Delay(TimeSpan.FromSeconds(time));
+            //rb.useGravity = true;
         }
 
         void ProcessShotOnGoal() { }
@@ -663,13 +711,16 @@ namespace WLL_NGO.Netcode
             }
             else // Not the owner or the selected one ( controlled by another client or the AI or busy in someway, for example stunned )
             {
+                
                 // If we are playing singleplayer mode then we are the host and we don't need synchronization at all.
                 // If we are playing multiplayer mode then we need to receive synch data from the dedicated server, both for opponents and our teammates.
                 if (!IsHost) 
                 {
+                    
                     // Simply get the last state processed by the server and apply it
                     if (!lastServerState.Equals(default))
                     {
+                        Debug.Log($"Last server state position:{lastServerState.position}");
                         WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
                         lastProcessedState = lastServerState;
                     }
@@ -715,9 +766,10 @@ namespace WLL_NGO.Netcode
                 CheckForBallHandling();
 
             }
-          
+            
             if (bufferIndex == -1) return; // No data
             // We send to all clients the last state processed by the server
+           
             SendToClientRpc(serverStateBuffer.Get(bufferIndex));
         }
 
@@ -756,7 +808,7 @@ namespace WLL_NGO.Netcode
             positionError = Vector3.Distance(rewindState.position, clientStateBuffer.Get(bufferIndex).position);
             if(positionError > reconciliationThreshold)
             {
-                Debug.Log($"Reconciliation, tick:{lastServerState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
+                Debug.Log($"{name} reconciliation - tick:{lastServerState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 
@@ -864,9 +916,54 @@ namespace WLL_NGO.Netcode
                 case (byte)PlayerState.Tackling:
                     UpdateTackleMovement();
                     break;
+                case (byte)PlayerState.Receiver:
+                    UpdateReceiverMovement();
+                    break;
             }
 
             
+        }
+
+        
+        void UpdateReceiverMovement()
+        {
+            if (!IsServer)
+                return;
+         
+            // Read the target
+            Vector3 targetPosition = BallController.Instance.GetShootindDataTargetPosition();
+
+            // Player should move towards the target position
+            
+            Vector3 dirH = Vector3.ProjectOnPlane(targetPosition - rb.transform.position, Vector3.up);
+            float minDist = .5f;
+            if (dirH.magnitude > minDist)
+            {
+                currentSpeed += acceleration * timer.DeltaTick;
+                if(currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+            }
+            else
+            {
+                currentSpeed -= acceleration * timer.DeltaTick;
+                if (currentSpeed < 0) currentSpeed = 0;
+            }
+            Debug.Log($"Setting receiver velocity:{dirH.normalized * currentSpeed}");
+            float vSpeed = rb.velocity.y;
+            rb.velocity = dirH.normalized * currentSpeed + Vector3.up * vSpeed;
+
+            //// Eventually jump
+            //float offset = .75f; // This may change depending on the shoot animation
+            //float targetHeight = targetPosition.y - offset;
+            //if(rb.position.y < targetHeight)
+            //{
+            //    //rb.AddForce(Vector3.up * 15, ForceMode.VelocityChange);
+            //    float time = Vector3.Distance(BallController.Instance.Position, targetPosition) / rb.velocity.magnitude;
+            //    float jumpSpeed = (targetHeight - rb.position.y) / time;
+            //    Debug.Log($"JumpSpeed:{jumpSpeed}");
+            //    rb.velocity += Vector3.up * 4f;
+            //}
+            
+
         }
 
         void UpdateNormalMovement(Vector2 moveInput)
@@ -893,7 +990,10 @@ namespace WLL_NGO.Netcode
 
         void UpdateStunnedMovement()
         {
-            switch(playerStateInfo.Value.subState)
+         
+            if(!IsServer) return;
+
+            switch (playerStateInfo.Value.subState)
             {
                 case (byte)StunType.ByKick:
                 //case (byte)StunType.ByKickBack:
@@ -1050,8 +1150,11 @@ namespace WLL_NGO.Netcode
         {
             if (inputHandler == null || !IsOwner || !Selected) 
                 return;
-            
-            input = inputHandler.GetInput();
+
+            if (Selected)
+                input = inputHandler.GetInput();
+            //else
+            //    input = new InputData() { joystick = Vector2.zero, button1 = false, button2 = false, button3 = false };
             //Debug.Log($"Client input:{input}");
         }
 
@@ -1135,12 +1238,22 @@ namespace WLL_NGO.Netcode
             this.playerStateInfo.Value = playerStateInfo;
         }
 
+        public void SetAsReceiver()
+        {
+            this.playerStateInfo.Value = new PlayerStateInfo() { state = (byte)PlayerState.Receiver };
+        }
+
         void IncreaseCharge(float time)
         {
             float ch = charge.Value;
             ch += time * chargingSpeed;
             ch = Mathf.Clamp01(ch);
             charge.Value = ch;
+        }
+
+        void ResetCharge()
+        {
+            charge.Value = 0;
         }
 
         /// <summary>
@@ -1248,6 +1361,7 @@ namespace WLL_NGO.Netcode
             Debug.Log($"PlayerController setting input handler:{inputHandler}");
             this.inputHandler = inputHandler;
         }
+
         #endregion
 
         

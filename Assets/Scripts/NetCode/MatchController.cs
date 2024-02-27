@@ -78,6 +78,7 @@ namespace WLL_NGO.Netcode
                     List<PlayerController> players = TeamController.HomeTeam.GetPlayers();
                     Debug.Log($"PlayerController.Count:{players.Count}");
                     TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam-1]);
+                    //TeamController.HomeTeam.SetPlayerSelected(players[0]);
                     break;
             }
 

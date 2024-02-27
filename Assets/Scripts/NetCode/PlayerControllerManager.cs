@@ -55,11 +55,11 @@ namespace WLL_NGO.Netcode
                 rb.rotation = spawnPoint.rotation;
                 NetworkObject no = go.GetComponent<NetworkObject>();
                 no.Spawn();
-                
-            }
 
+            }
+            //NetworkObject no = playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>();
             //Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
-            //NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>(), playerInfo.ClientId, true, false, false, spawnPoint.position, spawnPoint.rotation);
+            //NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(no, playerInfo.ClientId, true, false, false, spawnPoint.position, spawnPoint.rotation);
         }
 
         public void AddPlayerController(PlayerController playerController)

@@ -62,6 +62,7 @@ namespace WLL_NGO.Netcode
             public float EffectTime, CurrentEffectTime;
             public int InitialTick;
             public PlayerController Shooter;
+            public PlayerController Receiver; // Only for passage
 
             public override string ToString()
             {
@@ -102,7 +103,7 @@ namespace WLL_NGO.Netcode
 
         #region misc fields
         ShootingData shootingData = default;
-
+        
         #endregion
 
         protected override void Awake()
@@ -292,7 +293,7 @@ namespace WLL_NGO.Netcode
             
             if (positionError > reconciliationThreshold)
             {
-                Debug.Log($"Reconciliation - tick:{rewindState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
+                Debug.Log($"Ball reconciliation - tick:{rewindState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 
@@ -439,16 +440,14 @@ namespace WLL_NGO.Netcode
             NetworkObject player = null;
             if(playerRef.TryGet(out player))
             {
-                
-
-                ShootAtTick(player.GetComponent<PlayerController>(), targetPosition, speed, effectSpeed, tick);
+                ShootAtTick(player.GetComponent<PlayerController>(), null, targetPosition, speed, effectSpeed, tick);
             }
             
         }
 
        
 
-        public async void ShootAtTick(PlayerController player, Vector3 targetPosition, float speed, float effectSpeed, int tick)
+        public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
             Debug.Log($"Shoot at tick {tick}, currentTick:{timer.CurrentTick}");
 
@@ -466,6 +465,7 @@ namespace WLL_NGO.Netcode
                 //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
                 shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                 shootingData.Shooter = player;
+                shootingData.Receiver = receiver;
                 // Adjust elapsed time
                 if(shootingData.EffectTime > 0)
                     shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
@@ -485,6 +485,7 @@ namespace WLL_NGO.Netcode
                     //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
                     shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                     shootingData.Shooter = player;
+                    shootingData.Receiver = receiver;
                     // Adjust elapsed time ( it should be the same tick at this point, but... who knows )
                     if (shootingData.EffectTime > 0)
                         shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
@@ -501,6 +502,19 @@ namespace WLL_NGO.Netcode
             player.StopHandlingTheBall();
             rb.isKinematic = false;
             rb.velocity = shootingData.Velocity;
+
+            if (IsServer)
+            {
+                if(shootingData.Receiver != null)
+                {
+                    // Flag target as receiver
+                    shootingData.Receiver.SetAsReceiver();
+
+                    // Set target as the selected player
+                    TeamController.GetPlayerTeam(shootingData.Receiver).SetPlayerSelected(shootingData.Receiver);
+                }
+                
+            }
         }
                 
 
@@ -561,6 +575,11 @@ namespace WLL_NGO.Netcode
         public Vector3 GetEstimatedPosition(int tick)
         {
             return rb.position + rb.velocity * tick * timer.DeltaTick;
+        }
+
+        public Vector3 GetShootindDataTargetPosition()
+        {
+            return shootingData.TargetPosition;
         }
 
         #endregion
