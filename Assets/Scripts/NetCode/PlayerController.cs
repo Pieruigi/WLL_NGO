@@ -162,6 +162,7 @@ namespace WLL_NGO.Netcode
         string stunAnimTrigger = "Stun";
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
+        float height = 1.7f;
         #endregion
 
         /// <summary>
@@ -550,24 +551,29 @@ namespace WLL_NGO.Netcode
                 else // Receiver
                 {
                     // Check the input axis
-                   // Jump(10f, 1f);
+                    float offset = 1.2f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
+                    Vector3 targetPosition = BallController.Instance.GetShootindDataTargetPosition();
+                    float targetHeight = targetPosition.y;
+                    float hitPoint = targetHeight - offset;
+                    // If the hit point is less than the player height then jump
+                    if(hitPoint > height)
+                    {
+                        float time = Vector3.Distance(BallController.Instance.Position, targetPosition) / BallController.Instance.Velocity.magnitude;
+                        float jumpSpeed = (hitPoint / time) + (.5f * math.abs(Physics.gravity.y) * time);
+                        Jump(jumpSpeed, .5f);
+                    }
+                    // We must check for an available teammate depending on the player input
+
                 }
 
-
-                
-                //float effectSpeed = 5;
-                //Vector3 targetPosition = rb.position + transform.forward * 20.6f + Vector3.up * 2;
-
-                //int aheadTick = 32;
-                //BallController.Instance.ShootAtTick(this, targetPosition, speed, effectSpeed, tick + aheadTick);
             }
         }
 
-        async void Jump(float speed, float time)
+        async void Jump(float speed, float onAirTime)
         {
             //rb.useGravity = false;
             rb.velocity += Vector3.up * speed;
-            await Task.Delay(TimeSpan.FromSeconds(time));
+            await Task.Delay(TimeSpan.FromSeconds(onAirTime));
             //rb.useGravity = true;
         }
 
@@ -1137,6 +1143,10 @@ namespace WLL_NGO.Netcode
 
                     }
 
+                    break;
+                case (byte)PlayerState.Receiver:
+                    playerStateCooldown = 2f; // NOT_IMPLEMENTED_YET: we must compute the cooldown depending on the animation and eventually the jump
+                    ballHandlingTrigger.SetEnable(false);
                     break;
             }
         }

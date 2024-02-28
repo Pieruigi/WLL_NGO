@@ -37,12 +37,13 @@ namespace WLL_NGO.Netcode
 
         private void Update()
         {
-            if (IsServer)
-                return;
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
+            //if (IsServer)
+            //    return;
+            //if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    NetworkManager.Singleton.Shutdown();
+            //}
+            //NetworkTimer.Instance.Update(Time.deltaTime);
         }
 
         private void FixedUpdate()

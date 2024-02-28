@@ -83,6 +83,11 @@ namespace WLL_NGO.Netcode
             set { rb.position = value; if (rb.position.y < coll.radius) rb.position = new Vector3(rb.position.x, coll.radius + 0.01f, rb.position.z); }
         }
 
+        public Vector3 Velocity
+        {
+            get { return rb.velocity; }
+        }
+
         SphereCollider coll; 
 
         #region prediction and reconciliation
@@ -312,20 +317,21 @@ namespace WLL_NGO.Netcode
             clientStateBuffer.Add(state, state.tick);
 
             // Replay all the input from the rewind state to the current state
-            int tickToReplay = state.tick;
-            Physics.simulationMode = SimulationMode.Script;
-            while (tickToReplay < timer.CurrentTick)
-            {
-                int bufferIndex = tickToReplay % bufferSize;
+            //int tickToReplay = state.tick;
 
-                Physics.Simulate(timer.DeltaTick);
-                StatePayload clientState = ReadTransform();
+            //Physics.simulationMode = SimulationMode.Script;
+            //while (tickToReplay < timer.CurrentTick)
+            //{
+            //    int bufferIndex = tickToReplay % bufferSize;
+
+            //    Physics.Simulate(timer.DeltaTick);
+            //    StatePayload clientState = ReadTransform();
                 
-                clientState.tick = tickToReplay;
-                clientStateBuffer.Add(clientState, bufferIndex);
-                tickToReplay++;
-            }
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            //    clientState.tick = tickToReplay;
+            //    clientStateBuffer.Add(clientState, bufferIndex);
+            //    tickToReplay++;
+            //}
+            //Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
         bool ReconciliationAllowed()
