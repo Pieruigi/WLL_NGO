@@ -199,7 +199,7 @@ namespace WLL_NGO.Netcode
 
         #region netcode prediction and reconciliation
         // General
-        NetworkTimer timer = NetworkTimer.Instance;
+        NetworkTimer timer = null;
         float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
@@ -243,19 +243,20 @@ namespace WLL_NGO.Netcode
             clientStateBuffer = new CircularBuffer<StatePayload> (bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverInputQueue = new Queue<InputPaylod> ();
-            //timer = new NetworkTimer(serverTickRate);
+            //timer = new NetworkTimer();
             //timer = NetworkTimer.Instance;
+            MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
         }
 
-       
 
         private void Update()
         {
             if (!IsSpawned)
                 return;
 
-            if (Input.GetKeyDown(KeyCode.J))
-                Jump(10, 2f);
+            if (timer == null)
+                return;
+
 
 
             if (IsOwner && Selected)
@@ -272,36 +273,14 @@ namespace WLL_NGO.Netcode
             // Check the cooldown
             UpdateActionCooldown();
 
-            // If time to tick then tick
-            //if (timer.TimeToTick())
-            //{
-            //    // Client side
-            //    HandleClientTick();
-
-            //    // Server side
-            //    HandleServerTick();
-
-            //    // Both
-            //    CheckForBallHandling();
-            //}
-
-            //#if UNITY_EDITOR
-            //            if(Input.GetKeyDown(KeyCode.T))
-            //            {
-            //                if (IsServer)
-            //                {
-            //                    actionType.Value = 0;
-            //                    GetComponent<Animator>().SetTrigger("Tackle");
-            //                }
-
-            //            }
-
-            //#endif
         }
 
         private void FixedUpdate()
         {
             if (!IsSpawned)
+                return;
+
+            if (timer == null)
                 return;
 
             // If time to tick then tick
@@ -325,6 +304,7 @@ namespace WLL_NGO.Netcode
             base.OnNetworkSpawn();
 
             //Debug.Log($"New player spawned, owner:{playerInfo.Value}");
+            timer = new NetworkTimer();
 
             PlayerControllerManager.Instance.AddPlayerController(this);
 
@@ -353,6 +333,18 @@ namespace WLL_NGO.Netcode
             playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
 
             OnSpawned?.Invoke(this);
+        }
+
+        private void HandleOnMatchStateChanged(int oldValue, int newValue)
+        {
+            switch (newValue)
+            {
+                case (byte)MatchState.StartingMatch:
+                    //timer = new NetworkTimer();
+                    break;
+            }
+
+
         }
 
         #region buttons
@@ -504,12 +496,12 @@ namespace WLL_NGO.Netcode
             {
                 // We just want to reach the target in a given time 
                 float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
+                
                 if (playerStateInfo.Value.state == (byte)PlayerState.Normal)
                 {
-                    float maxAngle = 40f;
                     // Check for an available receiver
                     PlayerController receiver = null;
-                    if (TryGetAvailableReceiver(out receiver, maxAngle))
+                    if (TryGetAvailableReceiver(out receiver))
                     {
                         Debug.Log($"Receiver:{receiver.name}");
 
@@ -530,14 +522,15 @@ namespace WLL_NGO.Netcode
 
                         targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
-                        int aheadTick = 32;
-                        Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(timer.CurrentTick + aheadTick);
+                        int aheadTick = 1;
+                        // We have ball control while shooting and the player stops so the ball position won't change
+                        Vector3 estimatedBallPos = BallController.Instance.Position;// BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
 
                         // Compute estimated speed
                         float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
                         // Shoot
-                        BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, timer.CurrentTick + aheadTick);
+                        BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, BallController.Instance.CurrentTick + aheadTick);
 
                                                
                         
@@ -552,68 +545,121 @@ namespace WLL_NGO.Netcode
                 {
                     // Check the input axis
                     float offset = 1.2f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
-                    Vector3 targetPosition = BallController.Instance.GetShootindDataTargetPosition();
-                    float targetHeight = targetPosition.y;
+                    Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
+                    float targetHeight = currentTargetPosition.y;
                     float hitPoint = targetHeight - offset;
                     // If the hit point is less than the player height then jump
                     if(hitPoint > height)
                     {
-                        float time = Vector3.Distance(BallController.Instance.Position, targetPosition) / BallController.Instance.Velocity.magnitude;
+                        float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
                         float jumpSpeed = (hitPoint / time) + (.5f * math.abs(Physics.gravity.y) * time);
-                        Jump(jumpSpeed, .5f);
+                        JumpAndShoot(jumpSpeed, .5f);
                     }
-                    // We must check for an available teammate depending on the player input
-
+                  
                 }
 
             }
         }
 
-        async void Jump(float speed, float onAirTime)
+        async void JumpAndShoot(float speed, float onAirTime)
         {
             //rb.useGravity = false;
             rb.velocity += Vector3.up * speed;
             await Task.Delay(TimeSpan.FromSeconds(onAirTime));
-            //rb.useGravity = true;
+
+            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
+                return;
+
+            //if(rb.velocity.y < math.EPSILON)
+            {
+                // We can shoot
+                // We must check for an available teammate depending on the player input
+                float passageTime = 1f;
+                PlayerController receiver = null;
+                if (TryGetAvailableReceiver(out receiver))
+                {
+                    Debug.Log($"Receiver:{receiver.name}");
+
+                    // Get the target 
+                    Vector3 targetPosition;
+                    float maxError = 1.5f;
+                    if (charge.Value > 0.5f)
+                    {
+                        // High passage
+                        targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(4f, 7f);
+                    }
+                    else
+                    {
+                        // Low passage
+                        targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
+
+                    }
+
+                    targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
+
+                    int aheadTick = 1;
+                    Vector3 estimatedBallPos = BallController.Instance.Position;//  BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
+
+                    // Compute estimated speed
+                    float estBallSpeed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
+
+                    Debug.Log($"Shooting data - receiver:{receiver}, targetPosition:{targetPosition}, estimatedBallSpeed:{estBallSpeed}");
+                    // Shoot
+                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, BallController.Instance.CurrentTick + aheadTick);
+
+
+
+                }
+                else
+                {
+                    Debug.Log("No receiver found");
+
+                }
+            }
+
+            
         }
 
         void ProcessShotOnGoal() { }
 
-        bool TryGetAvailableReceiver(out PlayerController teammate, float angle)
+        bool TryGetAvailableReceiver(out PlayerController teammate)
         {
-            teammate = null;
-            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver) // Using the forward axis
+            float tollaranceAngle = 80;
+            Vector3 fwd = rb.transform.forward;
+            if (playerStateInfo.Value.state == (byte)PlayerState.Receiver) // Using the forward axis
             {
-                float distance = 0;
-                List<PlayerController> teammates = TeamController.GetPlayerTeam(this).GetPlayers();
-                foreach (PlayerController player in teammates)
-                {
-                    if(player == this) continue;
-                    if (player.playerStateInfo.Value.state != (byte)PlayerState.Normal) continue;
-
-                    // Get the vector from the current player to the candidate receiver
-                    Vector3 distV = player.rb.position - rb.position;
-                    // If a candidate teammate already exists and it's closer then skip
-                    if (teammate != null && distance < distV.magnitude)
-                        continue;
-                    // Get the angle between the direction and the current player forward
-                    Vector3 distProj = Vector3.ProjectOnPlane(distV.normalized, Vector3.up);
-                    if(Vector3.Angle(distProj, rb.transform.forward) < angle) 
-                    {
-                        // It's a valid target, check the distance
-                        if(!teammate || distance > distV.magnitude)
-                        {
-                            // Set the current candidate as the target
-                            teammate=player;
-                            distance=distV.magnitude;
-                        }
-                    }
-                        
-                }
+                fwd = new Vector3(input.joystick.x, 0f, input.joystick.y);    
             }
-            else // Using the input direction
+            
+            teammate = null;
+            float distance = 0;
+            float angle = 0f;
+            List<PlayerController> teammates = TeamController.GetPlayerTeam(this).GetPlayers();
+            foreach (PlayerController player in teammates)
             {
-                
+                if (player == this) continue;
+                if (player.playerStateInfo.Value.state != (byte)PlayerState.Normal) continue;
+
+                // Get the vector from the current player to the candidate receiver
+                Vector3 distV = player.rb.position - rb.position;
+                Vector3 distProj = Vector3.ProjectOnPlane(distV.normalized, Vector3.up);
+                float a = Vector3.Angle(distProj, fwd);
+                // If a candidate teammate already exists and it's closer then skip
+                if (teammate != null && angle < a/* && distance < distV.magnitude*/)
+                    continue;
+                // Get the angle between the direction and the current player forward
+                if (a < tollaranceAngle)
+                {
+                    // It's a valid target, check the distance
+                    if (!teammate || a<angle/*|| distance > distV.magnitude*/)
+                    {
+                        // Set the current candidate as the target
+                        teammate = player;
+                        distance = distV.magnitude;
+                        angle = a;
+                    }
+                }
+
             }
 
             return teammate;
@@ -953,7 +999,7 @@ namespace WLL_NGO.Netcode
                 currentSpeed -= acceleration * timer.DeltaTick;
                 if (currentSpeed < 0) currentSpeed = 0;
             }
-            Debug.Log($"Setting receiver velocity:{dirH.normalized * currentSpeed}");
+            //Debug.Log($"Setting receiver velocity:{dirH.normalized * currentSpeed}");
             float vSpeed = rb.velocity.y;
             rb.velocity = dirH.normalized * currentSpeed + Vector3.up * vSpeed;
 

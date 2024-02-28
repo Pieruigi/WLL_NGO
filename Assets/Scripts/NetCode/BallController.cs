@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -8,6 +9,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Events;
 using static UnityEditor.Searcher.SearcherWindow.Alignment;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
@@ -30,6 +32,8 @@ namespace WLL_NGO.Netcode
     /// </summary>
     public class BallController : SingletonNetwork<BallController>
     {
+        public static UnityAction OnBallSpawned;
+
         public struct StatePayload : INetworkSerializable
         {
             public int tick;
@@ -88,12 +92,16 @@ namespace WLL_NGO.Netcode
             get { return rb.velocity; }
         }
 
-        SphereCollider coll; 
+        SphereCollider coll;
 
         #region prediction and reconciliation
         // General
-        NetworkTimer timer = NetworkTimer.Instance;
-        float serverTickRate = Constants.ServerTickRate;
+        NetworkTimer timer = null;// NetworkTimer.Instance;
+        public int CurrentTick
+        {
+            get { return timer.CurrentTick; }
+        }
+        //float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
         // Client
@@ -121,14 +129,21 @@ namespace WLL_NGO.Netcode
             // Init netcode for p&r
             clientStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
-            
 
+            //timer = new NetworkTimer();
             //Physics.simulationMode = SimulationMode.FixedUpdate;
+            MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
         }
 
         
+
+       
+
         private void Update()
         {
+            if(!IsSpawned) 
+                return;
+
             if (timer == null)
                 return;
 
@@ -157,7 +172,10 @@ namespace WLL_NGO.Netcode
 
         private void FixedUpdate()
         {
-            if(timer==null) 
+            if (!IsSpawned)
+                return;
+
+            if (timer==null) 
                 return;
 
             if (timer.TimeToTick())
@@ -175,9 +193,15 @@ namespace WLL_NGO.Netcode
         {
             base.OnNetworkSpawn();
 
+            timer = new NetworkTimer();
+
             // Owner change event handler
             ownerReference.OnValueChanged += HandleOnOwnerReferenceChanged;
 
+            if (IsServer)
+                OnBallSpawned?.Invoke();
+
+            
         }
 
         public override void OnNetworkDespawn()
@@ -186,7 +210,19 @@ namespace WLL_NGO.Netcode
             // Owner change event handler
             ownerReference.OnValueChanged -= HandleOnOwnerReferenceChanged;
         }
+
+        private void HandleOnMatchStateChanged(int oldValue, int newValue)
+        {
+            switch(newValue)
+            {
+                case (byte)MatchState.StartingMatch:
+                    //timer = new NetworkTimer();
+                    break;
+            }
+
         
+        }
+
         void HandleOnOwnerReferenceChanged(NetworkObjectReference oldRef, NetworkObjectReference newRef)
         {
             // Try get the controller and set the owner 
@@ -390,7 +426,8 @@ namespace WLL_NGO.Netcode
         ShootingData ComputeVelocity(Vector3 targetPosition, float speed, float effectSpeed)
         {
             ShootingData sData = default;
-            sData.InitialTick = NetworkTimer.Instance.CurrentTick;
+            //sData.InitialTick = NetworkTimer.Instance.CurrentTick;
+            sData.InitialTick = timer.CurrentTick;
             sData.TargetPosition = targetPosition;
             sData.InitialPosition = rb.position;
             
@@ -456,7 +493,7 @@ namespace WLL_NGO.Netcode
         public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
             Debug.Log($"Shoot at tick {tick}, currentTick:{timer.CurrentTick}");
-
+          
             //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
 
             // You can not shoot the ball it's controlled by another player
@@ -522,7 +559,8 @@ namespace WLL_NGO.Netcode
                 
             }
         }
-                
+        
+        
 
         /// <summary>
         /// Evaluation function to decretate a winner during tackles

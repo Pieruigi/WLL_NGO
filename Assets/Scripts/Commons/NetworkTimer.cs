@@ -6,23 +6,23 @@ namespace WLL_NGO
 {
     public class NetworkTimer
     {
-        static NetworkTimer instance;
-        public static NetworkTimer Instance
-        {
-            get
-            { 
-                if(instance == null) 
-                    instance = new NetworkTimer(); 
-                return instance;
-            }
-        }
+        //static NetworkTimer instance;
+        //public static NetworkTimer Instance
+        //{
+        //    get
+        //    {
+        //        if (instance == null)
+        //            instance = new NetworkTimer();
+        //        return instance;
+        //    }
+        //}
 
         float timer;
         public float DeltaTick { get; private set; }
 
         public int CurrentTick { get; private set; }
 
-        private NetworkTimer()
+        public NetworkTimer()
         {
             DeltaTick = 1f / Constants.ServerTickRate;
         }
@@ -31,6 +31,7 @@ namespace WLL_NGO
         //{
         //    DeltaTick = 1f / serverTickRate;
         //}
+               
 
         public void Reset()
         {

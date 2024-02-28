@@ -73,7 +73,7 @@ namespace WLL_NGO.Netcode
             {
                 case (byte)MatchState.StartingMatch:
                     // Reset the tick timer
-                    NetworkTimer.Instance.Reset();
+                    //NetworkTimer.Instance.Reset();
                     // Select the last player
                     //foreach(PlayerController p in )
                     List<PlayerController> players = TeamController.HomeTeam.GetPlayers();
@@ -87,7 +87,11 @@ namespace WLL_NGO.Netcode
             OnStateChanged?.Invoke(previousValue, newValue);
         }
 
-
+        void SetStartingMatchState()
+        {
+            BallController.OnBallSpawned -= SetStartingMatchState;
+            SetMatchState(MatchState.StartingMatch);
+        }
         
 
         /// <summary>
@@ -103,7 +107,8 @@ namespace WLL_NGO.Netcode
                         // If all players are ready we can start the game
                         if (PlayerInfoManager.Instance.PlayerInitializedAll() && PlayerInfoManager.Instance.PlayerReadyAll())
                         {
-                            SetMatchState(MatchState.StartingMatch);
+                            BallController.OnBallSpawned += SetStartingMatchState;
+                            BallSpawner.Instance.SpawnBall();
                         }
                     }
                    
