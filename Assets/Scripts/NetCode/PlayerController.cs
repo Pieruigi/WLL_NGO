@@ -53,12 +53,15 @@ namespace WLL_NGO.Netcode
             public int tick;
             public Vector2 inputVector;
             public bool button1;
-
+            public bool button2;
+            public bool button3;
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref inputVector);
                 serializer.SerializeValue(ref button1);
+                serializer.SerializeValue(ref button2);
+                serializer.SerializeValue(ref button3);
             }
         }
 
@@ -520,7 +523,7 @@ namespace WLL_NGO.Netcode
                             
                         }
 
-                        targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
+                        //targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
                         int aheadTick = 1;
                         // We have ball control while shooting and the player stops so the ball position won't change
@@ -544,28 +547,56 @@ namespace WLL_NGO.Netcode
                 else // Receiver
                 {
                     // Check the input axis
-                    float offset = 1.2f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
-                    Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
-                    float targetHeight = currentTargetPosition.y;
-                    float hitPoint = targetHeight - offset;
+                    //float offset = 1.2f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
+                    //Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
+                    //float targetHeight = currentTargetPosition.y;
+                    //float hitPoint = targetHeight - offset;
                     // If the hit point is less than the player height then jump
-                    if(hitPoint > height)
-                    {
-                        float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
-                        float jumpSpeed = (hitPoint / time) + (.5f * math.abs(Physics.gravity.y) * time);
-                        JumpAndShoot(jumpSpeed, .5f);
-                    }
-                  
+                    //if(hitPoint > height)
+                    //{
+                    //    float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
+                    //    float jumpSpeed = (hitPoint / time) + (.5f * math.abs(Physics.gravity.y) * time);
+                    //    ShootAsReceiver(jumpSpeed, .5f);
+                    //}
+                    ShootAsReceiver();
                 }
 
             }
         }
 
-        async void JumpAndShoot(float speed, float onAirTime)
+        async void ShootAsReceiver(/*float speed, float onAirTime*/)
         {
-            //rb.useGravity = false;
-            rb.velocity += Vector3.up * speed;
-            await Task.Delay(TimeSpan.FromSeconds(onAirTime));
+            float offset = 0f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
+            Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
+            float targetHeight = currentTargetPosition.y;
+            Debug.Log($"[JUMP] TargetHeigh:{targetHeight}");
+            float hitPoint = targetHeight - offset;
+            
+            float delay = BallController.Instance.GetShootingDataRemainingTime();
+            Debug.Log($"Delay:{delay}");
+                        
+            
+            if (hitPoint > height)
+            {
+                
+                float jumpTime = Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
+                Debug.Log($"[JUMP] JumpTime:{jumpTime}");
+                if (delay > jumpTime)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(delay - jumpTime));
+                    delay = jumpTime;
+                }
+
+                //float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
+                float jumpSpeed = Mathf.Sqrt(2f * hitPoint * Mathf.Abs(Physics.gravity.y)); //(hitPoint / delay) + (.5f * math.abs(Physics.gravity.y) * delay);
+                Debug.Log($"[JUMP] JumpSpeed:{jumpSpeed}");
+                rb.velocity += Vector3.up * jumpSpeed;
+                //ShootAsReceiver(jumpSpeed, .5f);
+            }
+            
+            if (delay > 0)
+                await Task.Delay(TimeSpan.FromSeconds(delay));
+            
 
             if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
                 return;
@@ -598,7 +629,7 @@ namespace WLL_NGO.Netcode
                     targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
                     int aheadTick = 1;
-                    Vector3 estimatedBallPos = BallController.Instance.Position;//  BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
+                    Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(aheadTick);
 
                     // Compute estimated speed
                     float estBallSpeed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
@@ -607,7 +638,7 @@ namespace WLL_NGO.Netcode
                     // Shoot
                     BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, BallController.Instance.CurrentTick + aheadTick);
 
-
+                    
 
                 }
                 else
@@ -786,6 +817,7 @@ namespace WLL_NGO.Netcode
             }
         }
 
+        
 
         void HandleServerTick()
         {
@@ -797,6 +829,9 @@ namespace WLL_NGO.Netcode
             {
                 // Get the first input payload
                 var input = serverInputQueue.Dequeue();
+                // Set the current input in the global variable
+                this.input = new InputData() { joystick = input.inputVector, button1 = input.button1, button2 = input.button2, button3 = input.button3 };
+
                 // Get the buffer index
                 bufferIndex = input.tick % bufferSize;
 

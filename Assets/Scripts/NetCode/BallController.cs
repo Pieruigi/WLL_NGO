@@ -65,6 +65,7 @@ namespace WLL_NGO.Netcode
             public Vector3 InitialEffectVelocity, CurrentEffectVelocity; // Effect velocities
             public float EffectTime, CurrentEffectTime;
             public int InitialTick;
+            public int FinalTick;
             public PlayerController Shooter;
             public PlayerController Receiver; // Only for passage
 
@@ -154,19 +155,21 @@ namespace WLL_NGO.Netcode
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Q))
             {
+                Time.timeScale = 1;
+                //if (!owner)
+                //{
+                //    PlayerController pc = FindObjectsOfType<PlayerController>().Where(p => p.OwnerClientId == 1).First();
+                //    Debug.Log($"Ball - pc:{pc.PlayerInfo}");
+                //    ownerReference.Value = pc.NetworkObject;
+                //}
+                //else
+                //{
 
-                if (!owner)
-                {
-                    PlayerController pc = FindObjectsOfType<PlayerController>().Where(p => p.OwnerClientId == 1).First();
-                    Debug.Log($"Ball - pc:{pc.PlayerInfo}");
-                    ownerReference.Value = pc.NetworkObject;
-                }
-                else
-                {
-
-                    ownerReference.Value = default;
-                }
+                //    ownerReference.Value = default;
+                //}
             }
+
+
 #endif
         }
 
@@ -440,6 +443,7 @@ namespace WLL_NGO.Netcode
 
             // Get the time it takes to reach the original target 
             float t = direction.magnitude / speed;
+            sData.FinalTick = timer.CurrentTick + Mathf.RoundToInt( t / timer.DeltaTick );
 
             // Invert the sign of the first component of the velocity if the ball is higher than the target ( we must move down )
             float sign = rb.position.y > targetPosition.y ? -1 : 1;
@@ -616,9 +620,9 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        public Vector3 GetEstimatedPosition(int tick)
+        public Vector3 GetEstimatedPosition(int tickCount)
         {
-            return rb.position + rb.velocity * tick * timer.DeltaTick;
+            return rb.position + rb.velocity * tickCount * timer.DeltaTick + Vector3.up * Physics.gravity.y * tickCount * timer.DeltaTick;
         }
 
         public Vector3 GetShootindDataTargetPosition()
@@ -626,10 +630,20 @@ namespace WLL_NGO.Netcode
             return shootingData.TargetPosition;
         }
 
+        public int GetShootingDataRemainingTicks()
+        {
+            return shootingData.FinalTick - timer.CurrentTick;
+        }
+
+        public float GetShootingDataRemainingTime()
+        {
+            return GetShootingDataRemainingTicks() * timer.DeltaTick;
+        }
+
         #endregion
 
 
-       
+
     }
 
 }
