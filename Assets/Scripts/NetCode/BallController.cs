@@ -561,6 +561,7 @@ namespace WLL_NGO.Netcode
                     TeamController.GetPlayerTeam(shootingData.Receiver).SetPlayerSelected(shootingData.Receiver);
                 }
                 
+                
             }
         }
         

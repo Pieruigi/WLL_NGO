@@ -357,7 +357,7 @@ namespace WLL_NGO.Netcode
         /// <param name="value"></param>
         /// <param name="tick"></param>
         /// <param name="client"></param>
-        void CheckButton1(bool value, int tick, bool client)
+        void CheckButton1(/*bool value, */int tick, bool client)
         {
             //if ((client && IsServer) || (!client && !IsServer))
             //    return;
@@ -365,6 +365,7 @@ namespace WLL_NGO.Netcode
             if (!IsServer)
                 return;
 
+            bool value = input.button1;
 
             if (handlingTheBall)
                 CheckForShootingInput(value, button1LastValue, tick, true);
@@ -828,24 +829,25 @@ namespace WLL_NGO.Netcode
             while (serverInputQueue.Count > 0)
             {
                 // Get the first input payload
-                var input = serverInputQueue.Dequeue();
-                // Set the current input in the global variable
-                this.input = new InputData() { joystick = input.inputVector, button1 = input.button1, button2 = input.button2, button3 = input.button3 };
+                var inputPayload = serverInputQueue.Dequeue();
+                
+                // Fill the global input variable
+                input = new InputData() { joystick = inputPayload.inputVector, button1 = inputPayload.button1, button2 = inputPayload.button2, button3 = inputPayload.button3 };
 
                 // Get the buffer index
-                bufferIndex = input.tick % bufferSize;
+                bufferIndex = inputPayload.tick % bufferSize;
 
                 //
                 // Simulate movement
                 //
-                StatePayload state = ServerSimulateMovement(input.inputVector, input.tick);
+                StatePayload state = ServerSimulateMovement(/*input.inputVector, */inputPayload.tick);
                 //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
                 // Check buttons
                 //
-                CheckButton1(input.button1, input.tick, false);
+                CheckButton1(/*input.button1, */inputPayload.tick, false);
 
                 //
                 // Check for ball handling eventually
@@ -957,9 +959,10 @@ namespace WLL_NGO.Netcode
         /// <param name="inputMove"></param>
         /// <param name="tick"></param>
         /// <returns></returns>
-        StatePayload ServerSimulateMovement(Vector2 inputMove, int tick)
+        StatePayload ServerSimulateMovement(/*Vector2 inputMove, */int tick)
         {
             //Physics.simulationMode = SimulationMode.Script;
+            Vector2 inputMove = input.joystick;
             Move(inputMove);
             //Physics.Simulate(timer.DeltaTick);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
