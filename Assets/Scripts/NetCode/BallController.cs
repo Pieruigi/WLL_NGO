@@ -36,8 +36,9 @@ namespace WLL_NGO.Netcode
     {
         public static UnityAction OnBallSpawned;
         public static UnityAction OnShoot;
+        public static UnityAction OnOwnerChanged;
 
-        public struct StatePayload : INetworkSerializable
+        struct StatePayload : INetworkSerializable
         {
             public int tick;
             public Vector3 position;
@@ -83,6 +84,10 @@ namespace WLL_NGO.Netcode
         NetworkVariable<NetworkObjectReference> ownerReference = new NetworkVariable<NetworkObjectReference>(default);
 
         PlayerController owner = null;
+        public PlayerController Owner
+        {
+            get { return owner;}
+        }
 
         Rigidbody rb;
 
@@ -260,6 +265,7 @@ namespace WLL_NGO.Netcode
             if(oldRef.TryGet(out player))
                 player.GetComponent<PlayerController>().StopHandlingTheBall();
 
+            OnOwnerChanged?.Invoke();
         }
 
 
@@ -665,11 +671,19 @@ namespace WLL_NGO.Netcode
         {
             return shootingData.InitialPosition;
         }
+                
 
-        public StatePayload GetServerStatePayload(int tick)
+        public bool TryGetServerStatePosition(int tick, out Vector3 position)
         {
-            return serverStateBuffer.Get(tick);
+            position = Vector3.zero;   
+            if (serverStateBuffer.Equals(default))
+                return false;
+
+            position = serverStateBuffer.Get(tick).position;
+            return true;
         }
+
+
 
         #endregion
 

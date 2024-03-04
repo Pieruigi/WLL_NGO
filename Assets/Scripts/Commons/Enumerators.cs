@@ -24,7 +24,7 @@ namespace WLL_NGO
 
     public enum MatchState : byte { NotReady, StartingMatch }
 
-    public enum  ShotTiming : byte { Bad, Good, Perfect }
+    public enum  ShotTiming : byte { Bad, Normal, Good, Perfect }
     
 
 }

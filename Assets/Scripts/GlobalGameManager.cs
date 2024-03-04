@@ -13,8 +13,7 @@ namespace WLL_NGO
             get { return maxBallSpeed; }
         }
 
-       
-
+     
     }
 
 }

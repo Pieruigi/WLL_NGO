@@ -666,19 +666,17 @@ namespace WLL_NGO.Netcode
             int ballTick = tick - tickDiff;
             Vector3 targetPosition = BallController.Instance.GetShootingDataTargetPosition();
             Vector3 initialPosition = BallController.Instance.GetShootingDataInitialPosition();
-            BallController.StatePayload ballStatePayload = BallController.Instance.GetServerStatePayload(ballTick);
-            if (ballStatePayload.Equals(default))
-            {
-                Debug.LogWarning("No payload found");
-
-            }
-            else
-            {
-                Debug.Log("BallStatePayload.Position:" + ballStatePayload.position);
-            }
             
+            // Get the ball position at that specific tick
+            Vector3 ballPosition;
+            if (!BallController.Instance.TryGetServerStatePosition(ballTick, out ballPosition))
+            {
+                ballPosition = BallController.Instance.Position;
+            }
 
-            return (byte)ShotTiming.Bad;
+            byte timing = InputTimingUtility.GetOnTheFlyTiming(InputTimingUtility.GetOnTheFlyNormalizedTimingValue(initialPosition, targetPosition, ballPosition));
+
+            return timing;
         }
 
         bool TryGetAvailableReceiver(out PlayerController teammate)
@@ -1046,7 +1044,12 @@ namespace WLL_NGO.Netcode
         {
             if (!IsServer)
                 return;
-         
+
+            PlayerController receiver = BallController.Instance.GetShootingDataReceiver();
+            if (!receiver || receiver != this)
+                return;
+            
+
             // Read the target
             Vector3 targetPosition = BallController.Instance.GetShootingDataTargetPosition();
 
