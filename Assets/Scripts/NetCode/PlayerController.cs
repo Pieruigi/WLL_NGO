@@ -88,7 +88,7 @@ namespace WLL_NGO.Netcode
             }
         }
 
-
+        [System.Serializable]
         struct PlayerStateInfo : INetworkSerializable
         {
             public byte state; // The main state ( ex. 'stunned' )
@@ -166,6 +166,7 @@ namespace WLL_NGO.Netcode
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
         float height = 1.7f;
+        float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
         #endregion
 
         /// <summary>
@@ -397,7 +398,7 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Released:
                     if (isPassage)
-                        ProcessPassage();
+                        ProcessPassage(tick);
                     else
                         ProcessShotOnGoal();
                     break;
@@ -462,7 +463,7 @@ namespace WLL_NGO.Netcode
                 case (byte)ButtonState.Released:
 
                     if (isPassage)
-                        ProcessPassage();
+                        ProcessPassage(tick);
                     else
                         ProcessShotOnGoal();
                     
@@ -491,7 +492,8 @@ namespace WLL_NGO.Netcode
             return 0;
         }
 
-        void ProcessPassage()
+        
+        void ProcessPassage(int tick)
         {
             Debug.Log($"Pass:{name}");
 
@@ -499,83 +501,80 @@ namespace WLL_NGO.Netcode
             if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
             {
                 // We just want to reach the target in a given time 
-                float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
                 
                 if (playerStateInfo.Value.state == (byte)PlayerState.Normal)
                 {
-                    // Check for an available receiver
-                    PlayerController receiver = null;
-                    if (TryGetAvailableReceiver(out receiver))
-                    {
-                        Debug.Log($"Receiver:{receiver.name}");
-
-                        // Get the target 
-                        Vector3 targetPosition;
-                        float maxError = 1.5f;
-                        if (charge.Value > 0.5f)
-                        {
-                            // High passage
-                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(4f, 7f);
-                        }
-                        else
-                        {
-                            // Low passage
-                            targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
-                            
-                        }
-
-                        //targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
-
-                        int aheadTick = 1;
-                        // We have ball control while shooting and the player stops so the ball position won't change
-                        Vector3 estimatedBallPos = BallController.Instance.Position;// BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
-
-                        // Compute estimated speed
-                        float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
-
-                        // Shoot
-                        BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, BallController.Instance.CurrentTick + aheadTick);
-
-                                               
-                        
-                    }
-                    else
-                    {
-                        Debug.Log("No receiver found");
-
-                    }
+                   PassTheBall();
                 }
                 else // Receiver
                 {
-                    // Check the input axis
-                    //float offset = 1.2f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
-                    //Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
-                    //float targetHeight = currentTargetPosition.y;
-                    //float hitPoint = targetHeight - offset;
-                    // If the hit point is less than the player height then jump
-                    //if(hitPoint > height)
-                    //{
-                    //    float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
-                    //    float jumpSpeed = (hitPoint / time) + (.5f * math.abs(Physics.gravity.y) * time);
-                    //    ShootAsReceiver(jumpSpeed, .5f);
-                    //}
-                    ShootAsReceiver();
+                   PassTheBallOnTheFly(tick);
                 }
 
             }
         }
 
-        async void ShootAsReceiver(/*float speed, float onAirTime*/)
+        void PassTheBall()
         {
+            // Check for an available receiver
+            PlayerController receiver = null;
+            if (TryGetAvailableReceiver(out receiver))
+            {
+                Debug.Log($"Receiver:{receiver.name}");
+
+                // Get the target 
+                Vector3 targetPosition;
+                float maxError = 1.5f;
+                if (charge.Value > 0.5f)
+                {
+                    // High passage
+                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(4f, 7f);
+                }
+                else
+                {
+                    // Low passage
+                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
+
+                }
+
+                //targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
+
+                int aheadTick = 1;
+                // We have ball control while shooting and the player stops so the ball position won't change
+                Vector3 estimatedBallPos = BallController.Instance.Position;// BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
+
+                // Compute estimated speed
+                float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
+
+                // Shoot
+                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, BallController.Instance.CurrentTick + aheadTick);
+
+
+
+            }
+            else
+            {
+                Debug.Log("No receiver found");
+
+            }
+        }
+
+        async void PassTheBallOnTheFly(int tick)
+        {
+            float timing = GetOnTheFlyTiming(tick);
+
+
             float offset = 0f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
-            Vector3 currentTargetPosition = BallController.Instance.GetShootindDataTargetPosition();
+            Vector3 currentTargetPosition = BallController.Instance.GetShootingDataTargetPosition();
             float targetHeight = currentTargetPosition.y;
             Debug.Log($"[JUMP] TargetHeigh:{targetHeight}");
             float hitPoint = targetHeight - offset;
             
             float delay = BallController.Instance.GetShootingDataRemainingTime();
             Debug.Log($"Delay:{delay}");
-                        
+
+            // Disable the handling trigger 
+            ballHandlingTrigger.SetEnable(false);
             
             if (hitPoint > height)
             {
@@ -593,6 +592,9 @@ namespace WLL_NGO.Netcode
                 Debug.Log($"[JUMP] JumpSpeed:{jumpSpeed}");
                 rb.velocity += Vector3.up * jumpSpeed;
                 //ShootAsReceiver(jumpSpeed, .5f);
+
+                // Add the fall cooldown
+                playerStateCooldown += Mathf.Sqrt(2f*hitPoint/Mathf.Abs(Physics.gravity.y));
             }
             
             if (delay > 0)
@@ -606,7 +608,7 @@ namespace WLL_NGO.Netcode
             {
                 // We can shoot
                 // We must check for an available teammate depending on the player input
-                float passageTime = 1f;
+               
                 PlayerController receiver = null;
                 if (TryGetAvailableReceiver(out receiver))
                 {
@@ -653,6 +655,31 @@ namespace WLL_NGO.Netcode
         }
 
         void ProcessShotOnGoal() { }
+
+        /// <summary>
+        /// Server only
+        /// </summary>
+        /// <returns></returns>
+        int GetOnTheFlyTiming(int tick)
+        {
+            int tickDiff = timer.CurrentTick - BallController.Instance.CurrentTick;
+            int ballTick = tick - tickDiff;
+            Vector3 targetPosition = BallController.Instance.GetShootingDataTargetPosition();
+            Vector3 initialPosition = BallController.Instance.GetShootingDataInitialPosition();
+            BallController.StatePayload ballStatePayload = BallController.Instance.GetServerStatePayload(ballTick);
+            if (ballStatePayload.Equals(default))
+            {
+                Debug.LogWarning("No payload found");
+
+            }
+            else
+            {
+                Debug.Log("BallStatePayload.Position:" + ballStatePayload.position);
+            }
+            
+
+            return (byte)ShotTiming.Bad;
+        }
 
         bool TryGetAvailableReceiver(out PlayerController teammate)
         {
@@ -1021,7 +1048,7 @@ namespace WLL_NGO.Netcode
                 return;
          
             // Read the target
-            Vector3 targetPosition = BallController.Instance.GetShootindDataTargetPosition();
+            Vector3 targetPosition = BallController.Instance.GetShootingDataTargetPosition();
 
             // Player should move towards the target position
             
@@ -1229,8 +1256,9 @@ namespace WLL_NGO.Netcode
 
                     break;
                 case (byte)PlayerState.Receiver:
-                    playerStateCooldown = 2f; // NOT_IMPLEMENTED_YET: we must compute the cooldown depending on the animation and eventually the jump
-                    ballHandlingTrigger.SetEnable(false);
+                    //playerStateCooldown = 2f; // NOT_IMPLEMENTED_YET: we must compute the cooldown depending on the animation and eventually the jump
+                    playerStateCooldown = BallController.Instance.GetShootingDataRemainingTime() + .5f;
+                    //ballHandlingTrigger.SetEnable(false);
                     break;
             }
         }

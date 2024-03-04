@@ -10,6 +10,8 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEditor.FilePathAttribute;
+using UnityEngine.UIElements;
 using static UnityEditor.Searcher.SearcherWindow.Alignment;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
@@ -33,6 +35,7 @@ namespace WLL_NGO.Netcode
     public class BallController : SingletonNetwork<BallController>
     {
         public static UnityAction OnBallSpawned;
+        public static UnityAction OnShoot;
 
         public struct StatePayload : INetworkSerializable
         {
@@ -64,10 +67,11 @@ namespace WLL_NGO.Netcode
             public Vector3 Velocity; // Velocity with no effect applied
             public Vector3 InitialEffectVelocity, CurrentEffectVelocity; // Effect velocities
             public float EffectTime, CurrentEffectTime;
-            public int InitialTick;
-            public int FinalTick;
+            public int InitialTick; // The ball tick
+            public int FinalTick; // The ball tick
             public PlayerController Shooter;
             public PlayerController Receiver; // Only for passage
+          
 
             public override string ToString()
             {
@@ -304,6 +308,7 @@ namespace WLL_NGO.Netcode
 
             StatePayload state = ReadTransform();
             state.tick = timer.CurrentTick;
+            serverStateBuffer.Add(state, state.tick);
             SendToClientRpc(state);
         }
 
@@ -482,12 +487,14 @@ namespace WLL_NGO.Netcode
         /// <param name="force"></param>
         /// <param name="tick"></param>
         [ClientRpc]
-        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, Vector3 targetPosition, float speed, float effectSpeed, int tick)
+        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, NetworkObjectReference receiverRef, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
             NetworkObject player = null;
             if(playerRef.TryGet(out player))
             {
-                ShootAtTick(player.GetComponent<PlayerController>(), null, targetPosition, speed, effectSpeed, tick);
+                NetworkObject receiver = null;
+                receiverRef.TryGet(out receiver);
+                ShootAtTick(player.GetComponent<PlayerController>(), receiver.GetComponent<PlayerController>(), targetPosition, speed, effectSpeed, tick);
             }
             
         }
@@ -505,7 +512,7 @@ namespace WLL_NGO.Netcode
             
             // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), targetPosition, speed, effectSpeed, tick);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), new NetworkObjectReference(receiver.NetworkObject), targetPosition, speed, effectSpeed, tick);
             
             if(timer.CurrentTick > tick)
             {
@@ -541,7 +548,8 @@ namespace WLL_NGO.Netcode
                 }
                 
             }
-                
+
+            OnShoot?.Invoke();
         }
 
         void Shoot(PlayerController player, ShootingData shootingData)
@@ -563,6 +571,8 @@ namespace WLL_NGO.Netcode
                 
                 
             }
+
+            
         }
         
         
@@ -626,7 +636,7 @@ namespace WLL_NGO.Netcode
             return rb.position + rb.velocity * tickCount * timer.DeltaTick + Vector3.up * Physics.gravity.y * tickCount * timer.DeltaTick;
         }
 
-        public Vector3 GetShootindDataTargetPosition()
+        public Vector3 GetShootingDataTargetPosition()
         {
             return shootingData.TargetPosition;
         }
@@ -639,6 +649,26 @@ namespace WLL_NGO.Netcode
         public float GetShootingDataRemainingTime()
         {
             return GetShootingDataRemainingTicks() * timer.DeltaTick;
+        }
+
+        public PlayerController GetShootingDataShooter()
+        {
+            return shootingData.Shooter;
+        }
+
+        public PlayerController GetShootingDataReceiver()
+        {
+            return shootingData.Receiver;  
+        }
+
+        public Vector3 GetShootingDataInitialPosition()
+        {
+            return shootingData.InitialPosition;
+        }
+
+        public StatePayload GetServerStatePayload(int tick)
+        {
+            return serverStateBuffer.Get(tick);
         }
 
         #endregion
