@@ -102,12 +102,6 @@ namespace WLL_NGO.Netcode
 
         #region prediction and reconciliation
         // General
-        NetworkTimer timer = null;// NetworkTimer.Instance;
-        public int CurrentTick
-        {
-            get { return timer.CurrentTick; }
-        }
-        //float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
         // Client
@@ -150,12 +144,10 @@ namespace WLL_NGO.Netcode
             if(!IsSpawned) 
                 return;
 
-            if (timer == null)
-                return;
-
+        
             // Update timer
             // The ball is already on scene when the server starts, so client and server ticks don't match.
-            timer.Update(Time.deltaTime);
+            //timer.Update(Time.deltaTime);
 
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Q))
@@ -178,38 +170,38 @@ namespace WLL_NGO.Netcode
 #endif
         }
 
-        private void FixedUpdate()
-        {
-            if (!IsSpawned)
-                return;
+        //private void FixedUpdate()
+        //{
+        //    if (!IsSpawned)
+        //        return;
 
-            if (timer==null) 
-                return;
+        //    if (timer==null) 
+        //        return;
 
-            if (timer.TimeToTick())
-            {
-                // Client side
-                HandleClientTick();
-                // Server side
-                HandleServerTick();
-            }
+        //    if (timer.TimeToTick())
+        //    {
+        //        // Client side
+        //        HandleClientTick();
+        //        // Server side
+        //        HandleServerTick();
+        //    }
 
             
-        }
+        //}
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
-            timer = new NetworkTimer();
-
+         
             // Owner change event handler
             ownerReference.OnValueChanged += HandleOnOwnerReferenceChanged;
 
             if (IsServer)
                 OnBallSpawned?.Invoke();
 
-            
+            NetworkTimer.Instance.OnTimeToTick += HandleOnTimeToTick;
+          
         }
 
         public override void OnNetworkDespawn()
@@ -217,6 +209,21 @@ namespace WLL_NGO.Netcode
             base.OnNetworkDespawn();
             // Owner change event handler
             ownerReference.OnValueChanged -= HandleOnOwnerReferenceChanged;
+
+            NetworkTimer.Instance.OnTimeToTick -= HandleOnTimeToTick;
+        }
+
+        void HandleOnTimeToTick()
+        {
+            if (!IsSpawned)
+                return;
+
+            
+            // Client side
+            HandleClientTick();
+            // Server side
+            HandleServerTick();
+            
         }
 
         private void HandleOnMatchStateChanged(int oldValue, int newValue)
@@ -279,7 +286,7 @@ namespace WLL_NGO.Netcode
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload clientState = ReadTransform();
             
-            clientState.tick = timer.CurrentTick;
+            clientState.tick = NetworkTimer.Instance.CurrentTick;
             //Debug.Log($"Reconciliation - read client state, tick:{clientState.tick}, pos:{clientState.position}");
             clientStateBuffer.Add(clientState, clientState.tick % bufferSize);
 
@@ -309,7 +316,7 @@ namespace WLL_NGO.Netcode
 
 
             StatePayload state = ReadTransform();
-            state.tick = timer.CurrentTick;
+            state.tick = NetworkTimer.Instance.CurrentTick;
             serverStateBuffer.Add(state, state.tick);
             SendToClientRpc(state);
         }
@@ -321,7 +328,7 @@ namespace WLL_NGO.Netcode
                 // Remove the old effect velocity
                 rb.velocity -= shootingData.CurrentEffectVelocity;
                 shootingData.CurrentEffectVelocity = shootingData.InitialEffectVelocity * (1f - 2f * shootingData.CurrentEffectTime / shootingData.EffectTime);
-                shootingData.CurrentEffectTime += timer.DeltaTick;
+                shootingData.CurrentEffectTime += NetworkTimer.Instance.DeltaTick;
                 // Add the updated effect velocity
                 rb.velocity += shootingData.CurrentEffectVelocity;
                 if (shootingData.CurrentEffectTime >= shootingData.EffectTime)
@@ -354,10 +361,10 @@ namespace WLL_NGO.Netcode
 
         void ReconcileState(StatePayload state)
         {
-            Vector3 position = Vector3.Lerp(rb.position, state.position, timer.DeltaTick * reconciliationSpeed);
-            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, timer.DeltaTick * reconciliationSpeed);
-            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, timer.DeltaTick * reconciliationSpeed);
-            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, timer.DeltaTick * reconciliationSpeed);
+            Vector3 position = Vector3.Lerp(rb.position, state.position, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
 
             // Get the last server state data
             //WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
@@ -440,7 +447,7 @@ namespace WLL_NGO.Netcode
         {
             ShootingData sData = default;
             //sData.InitialTick = NetworkTimer.Instance.CurrentTick;
-            sData.InitialTick = timer.CurrentTick;
+            sData.InitialTick = NetworkTimer.Instance.CurrentTick;
             sData.TargetPosition = targetPosition;
             sData.InitialPosition = rb.position;
             
@@ -453,7 +460,7 @@ namespace WLL_NGO.Netcode
 
             // Get the time it takes to reach the original target 
             float t = direction.magnitude / speed;
-            sData.FinalTick = timer.CurrentTick + Mathf.RoundToInt( t / timer.DeltaTick );
+            sData.FinalTick = NetworkTimer.Instance.CurrentTick + Mathf.RoundToInt( t / NetworkTimer.Instance.DeltaTick );
 
             // Invert the sign of the first component of the velocity if the ball is higher than the target ( we must move down )
             float sign = rb.position.y > targetPosition.y ? -1 : 1;
@@ -508,7 +515,7 @@ namespace WLL_NGO.Netcode
 
         public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
-            Debug.Log($"Shoot at tick {tick}, currentTick:{timer.CurrentTick}");
+            Debug.Log($"Shoot at tick {tick}, currentTick:{NetworkTimer.Instance.CurrentTick}");
           
             //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
 
@@ -519,7 +526,7 @@ namespace WLL_NGO.Netcode
             if(IsServer && !IsHost)
                 ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), new NetworkObjectReference(receiver.NetworkObject), targetPosition, speed, effectSpeed, tick);
             
-            if(timer.CurrentTick > tick)
+            if(NetworkTimer.Instance.CurrentTick > tick)
             {
                 //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
                 shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
@@ -527,14 +534,14 @@ namespace WLL_NGO.Netcode
                 shootingData.Receiver = receiver;
                 // Adjust elapsed time
                 if(shootingData.EffectTime > 0)
-                    shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
+                    shootingData.CurrentEffectTime = (NetworkTimer.Instance.CurrentTick - tick) * NetworkTimer.Instance.DeltaTick;
     
 
                 Shoot(player, shootingData);
             }
             else
             {
-                while(timer.CurrentTick < tick)
+                while(NetworkTimer.Instance.CurrentTick < tick)
                 {
                     await Task.Delay(1000/Constants.ServerTickRate);
                 }
@@ -547,7 +554,7 @@ namespace WLL_NGO.Netcode
                     shootingData.Receiver = receiver;
                     // Adjust elapsed time ( it should be the same tick at this point, but... who knows )
                     if (shootingData.EffectTime > 0)
-                        shootingData.CurrentEffectTime = (timer.CurrentTick - tick) * timer.DeltaTick;
+                        shootingData.CurrentEffectTime = (NetworkTimer.Instance.CurrentTick - tick) * NetworkTimer.Instance.DeltaTick;
 
                     Shoot(player, shootingData);
                 }
@@ -638,7 +645,7 @@ namespace WLL_NGO.Netcode
 
         public Vector3 GetEstimatedPosition(int tickCount)
         {
-            return rb.position + rb.velocity * tickCount * timer.DeltaTick + Vector3.up * Physics.gravity.y * tickCount * timer.DeltaTick;
+            return rb.position + rb.velocity * tickCount * NetworkTimer.Instance.DeltaTick + Vector3.up * Physics.gravity.y * tickCount * NetworkTimer.Instance.DeltaTick;
         }
 
         public Vector3 GetShootingDataTargetPosition()
@@ -648,12 +655,12 @@ namespace WLL_NGO.Netcode
 
         public int GetShootingDataRemainingTicks()
         {
-            return shootingData.FinalTick - timer.CurrentTick;
+            return shootingData.FinalTick - NetworkTimer.Instance.CurrentTick;
         }
 
         public float GetShootingDataRemainingTime()
         {
-            return GetShootingDataRemainingTicks() * timer.DeltaTick;
+            return GetShootingDataRemainingTicks() * NetworkTimer.Instance.DeltaTick;
         }
 
         public PlayerController GetShootingDataShooter()

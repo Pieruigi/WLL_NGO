@@ -73,7 +73,7 @@ namespace WLL_NGO.Netcode
             {
                 case (byte)MatchState.StartingMatch:
                     // Reset the tick timer
-                    //NetworkTimer.Instance.Reset();
+                    NetworkTimer.Instance.StartTimer();
                     // Select the last player
                     //foreach(PlayerController p in )
                     List<PlayerController> players = TeamController.HomeTeam.GetPlayers();

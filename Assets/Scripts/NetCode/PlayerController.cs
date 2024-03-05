@@ -200,7 +200,7 @@ namespace WLL_NGO.Netcode
 
         #region netcode prediction and reconciliation
         // General
-        NetworkTimer timer = null;
+        //NetworkTimer timer = NetworkTimer.Instance;
         float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
@@ -209,7 +209,7 @@ namespace WLL_NGO.Netcode
         CircularBuffer<StatePayload> clientStateBuffer;
         StatePayload lastServerState = default;
         StatePayload lastProcessedState;
-        float reconciliationThreshold = 0.5f;
+        float reconciliationThreshold = 0.25f;
         float reconciliationSpeed = 4f;
 
         // Server
@@ -256,8 +256,8 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
-            if (timer == null)
-                return;
+            //if (timer == null)
+            //    return;
 
 
 
@@ -266,47 +266,44 @@ namespace WLL_NGO.Netcode
             else if (!IsOwner && !Selected)
             {
                 // Simulating AI controller ( to remove )
-                serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = timer.CurrentTick });
+                serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
             }
 
             // Update the network timer 
-            timer.Update(Time.deltaTime);
+            //timer.Update(Time.deltaTime);
 
             // Check the cooldown
             UpdateActionCooldown();
 
         }
 
-        private void FixedUpdate()
-        {
-            if (!IsSpawned)
-                return;
+        //private void FixedUpdate()
+        //{
+        //    if (!IsSpawned)
+        //        return;
 
-            if (timer == null)
-                return;
+        //    if (timer == null)
+        //        return;
 
-            // If time to tick then tick
-            if (timer.TimeToTick())
-            {
-                // Client side
-                HandleClientTick();
+        //    // If time to tick then tick
+        //    if (timer.TimeToTick())
+        //    {
+        //        // Client side
+        //        HandleClientTick();
 
-                // Server side
-                HandleServerTick();
+        //        // Server side
+        //        HandleServerTick();
 
-                // Both
-                CheckForBallHandling();
-            }
+        //        // Both
+        //        CheckForBallHandling();
+        //    }
 
-        }
+        //}
 
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-
-            //Debug.Log($"New player spawned, owner:{playerInfo.Value}");
-            timer = new NetworkTimer();
 
             PlayerControllerManager.Instance.AddPlayerController(this);
 
@@ -334,7 +331,30 @@ namespace WLL_NGO.Netcode
             // Player state changed event handler
             playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
 
+            NetworkTimer.Instance.OnTimeToTick += HandleOnTimeToTick;
+           
             OnSpawned?.Invoke(this);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            NetworkTimer.Instance.OnTimeToTick -= HandleOnTimeToTick;
+        }
+
+        void HandleOnTimeToTick()
+        {
+            if (!IsSpawned)
+                return;
+
+            // Client side
+            HandleClientTick();
+
+            // Server side
+            HandleServerTick();
+
+            // Both
+            CheckForBallHandling();
         }
 
         private void HandleOnMatchStateChanged(int oldValue, int newValue)
@@ -389,10 +409,10 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Pressed:
                     ResetCharge();
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Held:
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Released:
                     if (isPassage)
@@ -416,10 +436,10 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Pressed: // Button down
                     ResetCharge();
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Held: 
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Released: // Button up
                     // Do tackle
@@ -453,10 +473,10 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Pressed:
                     ResetCharge();
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Held:
-                    IncreaseCharge(timer.DeltaTick);
+                    IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Released:
 
@@ -493,8 +513,7 @@ namespace WLL_NGO.Netcode
         
         void ProcessPassage(int tick)
         {
-            Debug.Log($"Pass:{name}");
-
+          
             // You can only pass the ball if you are in the normal or receiver state
             if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
             {
@@ -545,7 +564,7 @@ namespace WLL_NGO.Netcode
                 float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
                 // Shoot
-                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, BallController.Instance.CurrentTick + aheadTick);
+                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
 
                 SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
                 // A bit of cooldown
@@ -567,12 +586,10 @@ namespace WLL_NGO.Netcode
             float offset = 0f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
             Vector3 currentTargetPosition = BallController.Instance.GetShootingDataTargetPosition();
             float targetHeight = currentTargetPosition.y;
-            Debug.Log($"[JUMP] TargetHeigh:{targetHeight}");
             float hitPoint = targetHeight - offset;
             
             float delay = BallController.Instance.GetShootingDataRemainingTime();
-            Debug.Log($"Delay:{delay}");
-
+          
             // Disable the handling trigger 
             ballHandlingTrigger.SetEnable(false);
             
@@ -580,7 +597,7 @@ namespace WLL_NGO.Netcode
             {
                 
                 float jumpTime = Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
-                Debug.Log($"[JUMP] JumpTime:{jumpTime}");
+                
                 if (delay > jumpTime)
                 {
                     await Task.Delay(TimeSpan.FromSeconds(delay - jumpTime));
@@ -589,7 +606,7 @@ namespace WLL_NGO.Netcode
 
                 //float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
                 float jumpSpeed = Mathf.Sqrt(2f * hitPoint * Mathf.Abs(Physics.gravity.y)); //(hitPoint / delay) + (.5f * math.abs(Physics.gravity.y) * delay);
-                Debug.Log($"[JUMP] JumpSpeed:{jumpSpeed}");
+            
                 rb.velocity += Vector3.up * jumpSpeed;
                 //ShootAsReceiver(jumpSpeed, .5f);
 
@@ -612,8 +629,7 @@ namespace WLL_NGO.Netcode
                 PlayerController receiver = null;
                 if (TryGetAvailableReceiver(out receiver))
                 {
-                    Debug.Log($"Receiver:{receiver.name}");
-
+                
                     // Get the target 
                     Vector3 targetPosition;
                     float maxError = 1.5f;
@@ -637,9 +653,9 @@ namespace WLL_NGO.Netcode
                     // Compute estimated speed
                     float estBallSpeed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
-                    Debug.Log($"Shooting data - receiver:{receiver}, targetPosition:{targetPosition}, estimatedBallSpeed:{estBallSpeed}");
+                    //Debug.Log($"Shooting data - receiver:{receiver}, targetPosition:{targetPosition}, estimatedBallSpeed:{estBallSpeed}");
                     // Shoot
-                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, BallController.Instance.CurrentTick + aheadTick);
+                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
 
                     SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
 
@@ -663,14 +679,14 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         int GetOnTheFlyTiming(int tick)
         {
-            int tickDiff = timer.CurrentTick - BallController.Instance.CurrentTick;
-            int ballTick = tick - tickDiff;
+            //int tickDiff = timer.CurrentTick - BallController.Instance.CurrentTick;
+            //int ballTick = tick - tickDiff;
             Vector3 targetPosition = BallController.Instance.GetShootingDataTargetPosition();
             Vector3 initialPosition = BallController.Instance.GetShootingDataInitialPosition();
             
             // Get the ball position at that specific tick
             Vector3 ballPosition;
-            if (!BallController.Instance.TryGetServerStatePosition(ballTick, out ballPosition))
+            if (!BallController.Instance.TryGetServerStatePosition(tick, out ballPosition))
             {
                 ballPosition = BallController.Instance.Position;
             }
@@ -781,7 +797,7 @@ namespace WLL_NGO.Netcode
             if (IsOwner && Selected) // If the client is the owner and the player is selected you can read input and send data to the server
             {
                 // Get the current tick and buffer index
-                int currentTick = timer.CurrentTick;
+                int currentTick = NetworkTimer.Instance.CurrentTick;
                 var bufferIndex = currentTick % bufferSize;
 
                 // Create the input payload
@@ -804,7 +820,7 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    //UnityEngine.Debug.Log(statePayload);
+                    UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
 
                     //
@@ -867,7 +883,7 @@ namespace WLL_NGO.Netcode
                 // Simulate movement
                 //
                 StatePayload state = ServerSimulateMovement(/*input.inputVector, */inputPayload.tick);
-                //UnityEngine.Debug.Log(state);
+                UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
@@ -923,7 +939,7 @@ namespace WLL_NGO.Netcode
             positionError = Vector3.Distance(rewindState.position, clientStateBuffer.Get(bufferIndex).position);
             if(positionError > reconciliationThreshold)
             {
-                Debug.Log($"{name} reconciliation - tick:{lastServerState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
+                //Debug.Log($"{name} reconciliation - tick:{lastServerState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 
@@ -936,13 +952,12 @@ namespace WLL_NGO.Netcode
         /// <param name="state"></param>
         void ReconcileState(StatePayload state)
         {
-            Debug.Log($"Reconciliation tick:{state.tick}");
-
+            
             // Get the last server state data
-            Vector3 position = Vector3.Lerp(rb.position, state.position, timer.DeltaTick * reconciliationSpeed);
-            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, timer.DeltaTick * reconciliationSpeed);
-            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, timer.DeltaTick * reconciliationSpeed);
-            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, timer.DeltaTick * reconciliationSpeed);
+            Vector3 position = Vector3.Lerp(rb.position, state.position, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
 
             WriteTransform(position, rotation, velocity, angularVelocity);
            
@@ -951,7 +966,7 @@ namespace WLL_NGO.Netcode
 
             // Replay all the input from the rewind state to the current state
             int tickToReplay = state.tick;
-            while(tickToReplay < timer.CurrentTick)
+            while(tickToReplay < NetworkTimer.Instance.CurrentTick)
             {
                 int bufferIndex = tickToReplay % bufferSize;
                 StatePayload clientState = ClientProcessMovement(clientInputBuffer.Get(bufferIndex).inputVector, tickToReplay);
@@ -1065,12 +1080,12 @@ namespace WLL_NGO.Netcode
             float minDist = .5f;
             if (dirH.magnitude > minDist)
             {
-                currentSpeed += acceleration * timer.DeltaTick;
+                currentSpeed += acceleration * NetworkTimer.Instance.DeltaTick;
                 if(currentSpeed > maxSpeed) currentSpeed = maxSpeed;
             }
             else
             {
-                currentSpeed -= acceleration * timer.DeltaTick;
+                currentSpeed -= acceleration * NetworkTimer.Instance.DeltaTick;
                 if (currentSpeed < 0) currentSpeed = 0;
             }
             //Debug.Log($"Setting receiver velocity:{dirH.normalized * currentSpeed}");
@@ -1101,13 +1116,13 @@ namespace WLL_NGO.Netcode
             {
                 transform.forward = new Vector3(moveInput.x, 0f, moveInput.y);
                 //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
-                speed += acceleration * timer.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
+                speed += acceleration * NetworkTimer.Instance.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
                 if (speed > maxSpeed) speed = maxSpeed;
             }
             else
             {
                 //speed -= deceleration * Time.fixedDeltaTime;
-                speed -= deceleration * timer.DeltaTick;
+                speed -= deceleration * NetworkTimer.Instance.DeltaTick;
                 if (speed < 0) speed = 0;
             }
             currentSpeed = speed;
@@ -1132,13 +1147,13 @@ namespace WLL_NGO.Netcode
                     if (time < .8f)
                     {
                         //currentSpeed += 10f * Time.fixedDeltaTime;
-                        currentSpeed += acc * timer.DeltaTick;
+                        currentSpeed += acc * NetworkTimer.Instance.DeltaTick;
                         if(currentSpeed > maxSpeed) currentSpeed = maxSpeed;
                     }
                     else
                     {
                         //currentSpeed -= 10f * Time.fixedDeltaTime;
-                        currentSpeed -= acc * timer.DeltaTick;
+                        currentSpeed -= acc * NetworkTimer.Instance.DeltaTick;
                         if (currentSpeed < 0)
                             currentSpeed = 0;
                     }
@@ -1170,14 +1185,14 @@ namespace WLL_NGO.Netcode
                     if (time < .8f)
                     {
                         //currentSpeed += 10f * Time.fixedDeltaTime;
-                        currentSpeed += acc * timer.DeltaTick;
+                        currentSpeed += acc * NetworkTimer.Instance.DeltaTick;
                         if(currentSpeed > maxSpeed)
                             currentSpeed = maxSpeed;
                     }
                     else
                     {
                         //currentSpeed -= 10f * Time.fixedDeltaTime;
-                        currentSpeed -= acc * timer.DeltaTick;
+                        currentSpeed -= acc * NetworkTimer.Instance.DeltaTick;
                         if (currentSpeed < 0)
                             currentSpeed = 0;
                     }
