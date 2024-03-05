@@ -41,8 +41,19 @@ namespace WLL_NGO.Netcode
                 homeTeamController = this;
             else
                 awayTeamController = this;
+
+            
         }
 
+        //private void OnEnable()
+        //{
+        //    BallController.OnOwnerChanged += HandleOnBallOwnerChanged;
+        //}
+
+        //private void OnDisable()
+        //{
+        //    BallController.OnOwnerChanged -= HandleOnBallOwnerChanged;
+        //}
 
         public override void OnNetworkSpawn()
         {
@@ -73,9 +84,21 @@ namespace WLL_NGO.Netcode
 
             OnSelectedPlayerChanged?.Invoke(this, selectedPlayer);
 
-            Debug.Log($"New player selected:{selectedPlayer?.name}");
+           
         }
 
+        //void HandleOnBallOwnerChanged()
+        //{
+        //    if(!IsServer) return;
+
+        //    // Get the new owner
+        //    PlayerController owner = BallController.Instance.Owner;
+        //    if(owner != selectedPlayer)
+        //    {
+        //        // Select the new player
+        //        SetPlayerSelected(owner);
+        //    }
+        //}
       
         /// <summary>
         /// Returns the team of a specific player info
@@ -109,7 +132,7 @@ namespace WLL_NGO.Netcode
         /// <param name="player"></param>
         public void SetPlayerSelected(PlayerController player)
         {
-            Debug.Log($"Selecting a new player:{player?.name}");
+            //Debug.Log($"Selecting a new player:{player?.name}");
             if(!IsServer) return;
 
             if (player == selectedPlayer)

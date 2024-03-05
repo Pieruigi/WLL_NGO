@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Interfaces;
@@ -213,6 +210,7 @@ namespace WLL_NGO.Netcode
         StatePayload lastServerState = default;
         StatePayload lastProcessedState;
         float reconciliationThreshold = 0.5f;
+        float reconciliationSpeed = 4f;
 
         // Server
         CircularBuffer<StatePayload> serverStateBuffer;
@@ -520,7 +518,7 @@ namespace WLL_NGO.Netcode
             PlayerController receiver = null;
             if (TryGetAvailableReceiver(out receiver))
             {
-                Debug.Log($"Receiver:{receiver.name}");
+                //Debug.Log($"Receiver:{receiver.name}");
 
                 // Get the target 
                 Vector3 targetPosition;
@@ -539,9 +537,9 @@ namespace WLL_NGO.Netcode
 
                 //targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
-                int aheadTick = 1;
+                int aheadTick = 0;
                 // We have ball control while shooting and the player stops so the ball position won't change
-                Vector3 estimatedBallPos = BallController.Instance.Position;// BallController.Instance.GetEstimatedPosition(BallController.Instance.CurrentTick + aheadTick);
+                Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(aheadTick);
 
                 // Compute estimated speed
                 float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
@@ -549,7 +547,9 @@ namespace WLL_NGO.Netcode
                 // Shoot
                 BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, BallController.Instance.CurrentTick + aheadTick);
 
-
+                SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
+                // A bit of cooldown
+                playerStateCooldown = .5f;
 
             }
             else
@@ -631,7 +631,7 @@ namespace WLL_NGO.Netcode
 
                     targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
-                    int aheadTick = 1;
+                    int aheadTick = 0;
                     Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(aheadTick);
 
                     // Compute estimated speed
@@ -641,7 +641,8 @@ namespace WLL_NGO.Netcode
                     // Shoot
                     BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, BallController.Instance.CurrentTick + aheadTick);
 
-                    
+                    SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
+
 
                 }
                 else
@@ -829,7 +830,7 @@ namespace WLL_NGO.Netcode
                     // Simply get the last state processed by the server and apply it
                     if (!lastServerState.Equals(default))
                     {
-                        Debug.Log($"Last server state position:{lastServerState.position}");
+                        //Debug.Log($"Last server state position:{lastServerState.position}");
                         WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
                         lastProcessedState = lastServerState;
                     }
@@ -938,7 +939,12 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Reconciliation tick:{state.tick}");
 
             // Get the last server state data
-            WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
+            Vector3 position = Vector3.Lerp(rb.position, state.position, timer.DeltaTick * reconciliationSpeed);
+            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, timer.DeltaTick * reconciliationSpeed);
+            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, timer.DeltaTick * reconciliationSpeed);
+            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, timer.DeltaTick * reconciliationSpeed);
+
+            WriteTransform(position, rotation, velocity, angularVelocity);
            
             // Add to the client buffer
             clientStateBuffer.Add(state, state.tick);
@@ -1218,8 +1224,7 @@ namespace WLL_NGO.Netcode
         void HandleOnPlayerStateInfoChanged(PlayerStateInfo oldState, PlayerStateInfo newState)
         {
             if(oldState == newState) return;
-            Debug.Log($"Change state:{newState}");
-
+          
             switch(newState.state)
             {
                 case (byte)PlayerState.Normal:
@@ -1288,7 +1293,6 @@ namespace WLL_NGO.Netcode
         /// </summary>
         private void HandleOnBallEnter()
         {
-            Debug.Log("Ball enter");
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
 
             BallController.Instance.BallEnterTheHandlingTrigger(this);
@@ -1299,7 +1303,7 @@ namespace WLL_NGO.Netcode
         /// </summary>
         private void HandleOnBallExit()
         {
-            Debug.Log("Ball exit");
+            
             // It's the ball
             BallController.Instance.BallExitTheHandlingTrigger(this);
         }
@@ -1312,6 +1316,9 @@ namespace WLL_NGO.Netcode
             if (handlingTheBall)
                 return;
             handlingTheBall = true;
+
+            // Set the player who owns the ball as the selected one
+            TeamController.GetPlayerTeam(this).SetPlayerSelected(this);
         }
 
         /// <summary>

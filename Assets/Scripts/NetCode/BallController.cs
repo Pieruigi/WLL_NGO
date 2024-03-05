@@ -6,13 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
-using static UnityEditor.FilePathAttribute;
 using UnityEngine.UIElements;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
 using static WLL_NGO.Netcode.PlayerController;
@@ -119,7 +115,7 @@ namespace WLL_NGO.Netcode
         StatePayload lastServerState = default;
         StatePayload lastProcessedState;
         float reconciliationThreshold = .5f;
-
+        float reconciliationSpeed = 4f;
         // Server
         CircularBuffer<StatePayload> serverStateBuffer;
         #endregion
@@ -358,11 +354,14 @@ namespace WLL_NGO.Netcode
 
         void ReconcileState(StatePayload state)
         {
-            
+            Vector3 position = Vector3.Lerp(rb.position, state.position, timer.DeltaTick * reconciliationSpeed);
+            Quaternion rotation = Quaternion.Lerp(rb.rotation, state.rotation, timer.DeltaTick * reconciliationSpeed);
+            Vector3 velocity = Vector3.Lerp(rb.velocity, state.velocity, timer.DeltaTick * reconciliationSpeed);
+            Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, state.angularVelocity, timer.DeltaTick * reconciliationSpeed);
 
             // Get the last server state data
-            WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
-            Debug.Log($"Reconciliation - position:{rb.position}");
+            //WriteTransform(state.position, state.rotation, state.velocity, state.angularVelocity);
+            WriteTransform(position, rotation, velocity, angularVelocity);
             // Add to the client buffer
             clientStateBuffer.Add(state, state.tick);
 

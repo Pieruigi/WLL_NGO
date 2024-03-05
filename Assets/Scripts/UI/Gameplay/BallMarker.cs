@@ -128,7 +128,7 @@ namespace WLL_NGO.UI
 
         void HandleOnOwnerChanged()
         {
-            Debug.Log($"Owner changed:{BallController.Instance.Owner}");
+            //Debug.Log($"Owner changed:{BallController.Instance.Owner}");
 
             hasOwner = BallController.Instance.Owner != null;
 
