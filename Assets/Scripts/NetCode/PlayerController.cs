@@ -847,7 +847,11 @@ namespace WLL_NGO.Netcode
                     if (!lastServerState.Equals(default))
                     {
                         //Debug.Log($"Last server state position:{lastServerState.position}");
-                        WriteTransform(lastServerState.position, lastServerState.rotation, lastServerState.velocity, lastServerState.angularVelocity);
+                        Vector3 position = Vector3.Lerp(rb.position, lastServerState.position, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+                        Quaternion rotation = Quaternion.Lerp(rb.rotation, lastServerState.rotation, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+                        Vector3 velocity = Vector3.Lerp(rb.velocity, lastServerState.velocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+                        Vector3 angularVelocity = Vector3.Lerp(rb.angularVelocity, lastServerState.angularVelocity, NetworkTimer.Instance.DeltaTick * reconciliationSpeed);
+                        WriteTransform(position, rotation, velocity, angularVelocity);
                         lastProcessedState = lastServerState;
                     }
 
