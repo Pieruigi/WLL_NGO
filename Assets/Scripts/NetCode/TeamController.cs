@@ -27,6 +27,10 @@ namespace WLL_NGO.Netcode
         //private NetworkVariable<bool> home = new NetworkVariable<bool>();
         [SerializeField]
         bool home;
+        public bool Home
+        {
+            get { return home; }
+        }
 
         private NetworkVariable<NetworkObjectReference> selectedPlayerRef = new NetworkVariable<NetworkObjectReference>(default);
         private PlayerController selectedPlayer = null;

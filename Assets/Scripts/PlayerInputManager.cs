@@ -35,7 +35,7 @@ namespace WLL_NGO
             {
                 joystick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized,
                 button1 = Input.GetKey(KeyCode.Keypad1),
-                button2 = false,
+                button2 = Input.GetKey(KeyCode.Keypad2),
                 button3 = false
             };
         }

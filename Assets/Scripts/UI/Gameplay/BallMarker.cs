@@ -80,6 +80,18 @@ namespace WLL_NGO.UI
             }
         }
 
+        private void LateUpdate()
+        {
+            if (!ballSpawned)
+                return;
+
+            // Set position
+            Vector3 pos  = BallController.Instance.Position;
+            pos.y = 0;
+            transform.position = pos;
+            
+        }
+
         private void OnDestroy()
         {
             UnregisterCallbacks();

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
@@ -200,8 +201,6 @@ namespace WLL_NGO.Netcode
 
         #region netcode prediction and reconciliation
         // General
-        //NetworkTimer timer = NetworkTimer.Instance;
-        float serverTickRate = Constants.ServerTickRate;
         int bufferSize = 1024;
 
         // Client
@@ -245,8 +244,7 @@ namespace WLL_NGO.Netcode
             clientStateBuffer = new CircularBuffer<StatePayload> (bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverInputQueue = new Queue<InputPaylod> ();
-            //timer = new NetworkTimer();
-            //timer = NetworkTimer.Instance;
+         
             MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
         }
 
@@ -256,11 +254,7 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
-            //if (timer == null)
-            //    return;
-
-
-
+          
             if (IsOwner && Selected)
                 CheckInput();
             else if (!IsOwner && !Selected)
@@ -268,9 +262,6 @@ namespace WLL_NGO.Netcode
                 // Simulating AI controller ( to remove )
                 serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
             }
-
-            // Update the network timer 
-            //timer.Update(Time.deltaTime);
 
             // Check the cooldown
             UpdateActionCooldown();
@@ -378,9 +369,7 @@ namespace WLL_NGO.Netcode
         /// <param name="client"></param>
         void CheckButton1(/*bool value, */int tick, bool client)
         {
-            //if ((client && IsServer) || (!client && !IsServer))
-            //    return;
-
+          
             if (!IsServer)
                 return;
 
@@ -394,6 +383,25 @@ namespace WLL_NGO.Netcode
                 CheckForTacklingInput(value, button1LastValue, tick);
 
             button1LastValue = value;
+        }
+
+        void CheckButton2(/*bool value, */int tick, bool client)
+        {
+            
+
+            if (!IsServer)
+                return;
+
+            bool value = input.button2;
+           
+            if (handlingTheBall)
+                CheckForShootingInput(value, button2LastValue, tick, false);
+            else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+                CheckForShootingInputAsReceiver(value, button2LastValue, tick, false);
+            //else
+            //    CheckForTacklingInput(value, button1LastValue, tick); // Check for switching player
+
+            button2LastValue = value;
         }
 
         private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
@@ -418,7 +426,7 @@ namespace WLL_NGO.Netcode
                     if (isPassage)
                         ProcessPassage(tick);
                     else
-                        ProcessShotOnGoal();
+                        ProcessShotOnGoal(tick);
                     break;
             }
         }
@@ -483,7 +491,7 @@ namespace WLL_NGO.Netcode
                     if (isPassage)
                         ProcessPassage(tick);
                     else
-                        ProcessShotOnGoal();
+                        ProcessShotOnGoal(tick);
                     
                     break;
             }
@@ -554,7 +562,7 @@ namespace WLL_NGO.Netcode
 
                 }
 
-                //targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
+                targetPosition += Vector3.forward * UnityEngine.Random.Range(-maxError, maxError) + Vector3.right * UnityEngine.Random.Range(-maxError, maxError);
 
                 int aheadTick = 0;
                 // We have ball control while shooting and the player stops so the ball position won't change
@@ -671,7 +679,78 @@ namespace WLL_NGO.Netcode
             
         }
 
-        void ProcessShotOnGoal() { }
+        void ProcessShotOnGoal(int tick) 
+        {
+            // You can only pass the ball if you are in the normal or receiver state
+            if (playerStateInfo.Value.state == (byte)PlayerState.Normal || playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+            {
+                // We just want to reach the target in a given time 
+
+                if (playerStateInfo.Value.state == (byte)PlayerState.Normal)
+                {
+                    ShootOnGoal();
+                }
+                else // Receiver
+                {
+                    ShootOnGoalOnTheFly(tick);
+                }
+
+            }
+        }
+
+        void ShootOnGoal()
+        {
+            
+            // Get the opponent team net controller
+            NetController net = NetController.GetOpponentTeamNetController(TeamController.GetPlayerTeam(this));
+
+            float tolleranceAngle = 70;
+            Vector3 hDir = Vector3.ProjectOnPlane(net.transform.position - rb.position, Vector3.up);
+            float angle = Vector3.SignedAngle(hDir, transform.forward, Vector3.up);
+            Debug.Log($"Shot angle:{angle}");
+            Vector3 targetPosition;
+            if (Mathf.Abs(angle) < tolleranceAngle)
+            {
+
+
+                // If the angle is positive the player is aiming to the right ( which is the net left side ), otherwise is aiming to the left ( the net right side )
+                targetPosition = angle > 0 ? net.GetRandomTarget(left: true) : net.GetRandomTarget(left: false);
+                
+                // Add some error depending on the shot timing
+                // AddError();
+
+
+
+
+                Debug.Log("Targeting the opponent net...");
+
+            }
+            else 
+            {
+                Debug.Log("Getting random target...");
+                targetPosition = Vector3.zero;
+            }
+
+            int aheadTick = 0;
+            // We have ball control while shooting and the player stops so the ball position won't change
+            Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(aheadTick);
+
+            // Compute estimated speed
+            // Depending on the timing and the player power
+            float speed = 30;
+
+            // Shoot
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+
+            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
+            // A bit of cooldown
+            playerStateCooldown = .5f;
+        }
+
+        void ShootOnGoalOnTheFly(int tick)
+        {
+
+        }
 
         /// <summary>
         /// Server only
@@ -805,7 +884,9 @@ namespace WLL_NGO.Netcode
                 {
                     tick = currentTick,
                     inputVector = input.joystick,
-                    button1 = input.button1
+                    button1 = input.button1,
+                    button2 = input.button2,
+                    button3 = input.button3
                 };
                 // Add the input to the buffer
                 clientInputBuffer.Add(payload, bufferIndex);
@@ -820,7 +901,7 @@ namespace WLL_NGO.Netcode
                     //
                     StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
                     clientStateBuffer.Add(statePayload, bufferIndex);
-                    UnityEngine.Debug.Log(statePayload);
+                    //UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
 
                     //
@@ -886,14 +967,16 @@ namespace WLL_NGO.Netcode
                 //
                 // Simulate movement
                 //
-                StatePayload state = ServerSimulateMovement(/*input.inputVector, */inputPayload.tick);
-                UnityEngine.Debug.Log(state);
+                StatePayload state = ServerSimulateMovement(inputPayload.tick);
+                //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
                 // Check buttons
                 //
-                CheckButton1(/*input.button1, */inputPayload.tick, false);
+                CheckButton1(inputPayload.tick, false);
+                CheckButton2(inputPayload.tick, false);
+
 
                 //
                 // Check for ball handling eventually
