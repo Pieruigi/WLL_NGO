@@ -265,54 +265,24 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
-
             if (IsOwner) // Is client or host
             {
                 if (Selected)
-                    CheckInput();
-                else
-                    serverInputQueue.Enqueue(new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
+                    CheckHumanInput();
+                else if (IsHost)
+                    CheckNotHumanInput();
             }
-            else
+            else // Client is the owner of the player, so we are on the dedicated server here
             {
-                serverInputQueue.Enqueue(new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
+                if (!Selected)
+                    CheckNotHumanInput();
             }
 
-            //if (IsOwner && Selected)
-            //    CheckInput();
-            //else if (!IsOwner && !Selected)
-            //{
-            //    // Simulating AI controller ( to remove )
-            //    serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
-            //}
 
             // Check the cooldown
             UpdateActionCooldown();
 
         }
-
-        //private void FixedUpdate()
-        //{
-        //    if (!IsSpawned)
-        //        return;
-
-        //    if (timer == null)
-        //        return;
-
-        //    // If time to tick then tick
-        //    if (timer.TimeToTick())
-        //    {
-        //        // Client side
-        //        HandleClientTick();
-
-        //        // Server side
-        //        HandleServerTick();
-
-        //        // Both
-        //        CheckForBallHandling();
-        //    }
-
-        //}
 
 
         public override void OnNetworkSpawn()
@@ -1441,7 +1411,7 @@ namespace WLL_NGO.Netcode
         /// <summary>
         /// To replace with an input handler ( in order to support AI )
         /// </summary>
-        void CheckInput()
+        void CheckHumanInput()
         {
             if (inputHandler == null || !IsOwner || !Selected) 
                 return;
@@ -1451,6 +1421,15 @@ namespace WLL_NGO.Netcode
             //else
             //    input = new InputData() { joystick = Vector2.zero, button1 = false, button2 = false, button3 = false };
             //Debug.Log($"Client input:{input}");
+        }
+
+        /// <summary>
+        /// Get input from ai and fill the server input queue ( ai always runs on server )
+        /// </summary>
+        void CheckNotHumanInput()
+        {
+            InputData input = inputHandler.GetInput();
+            serverInputQueue.Enqueue(new InputPaylod() { inputVector = input.joystick, button1 = input.button1, button2 = input.button2, button3 = input.button3, tick = NetworkTimer.Instance.CurrentTick });
         }
 
         /// <summary>
@@ -1553,6 +1532,7 @@ namespace WLL_NGO.Netcode
             charge.Value = 0;
         }
 
+        
         /// <summary>
         /// Called on this player when they are tackling.
         /// </summary>

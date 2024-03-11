@@ -236,6 +236,15 @@ namespace WLL_NGO.Netcode
             return default;
         }
         
+        public List<PlayerInfo> GetPlayerInfoAll(bool home)
+        {
+            List<PlayerInfo> ret = new List<PlayerInfo>();
+            foreach(var player in players)
+            {
+                if(player.Home == home) ret.Add(player);
+            }
+            return ret;
+        }
     }
 
 }

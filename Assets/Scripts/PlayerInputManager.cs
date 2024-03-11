@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,11 @@ namespace WLL_NGO
     [System.Serializable]
     public class HumanInputHandler : IInputHandler
     {
+
+
         public InputData GetInput()
         {
+
             return new InputData()
             {
                 joystick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized,
@@ -42,11 +46,22 @@ namespace WLL_NGO
     }
 
     [System.Serializable]
-    public class NotHumanInputHandler : HumanInputHandler
+    public class NotHumanInputHandler : IInputHandler
     {
         Vector2 joystick;
         
         bool button1, button2, button3;
+
+        public InputData GetInput()
+        {
+            return new InputData()
+            {
+                joystick = this.joystick,
+                button1 = this.button1,
+                button2 = this.button2,
+                button3 = this.button3
+            };
+        }
 
         public void SetJoystick(Vector2 joystick)
         {
@@ -69,20 +84,35 @@ namespace WLL_NGO
 
     public class PlayerInputManager: Singleton<PlayerInputManager>
     {
-        IInputHandler humanInputHandler;
-        IInputHandler notHumanInputHandler;
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            
-        }
-
+       
         private void OnEnable()
         {
           
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
+            TeamController.OnSelectedPlayerChanged += HandleOnSelectedPlayerChanged;
+        }
+
+        private void OnDisable()
+        {
+            PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
+            TeamController.OnSelectedPlayerChanged -= HandleOnSelectedPlayerChanged;
+        }
+
+        private void HandleOnSelectedPlayerChanged(TeamController team, PlayerController oldPlayer, PlayerController newPlayer)
+        {
+            // Nothing to change on bots 
+            if (team.IsBot())
+                return;
+
+            if(oldPlayer != null)
+            {
+                oldPlayer.SetInputHandler(new NotHumanInputHandler());
+            }
+            
+            if(newPlayer != null)
+            {
+                newPlayer.SetInputHandler(new HumanInputHandler());
+            }
         }
 
         /// <summary>
@@ -91,19 +121,11 @@ namespace WLL_NGO
         /// <param name="pc"></param>
         void HandleOnPlayerControllerSpawned(PlayerController pc)
         {
-            if(humanInputHandler == null)
-            {
-                
-                if (NetworkManager.Singleton.IsClient)
-                {
-                    // Create a human input handler
-                    humanInputHandler = new HumanInputHandler();
-                }
-            }
-           
-
-            pc.SetInputHandler(humanInputHandler);
+    
+            pc.SetInputHandler(new NotHumanInputHandler());
         }
+
+       
     }
 
 }

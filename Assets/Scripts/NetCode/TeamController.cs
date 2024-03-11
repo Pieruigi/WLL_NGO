@@ -12,7 +12,7 @@ namespace WLL_NGO.Netcode
 {
     public class TeamController : NetworkBehaviour
     {
-        public static UnityAction<TeamController, PlayerController> OnSelectedPlayerChanged;
+        public static UnityAction<TeamController, /*Old*/PlayerController, /*New*/PlayerController> OnSelectedPlayerChanged;
 
         static TeamController homeTeamController, awayTeamController;
         public static TeamController HomeTeam
@@ -86,24 +86,19 @@ namespace WLL_NGO.Netcode
             else
                 selectedPlayer = null;
 
-            OnSelectedPlayerChanged?.Invoke(this, selectedPlayer);
+            OnSelectedPlayerChanged?.Invoke(this, preNetObject ? preNetObject.GetComponent<PlayerController>() : null, selectedPlayer);
 
            
         }
 
-        //void HandleOnBallOwnerChanged()
-        //{
-        //    if(!IsServer) return;
+            
+        public bool IsBot()
+        {
+            List<PlayerInfo> list = PlayerInfoManager.Instance.GetPlayerInfoAll(home);
+            return list[0].Bot;
 
-        //    // Get the new owner
-        //    PlayerController owner = BallController.Instance.Owner;
-        //    if(owner != selectedPlayer)
-        //    {
-        //        // Select the new player
-        //        SetPlayerSelected(owner);
-        //    }
-        //}
-      
+        }
+
         /// <summary>
         /// Returns the team of a specific player info
         /// </summary>
