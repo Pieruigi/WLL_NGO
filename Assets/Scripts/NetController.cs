@@ -20,6 +20,19 @@ namespace WLL_NGO
         //List<Transform> targets;
 
         float width, height;
+        public float Width
+        {
+            get { return width; }
+        }
+        public float Height
+        {
+            get { return height; }
+        }
+
+        public Vector3 Position
+        {
+            get { return transform.position; }
+        }
 
         private void Awake()
         {
@@ -51,20 +64,11 @@ namespace WLL_NGO
             return team.Home ? AwayNetController : HomeNetController;
         }
 
-        //public Transform GetLeftTarget()
-        //{
-        //    return targets[2];
-        //}
+        public static NetController GetTeamNetController(TeamController team)
+        {
+            return team.Home ? HomeNetController : AwayNetController;
+        }
 
-        //public Transform GetRightTarget()
-        //{
-        //    return targets[0];
-        //}
-
-        //public Transform GetCenterTarget()
-        //{
-        //    return targets[1];
-        //}
 
         public Vector3 GetRandomTarget(bool left)
         {

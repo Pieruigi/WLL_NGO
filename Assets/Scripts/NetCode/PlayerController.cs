@@ -588,44 +588,12 @@ namespace WLL_NGO.Netcode
 
         async void PassTheBallOnTheFly(int tick)
         {
-            float timing = GetOnTheFlyTiming(tick);
-
-
-            float offset = 0f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
-            Vector3 currentTargetPosition = BallController.Instance.GetShootingDataTargetPosition();
-            float targetHeight = currentTargetPosition.y;
-            float hitPoint = targetHeight - offset;
-            
-            float delay = BallController.Instance.GetShootingDataRemainingTime();
-          
             // Disable the handling trigger 
             ballHandlingTrigger.SetEnable(false);
-            
-            if (hitPoint > height)
-            {
-                
-                float jumpTime = Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
-                
-                if (delay > jumpTime)
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(delay - jumpTime));
-                    delay = jumpTime;
-                }
 
-                //float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
-                float jumpSpeed = Mathf.Sqrt(2f * hitPoint * Mathf.Abs(Physics.gravity.y)); //(hitPoint / delay) + (.5f * math.abs(Physics.gravity.y) * delay);
-            
-                rb.velocity += Vector3.up * jumpSpeed;
-                //ShootAsReceiver(jumpSpeed, .5f);
+            await OnTheFlyJumpAsync(tick);
 
-                // Add the fall cooldown
-                playerStateCooldown += Mathf.Sqrt(2f*hitPoint/Mathf.Abs(Physics.gravity.y));
-            }
-            
-            if (delay > 0)
-                await Task.Delay(TimeSpan.FromSeconds(delay));
-            
-
+            // We must be sure the player is still in its receiving state before we can shoot
             if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
                 return;
 
@@ -747,13 +715,86 @@ namespace WLL_NGO.Netcode
             playerStateCooldown = .5f;
         }
 
-        void ShootOnGoalOnTheFly(int tick)
+        async Task OnTheFlyJumpAsync(int tick)
         {
+            // Get the player timing 
+            float timing = GetOnTheFlyTiming(tick);
 
+            float offset = 0f; // NOT_IMPLEMENTED_YET: The part of the body player that hits the ball
+            Vector3 currentTargetPosition = BallController.Instance.GetShootingDataTargetPosition();
+            float targetHeight = currentTargetPosition.y;
+            float hitPoint = targetHeight - offset;
+
+            // How much time it will take the ball to reach the target position
+            float delay = BallController.Instance.GetShootingDataRemainingTime();
+
+            // If the it point has a minimum height we must jump
+            if (hitPoint > height)
+            {
+
+                float jumpTime = Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
+
+                if (delay > jumpTime)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(delay - jumpTime));
+                    delay = jumpTime;
+                }
+
+                //float time = Vector3.Distance(BallController.Instance.Position, currentTargetPosition) / BallController.Instance.Velocity.magnitude;
+                float jumpSpeed = Mathf.Sqrt(2f * hitPoint * Mathf.Abs(Physics.gravity.y)); //(hitPoint / delay) + (.5f * math.abs(Physics.gravity.y) * delay);
+
+                rb.velocity += Vector3.up * jumpSpeed;
+                //ShootAsReceiver(jumpSpeed, .5f);
+
+                // Add the fall cooldown
+                playerStateCooldown += Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
+            }
+
+            if (delay > 0)
+                await Task.Delay(TimeSpan.FromSeconds(delay));
+        }
+
+        async void ShootOnGoalOnTheFly(int tick)
+        {
+            // Disable the handling trigger 
+            ballHandlingTrigger.SetEnable(false);
+
+            await OnTheFlyJumpAsync(tick);
+
+            // We must be sure the player is still in its receiving state before we can shoot
+            if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
+                return;
+
+            // Get the opponent team net controller
+            NetController net = NetController.GetOpponentTeamNetController(TeamController.GetPlayerTeam(this));
+
+            
+            Vector3 targetPosition = UnityEngine.Random.Range(0,2) > 0 ? net.GetRandomTarget(left: true) : net.GetRandomTarget(left: false);
+
+            // Add some error depending on the shot timing
+            // AddError();
+
+
+            Debug.Log("Targeting the opponent net...");
+            int aheadTick = 0;
+            // We have ball control while shooting and the player stops so the ball position won't change
+            Vector3 estimatedBallPos = BallController.Instance.GetEstimatedPosition(aheadTick);
+
+            // Compute estimated speed
+            // Depending on the timing and the player power
+            float speed = 30;
+
+            // Shoot
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+
+            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
+            // A bit of cooldown
+            playerStateCooldown = .5f;
         }
 
         /// <summary>
-        /// Server only
+        /// Server only.
+        /// Did you shoot with the right timing?
         /// </summary>
         /// <returns></returns>
         int GetOnTheFlyTiming(int tick)
