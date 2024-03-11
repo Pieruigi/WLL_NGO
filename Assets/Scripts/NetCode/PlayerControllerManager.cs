@@ -48,7 +48,7 @@ namespace WLL_NGO.Netcode
                 GameObject go = Instantiate(playerPrefabList.PrefabList[0].Prefab);
                 PlayerController pc = go.GetComponent<PlayerController>();
 
-                pc.Init(playerInfo);
+                pc.Init(playerInfo, i);
                 Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(i) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(i);
                 Rigidbody rb = go.GetComponent<Rigidbody>();
                 rb.position = spawnPoint.position;

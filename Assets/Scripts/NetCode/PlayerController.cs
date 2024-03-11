@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using WLL_NGO.AI;
 using WLL_NGO.Interfaces;
 using static UnityEngine.Rendering.DebugUI;
 using static UnityEngine.UI.GridLayoutGroup;
@@ -144,6 +145,10 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         float deceleration = 30f;
 
+        public Vector3 Position
+        {
+            get { return rb.position; }
+        }
 
         #region action fields
         //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
@@ -227,6 +232,12 @@ namespace WLL_NGO.Netcode
             get { return playerInfo; }
         }
 
+        NetworkVariable<byte> index = new NetworkVariable<byte>(0);
+        public int Index
+        {
+            get { return index.Value; }
+        }
+
         private void Awake()
         {
             // Get the rigidbody
@@ -254,14 +265,26 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
-          
-            if (IsOwner && Selected)
-                CheckInput();
-            else if (!IsOwner && !Selected)
+
+            if (IsOwner) // Is client or host
             {
-                // Simulating AI controller ( to remove )
-                serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
+                if (Selected)
+                    CheckInput();
+                else
+                    serverInputQueue.Enqueue(new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
             }
+            else
+            {
+                serverInputQueue.Enqueue(new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
+            }
+
+            //if (IsOwner && Selected)
+            //    CheckInput();
+            //else if (!IsOwner && !Selected)
+            //{
+            //    // Simulating AI controller ( to remove )
+            //    serverInputQueue.Enqueue (new InputPaylod() { inputVector = Vector2.zero, button1 = false, tick = NetworkTimer.Instance.CurrentTick });
+            //}
 
             // Check the cooldown
             UpdateActionCooldown();
@@ -313,7 +336,6 @@ namespace WLL_NGO.Netcode
                 
             }
 
-            
 
             // Change object name on both client and server
             name = $"Player_{PlayerControllerManager.Instance.PlayerControllers.Count}_{playerInfo.Home}";
@@ -1625,10 +1647,11 @@ namespace WLL_NGO.Netcode
         /// Called by the server when a new player controller is spawned
         /// </summary>
         /// <param name="owner"></param>
-        public void Init(PlayerInfo owner)
+        public void Init(PlayerInfo owner, int index)
         {
             //this.playerInfo.Value = owner;
             this.playerInfoId.Value = owner.Id;
+            this.index.Value = (byte)index;
         }
 
         public void SetInputHandler(IInputHandler inputHandler)

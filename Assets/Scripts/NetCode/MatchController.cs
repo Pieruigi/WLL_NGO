@@ -80,6 +80,10 @@ namespace WLL_NGO.Netcode
                     Debug.Log($"PlayerController.Count:{players.Count}");
                     TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam-1]);
                     //TeamController.HomeTeam.SetPlayerSelected(players[0]);
+
+                    // NOT IMPLEMENTED: we must do kick off first
+                    matchState.Value = (byte)MatchState.Playing;
+
                     break;
             }
 
@@ -124,6 +128,12 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Server - Setting new match state: {newMatchState}");
             matchState.Value = (byte)newMatchState;
         }
+
+        public bool IsPlaying()
+        {
+            return matchState.Value == (byte)MatchState.Playing;
+        }
+
 
     }
 

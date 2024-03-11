@@ -41,10 +41,36 @@ namespace WLL_NGO
         }
     }
 
+    [System.Serializable]
+    public class NotHumanInputHandler : HumanInputHandler
+    {
+        Vector2 joystick;
+        
+        bool button1, button2, button3;
+
+        public void SetJoystick(Vector2 joystick)
+        {
+            this.joystick = joystick;
+        }
+
+        public void SetButton1(bool value)
+        {
+            button1 = value;
+        }
+        public void SetButton2(bool value)
+        {
+            button2 = value;
+        }
+        public void SetButton3(bool value)
+        {
+            button3 = value;
+        }
+    }
 
     public class PlayerInputManager: Singleton<PlayerInputManager>
     {
         IInputHandler humanInputHandler;
+        IInputHandler notHumanInputHandler;
 
         protected override void Awake()
         {
@@ -74,7 +100,8 @@ namespace WLL_NGO
                     humanInputHandler = new HumanInputHandler();
                 }
             }
-            
+           
+
             pc.SetInputHandler(humanInputHandler);
         }
     }
