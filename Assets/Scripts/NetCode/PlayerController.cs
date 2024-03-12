@@ -171,7 +171,11 @@ namespace WLL_NGO.Netcode
         NetworkVariable<PlayerStateInfo> playerStateInfo = new NetworkVariable<PlayerStateInfo>(new PlayerStateInfo() { state = (byte)PlayerState.Normal, subState = 0, detail = 0 });
 
 
-
+        NetworkVariable<float> charge = new NetworkVariable<float>(0);
+        float chargingSpeed = 1;
+        float lightTackleChargeAmount = .2f;
+        Vector3 lookDirection = Vector3.zero;
+        
         float currentSpeed = 0;
         /// <summary>
         /// Used to give more detail about a specific state ( ex. what type of tackle the player is doing ).
@@ -208,16 +212,13 @@ namespace WLL_NGO.Netcode
             get { return TeamController.GetPlayerTeam(this).SelectedPlayer == this; }
         }
 
-        #region input data
+        #region input and gameplay data 
         [SerializeField]
         IInputHandler inputHandler;
         InputData input;
         bool button1LastValue, button2LastValue, button3LastValue;
         
-        NetworkVariable<float> charge = new NetworkVariable<float>(0);
-        float chargingSpeed = 1;
-        float lightTackleChargeAmount = .2f;
-
+      
         #endregion
 
         #region netcode prediction and reconciliation
@@ -1241,7 +1242,11 @@ namespace WLL_NGO.Netcode
             float speed = currentSpeed;
             if (moveInput.magnitude > 0)
             {
-                transform.forward = new Vector3(moveInput.x, 0f, moveInput.y);
+                Vector3 lDir = new Vector3(moveInput.x, 0f, moveInput.y);
+                if(lookDirection != Vector3.zero)
+                    lDir = lookDirection;
+
+                transform.forward = Vector3.MoveTowards(transform.forward, lDir, rotationSpeed * NetworkTimer.Instance.DeltaTick);
                 //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
                 speed += acceleration * NetworkTimer.Instance.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
                 if (speed > maxSpeed) speed = maxSpeed;
@@ -1253,7 +1258,12 @@ namespace WLL_NGO.Netcode
                 if (speed < 0) speed = 0;
             }
             currentSpeed = speed;
-            rb.velocity = transform.forward * currentSpeed + rb.velocity.y * Vector3.up;
+
+            Vector3 mDir = transform.forward;
+            if (lookDirection != Vector3.zero)
+                mDir = new Vector3(moveInput.x, 0f, moveInput.y);
+
+            rb.velocity = mDir * currentSpeed + rb.velocity.y * Vector3.up;
         }
 
         void UpdateStunnedMovement()
@@ -1524,6 +1534,25 @@ namespace WLL_NGO.Netcode
         public void SetAsReceiver()
         {
             this.playerStateInfo.Value = new PlayerStateInfo() { state = (byte)PlayerState.Receiver };
+        }
+
+        public void SetLookDirection(Vector3 lookDirection)
+        {
+            Debug.Log($"LookDirection - set:{lookDirection}");
+            lookDirection.y = 0f;
+            this.lookDirection = lookDirection.normalized;
+            
+        }
+
+        public void ResetLookDirection()
+        {
+            Debug.Log($"LookDirection - reset:{lookDirection}");
+            lookDirection = Vector3.zero;
+        }
+
+        public bool IsSelected()
+        {
+            return TeamController.GetPlayerTeam(this).SelectedPlayer == this;
         }
 
         void IncreaseCharge(float time)

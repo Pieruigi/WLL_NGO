@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -51,12 +52,15 @@ namespace WLL_NGO.AI
         {
             //PlayerController.OnSpawned += HandleOnPlayerSpawned;
             BallController.OnBallSpawned += HandleOnBallSpawned;
+            BallController.OnOwnerChanged += HandleOnOwnerChanged;
         }
 
+        
         private void OnDisable()
         {
             //PlayerController.OnSpawned -= HandleOnPlayerSpawned;
             BallController.OnBallSpawned -= HandleOnBallSpawned;
+            BallController.OnOwnerChanged -= HandleOnOwnerChanged;
         }
 
         void HandleOnBallSpawned()
@@ -64,6 +68,20 @@ namespace WLL_NGO.AI
             //Debug.Log($"Ball spawned:{BallController.Instance}");
             ball = BallController.Instance;
         }
+
+        private void HandleOnOwnerChanged(PlayerController oldOwner, PlayerController newOwner)
+        {
+            Debug.Log($"Owner changed:{oldOwner}, {newOwner}");
+
+            if (newOwner == player)
+            {
+                player.SetInputHandler(new HumanInputHandler());
+                player.ResetLookDirection();
+            }
+            else if (oldOwner == player) 
+                player.SetInputHandler(new NotHumanInputHandler());
+        }
+
 
         void Initialize()
         {
@@ -89,6 +107,10 @@ namespace WLL_NGO.AI
 
         void UpdateNormal()
         {
+            if (player.IsSelected())
+                return;
+            
+
             if (areaBounds.Contains(ball.Position))
             {
                 Debug.Log("Ball is in area");
@@ -96,10 +118,17 @@ namespace WLL_NGO.AI
             else
             {
                 Debug.Log("Ball is not in area");
-                if(ball.Owner != null)
+                if(ball.Owner != null && ball.Owner != this)
                 {
                     // Move the goalkeeper in the best position
                     KeepPosition();
+                }
+                else
+                {
+                    if(ball.Owner == this)
+                    {
+                        player.ResetLookDirection();
+                    }
                 }
             }
         }
@@ -107,6 +136,9 @@ namespace WLL_NGO.AI
 
         void KeepPosition()
         {
+            // Look at the ball
+            player.SetLookDirection(ball.Position - player.Position);
+
             // Get ball direction
             Vector3 direction = ball.Position - netCenter;
             direction.y = 0;

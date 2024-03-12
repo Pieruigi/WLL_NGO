@@ -32,7 +32,7 @@ namespace WLL_NGO.Netcode
     {
         public static UnityAction OnBallSpawned;
         public static UnityAction OnShoot;
-        public static UnityAction OnOwnerChanged;
+        public static UnityAction</*old*/PlayerController, /*new*/PlayerController> OnOwnerChanged;
 
         struct StatePayload : INetworkSerializable
         {
@@ -265,10 +265,15 @@ namespace WLL_NGO.Netcode
             }
 
             // The old owner must eventually stop handling the ball
+            PlayerController oldOwner = null;
             if(oldRef.TryGet(out player))
-                player.GetComponent<PlayerController>().StopHandlingTheBall();
+            {
+                oldOwner = player.GetComponent<PlayerController>();
+                oldOwner.GetComponent<PlayerController>().StopHandlingTheBall();
+            }
+                
 
-            OnOwnerChanged?.Invoke();
+            OnOwnerChanged?.Invoke(oldOwner, owner);
         }
 
 

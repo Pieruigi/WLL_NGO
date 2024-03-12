@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -82,13 +83,22 @@ namespace WLL_NGO.Netcode
                     //TeamController.HomeTeam.SetPlayerSelected(players[0]);
 
                     // NOT IMPLEMENTED: we must do kick off first
-                    //matchState.Value = (byte)MatchState.Playing;
+                    SetPlayingState();
 
                     break;
             }
 
             // Do something
             OnStateChanged?.Invoke(previousValue, newValue);
+        }
+
+        async void SetPlayingState()
+        {
+            if (!IsServer)
+                return;
+
+            await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+            matchState.Value = (byte)MatchState.Playing;
         }
 
         void SetStartingMatchState()
