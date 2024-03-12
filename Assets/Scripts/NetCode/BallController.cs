@@ -506,7 +506,7 @@ namespace WLL_NGO.Netcode
             {
                 NetworkObject receiver = null;
                 receiverRef.TryGet(out receiver);
-                ShootAtTick(player.GetComponent<PlayerController>(), receiver.GetComponent<PlayerController>(), targetPosition, speed, effectSpeed, tick);
+                ShootAtTick(player.GetComponent<PlayerController>(), receiver ? receiver.GetComponent<PlayerController>() : null, targetPosition, speed, effectSpeed, tick);
             }
             
         }
@@ -524,7 +524,7 @@ namespace WLL_NGO.Netcode
             
             // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), new NetworkObjectReference(receiver.NetworkObject), targetPosition, speed, effectSpeed, tick);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), receiver ? new NetworkObjectReference(receiver.NetworkObject) : default, targetPosition, speed, effectSpeed, tick);
             
             if(NetworkTimer.Instance.CurrentTick > tick)
             {

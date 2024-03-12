@@ -82,7 +82,7 @@ namespace WLL_NGO.Netcode
                     //TeamController.HomeTeam.SetPlayerSelected(players[0]);
 
                     // NOT IMPLEMENTED: we must do kick off first
-                    matchState.Value = (byte)MatchState.Playing;
+                    //matchState.Value = (byte)MatchState.Playing;
 
                     break;
             }
