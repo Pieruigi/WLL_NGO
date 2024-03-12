@@ -11,21 +11,23 @@ namespace WLL_NGO.AI
     {
         PlayerController player;
 
-        //float keepPositionTollerance = 2;
+        float keepPositionTollerance = 1.5f;
+        float keepPositionDistance = 3;
         //float[] keepPositionCenter;
 
         Vector3 netCenter;
         float netWidth, netHeight;
         Bounds areaBounds;
         
-        float keepPositionDistance = 0;
-
+        
+        float keepPositionTolleranceDefault;
         bool superShot = false;
         BallController ball;
 
         private void Awake()
         {
             player = GetComponent<PlayerController>();
+            keepPositionTolleranceDefault = keepPositionTollerance;
         }
 
         private void Start()
@@ -68,6 +70,7 @@ namespace WLL_NGO.AI
             TeamController team = TeamController.GetPlayerTeam(player);
             NetController net = NetController.GetTeamNetController(team);
             netCenter = net.Position;
+            netCenter.y = 0f;
             netWidth = net.Width;
             netHeight = net.Height;
             
@@ -105,10 +108,24 @@ namespace WLL_NGO.AI
         void KeepPosition()
         {
             // Get ball direction
-            Vector3 direction = ball.Position - player.Position;
+            Vector3 direction = ball.Position - netCenter;
             direction.y = 0;
 
-
+            // Compute the goalkeeper target position
+            Vector3 targetPosition = netCenter + direction.normalized * keepPositionDistance;
+            if(Vector3.Distance(player.Position, targetPosition) > keepPositionTollerance)
+            {
+                keepPositionTollerance = .25f;
+                Vector3 worldDirecton = targetPosition - player.Position;
+                worldDirecton.y = 0;
+            
+                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(worldDirecton));
+            }
+            else
+            {
+                keepPositionTollerance = keepPositionTolleranceDefault;
+                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector3.zero);
+            }
         }
        
     }

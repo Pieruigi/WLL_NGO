@@ -4,6 +4,7 @@ using ParrelSync;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WLL_NGO.Netcode;
 
 namespace WLL_NGO
 {
@@ -47,6 +48,20 @@ namespace WLL_NGO
         }
 
 
+        //public static Vector2 ToInputDirection(Vector3 worldDirection)
+        //{
+        //    return new Vector2(worldDirection.x, worldDirection.z).normalized;
+        //}
+
+        //public static InputData ToInputData(PlayerController.InputPayload inputPayload)
+        //{
+        //    return new InputData() { joystick = inputPayload.inputVector, button1 = inputPayload.button1, button2 = inputPayload.button2, button3 = inputPayload.button3 };
+        //}
+
+        //public static PlayerController.InputPayload ToInputPayload(InputData inputData, int tick)
+        //{
+        //    return new PlayerController.InputPayload() { inputVector = inputData.joystick, button1 = inputData.button1, button2 = inputData.button2, button3 = inputData.button3, tick = tick };
+        //}
     }
 
 

@@ -47,13 +47,26 @@ namespace WLL_NGO.Netcode
     {
         public static UnityAction<PlayerController> OnSpawned;
 
-        public struct InputPaylod : INetworkSerializable
+        public struct InputPayload : INetworkSerializable
         {
             public int tick;
             public Vector2 inputVector;
             public bool button1;
             public bool button2;
             public bool button3;
+
+
+            public InputPayload(InputData inputData, int tick)
+            {
+
+                inputVector = inputData.joystick;
+                button1 = inputData.button1;
+                button2 = inputData.button2;
+                button3 = inputData.button3;
+                this.tick = tick;
+            }
+
+
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
@@ -62,6 +75,9 @@ namespace WLL_NGO.Netcode
                 serializer.SerializeValue(ref button2);
                 serializer.SerializeValue(ref button3);
             }
+
+
+            
         }
 
         public struct StatePayload : INetworkSerializable
@@ -209,7 +225,7 @@ namespace WLL_NGO.Netcode
         int bufferSize = 1024;
 
         // Client
-        CircularBuffer<InputPaylod> clientInputBuffer;
+        CircularBuffer<InputPayload> clientInputBuffer;
         CircularBuffer<StatePayload> clientStateBuffer;
         StatePayload lastServerState = default;
         StatePayload lastProcessedState;
@@ -218,7 +234,7 @@ namespace WLL_NGO.Netcode
 
         // Server
         CircularBuffer<StatePayload> serverStateBuffer;
-        Queue<InputPaylod> serverInputQueue;
+        Queue<InputPayload> serverInputQueue;
 
         #endregion
 
@@ -251,10 +267,10 @@ namespace WLL_NGO.Netcode
             ballHandlingTrigger.OnBallExit += HandleOnBallExit;
 
             // Init netcode for p&r
-            clientInputBuffer = new CircularBuffer<InputPaylod> (bufferSize);
+            clientInputBuffer = new CircularBuffer<InputPayload> (bufferSize);
             clientStateBuffer = new CircularBuffer<StatePayload> (bufferSize);
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
-            serverInputQueue = new Queue<InputPaylod> ();
+            serverInputQueue = new Queue<InputPayload> ();
          
             MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
         }
@@ -359,44 +375,45 @@ namespace WLL_NGO.Netcode
         /// <param name="value"></param>
         /// <param name="tick"></param>
         /// <param name="client"></param>
-        void CheckButton1(/*bool value, */int tick, bool client)
+        //void CheckButton1(/*bool value, */int tick, bool client)
+        void CheckButton1(InputPayload inputPayload, bool client)
         {
           
             if (!IsServer)
                 return;
 
-            bool value = input.button1;
+            bool value = inputPayload.button1;
 
             if (handlingTheBall)
-                CheckForShootingInput(value, button1LastValue, tick, true);
+                CheckForShootingInput(value, button1LastValue, inputPayload.tick, true);
             else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
-                CheckForShootingInputAsReceiver(value, button1LastValue, tick, true);
+                CheckForShootingInputAsReceiver(value, button1LastValue, inputPayload.tick, true, inputPayload.inputVector);
             else                 
-                CheckForTacklingInput(value, button1LastValue, tick);
+                CheckForTacklingInput(value, button1LastValue, inputPayload.tick);
 
             button1LastValue = value;
         }
 
-        void CheckButton2(/*bool value, */int tick, bool client)
+        void CheckButton2(InputPayload inputPayload, bool client)
         {
             
 
             if (!IsServer)
                 return;
 
-            bool value = input.button2;
+            bool value = inputPayload.button2;
            
             if (handlingTheBall)
-                CheckForShootingInput(value, button2LastValue, tick, false);
+                CheckForShootingInput(value, button2LastValue, inputPayload.tick, false);
             else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
-                CheckForShootingInputAsReceiver(value, button2LastValue, tick, false);
+                CheckForShootingInputAsReceiver(value, button2LastValue, inputPayload.tick, false);
             //else
             //    CheckForTacklingInput(value, button1LastValue, tick); // Check for switching player
 
             button2LastValue = value;
         }
 
-        private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
+        private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage, Vector2 passageDirection = default)
         {
             if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
                 return;
@@ -416,7 +433,7 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Released:
                     if (isPassage)
-                        ProcessPassage(tick);
+                        ProcessPassage(tick, passageDirection);
                     else
                         ProcessShotOnGoal(tick);
                     break;
@@ -511,7 +528,7 @@ namespace WLL_NGO.Netcode
         }
 
         
-        void ProcessPassage(int tick)
+        void ProcessPassage(int tick, Vector2 passageDirection = default)
         {
           
             // You can only pass the ball if you are in the normal or receiver state
@@ -525,7 +542,7 @@ namespace WLL_NGO.Netcode
                 }
                 else // Receiver
                 {
-                   PassTheBallOnTheFly(tick);
+                   PassTheBallOnTheFly(tick, passageDirection);
                 }
 
             }
@@ -578,7 +595,7 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        async void PassTheBallOnTheFly(int tick)
+        async void PassTheBallOnTheFly(int tick, Vector2 passageDirection)
         {
             // Disable the handling trigger 
             ballHandlingTrigger.SetEnable(false);
@@ -595,7 +612,7 @@ namespace WLL_NGO.Netcode
                 // We must check for an available teammate depending on the player input
                
                 PlayerController receiver = null;
-                if (TryGetAvailableReceiver(out receiver))
+                if (TryGetAvailableReceiver(out receiver, passageDirection))
                 {
                 
                     // Get the target 
@@ -808,13 +825,13 @@ namespace WLL_NGO.Netcode
             return timing;
         }
 
-        bool TryGetAvailableReceiver(out PlayerController teammate)
+        bool TryGetAvailableReceiver(out PlayerController teammate, Vector2 passageDirection = default)
         {
             float tollaranceAngle = 80;
             Vector3 fwd = rb.transform.forward;
             if (playerStateInfo.Value.state == (byte)PlayerState.Receiver) // Using the forward axis
             {
-                fwd = new Vector3(input.joystick.x, 0f, input.joystick.y);    
+                fwd = new Vector3(passageDirection.x, 0f, passageDirection.y);    
             }
             
             teammate = null;
@@ -913,14 +930,8 @@ namespace WLL_NGO.Netcode
                 var bufferIndex = currentTick % bufferSize;
 
                 // Create the input payload
-                InputPaylod payload = new InputPaylod()
-                {
-                    tick = currentTick,
-                    inputVector = input.joystick,
-                    button1 = input.button1,
-                    button2 = input.button2,
-                    button3 = input.button3
-                };
+                InputPayload payload = new InputPayload(input, currentTick);
+
                 // Add the input to the buffer
                 clientInputBuffer.Add(payload, bufferIndex);
 
@@ -932,7 +943,8 @@ namespace WLL_NGO.Netcode
                     //
                     // Process movement locally
                     //
-                    StatePayload statePayload = ClientProcessMovement(payload.inputVector, payload.tick);
+                    
+                    StatePayload statePayload = ClientProcessMovement(payload);
                     clientStateBuffer.Add(statePayload, bufferIndex);
                     //UnityEngine.Debug.Log(statePayload);
                     HandleReconciliation();
@@ -942,10 +954,6 @@ namespace WLL_NGO.Netcode
                     //
                     CheckForBallHandling();
 
-                    //
-                    // Check buttons ( we can check directly on server )
-                    //
-                    //CheckButton1(payload.button1, currentTick, true); 
                 }
                 
             }
@@ -991,24 +999,21 @@ namespace WLL_NGO.Netcode
                 // Get the first input payload
                 var inputPayload = serverInputQueue.Dequeue();
                 
-                // Fill the global input variable
-                input = new InputData() { joystick = inputPayload.inputVector, button1 = inputPayload.button1, button2 = inputPayload.button2, button3 = inputPayload.button3 };
-
                 // Get the buffer index
                 bufferIndex = inputPayload.tick % bufferSize;
 
                 //
                 // Simulate movement
                 //
-                StatePayload state = ServerSimulateMovement(inputPayload.tick);
+                StatePayload state = ServerSimulateMovement(inputPayload);
                 //UnityEngine.Debug.Log(state);
                 serverStateBuffer.Add(state, bufferIndex);
 
                 //
                 // Check buttons
                 //
-                CheckButton1(inputPayload.tick, false);
-                CheckButton2(inputPayload.tick, false);
+                CheckButton1(inputPayload, false);
+                CheckButton2(inputPayload, false);
 
 
                 //
@@ -1089,7 +1094,8 @@ namespace WLL_NGO.Netcode
             while(tickToReplay < NetworkTimer.Instance.CurrentTick)
             {
                 int bufferIndex = tickToReplay % bufferSize;
-                StatePayload clientState = ClientProcessMovement(clientInputBuffer.Get(bufferIndex).inputVector, tickToReplay);
+                InputPayload payload = clientInputBuffer.Get(bufferIndex);
+                StatePayload clientState = ClientProcessMovement(payload);
                 clientStateBuffer.Add(clientState, bufferIndex);
                 tickToReplay++;
             }
@@ -1100,7 +1106,7 @@ namespace WLL_NGO.Netcode
         /// </summary>
         /// <param name="input"></param>
         [ServerRpc]
-        void SendToServerRpc(InputPaylod input)
+        void SendToServerRpc(InputPayload input)
         {
             // We don't need to send data to the server if we are the host
             //if (IsHost) return;
@@ -1125,46 +1131,46 @@ namespace WLL_NGO.Netcode
         /// <param name="inputMove"></param>
         /// <param name="tick"></param>
         /// <returns></returns>
-        StatePayload ServerSimulateMovement(/*Vector2 inputMove, */int tick)
+        StatePayload ServerSimulateMovement(InputPayload inputPayload)
         {
             //Physics.simulationMode = SimulationMode.Script;
-            Vector2 inputMove = input.joystick;
-            Move(inputMove);
+            Move(new InputData(inputPayload));
             //Physics.Simulate(timer.DeltaTick);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
 
             StatePayload state = ReadTransform();
-            state.tick = tick;
+            state.tick = inputPayload.tick;
             return state;
         }
 
-       
+
         /// <summary>
         /// Called on the client to apply movement to the local selected player
         /// </summary>
         /// <param name="inputMove"></param>
         /// <param name="tick"></param>
         /// <returns></returns>
-        StatePayload ClientProcessMovement(Vector2 inputMove, int tick)
+        //StatePayload ClientProcessMovement(/*Vector2 inputMove, */int tick)
+        StatePayload ClientProcessMovement(InputPayload inputPayload)
         {
             // Move player and return the state payload
             //Physics.simulationMode = SimulationMode.Script;
-            Move(inputMove);
+            Move(new InputData(inputPayload));
             //Physics.Simulate(timer.DeltaTick);
             //Physics.simulationMode = SimulationMode.FixedUpdate;
             StatePayload state = ReadTransform();
-            state.tick = tick;
+            state.tick = inputPayload.tick;
             return state;
            
         }
 
        
-        private void Move(Vector2 moveInput)
+        private void Move(InputData inputData)
         {
             switch (playerStateInfo.Value.state)
             {
                 case (byte)PlayerState.Normal:
-                    UpdateNormalMovement(moveInput);
+                    UpdateNormalMovement(inputData);
                     break;
                 case (byte)PlayerState.Stunned:
                     UpdateStunnedMovement();
@@ -1227,8 +1233,9 @@ namespace WLL_NGO.Netcode
 
         }
 
-        void UpdateNormalMovement(Vector2 moveInput)
+        void UpdateNormalMovement(InputData inputData)
         {
+            Vector2 moveInput = inputData.joystick;
             // Normalize input 
             moveInput.Normalize();
             float speed = currentSpeed;
@@ -1429,7 +1436,7 @@ namespace WLL_NGO.Netcode
         void CheckNotHumanInput()
         {
             InputData input = inputHandler.GetInput();
-            serverInputQueue.Enqueue(new InputPaylod() { inputVector = input.joystick, button1 = input.button1, button2 = input.button2, button3 = input.button3, tick = NetworkTimer.Instance.CurrentTick });
+            serverInputQueue.Enqueue(new InputPayload() { inputVector = input.joystick, button1 = input.button1, button2 = input.button2, button3 = input.button3, tick = NetworkTimer.Instance.CurrentTick });
         }
 
         /// <summary>
@@ -1638,6 +1645,11 @@ namespace WLL_NGO.Netcode
         {
             Debug.Log($"PlayerController setting input handler:{inputHandler}");
             this.inputHandler = inputHandler;
+        }
+
+        public IInputHandler GetInputHandler()
+        {
+            return inputHandler;
         }
 
         #endregion

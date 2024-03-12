@@ -21,6 +21,20 @@ namespace WLL_NGO
         [SerializeField]
         public bool button3;
 
+
+        public InputData(PlayerController.InputPayload inputPayload)
+        {
+            joystick = inputPayload.inputVector;
+            button1 = inputPayload.button1;
+            button2 = inputPayload.button2;
+            button3 = inputPayload.button3;
+        }
+
+        public static Vector2 ToInputDirection(Vector3 worldDirection)
+        {
+            return new Vector2(worldDirection.x, worldDirection.z).normalized;
+        }
+
         public override string ToString()
         {
             return $"[Input joystick:{joystick}, button1:{button1}, button2:{button2}, button3:{button3}]";
