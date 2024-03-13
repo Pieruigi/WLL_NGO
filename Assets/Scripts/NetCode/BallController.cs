@@ -597,12 +597,17 @@ namespace WLL_NGO.Netcode
         /// <summary>
         /// Evaluation function to decretate a winner during tackles
         /// </summary>
-        /// <param name="playerA"></param>
-        /// <param name="playerB"></param>
+        /// <param name="playerA">The player who just entered the trigger</param>
+        /// <param name="playerB">The current owner</param>
         /// <returns></returns>
         PlayerController EvaluateTackleWinner(PlayerController playerA, PlayerController playerB)
         {
             Debug.Log($"Tackle evaluation - {playerA} VS {playerB}");
+
+
+            if (playerA.GetRole() == (int)PlayerRole.GK)
+                return playerA;
+
             return playerA;
         }
 

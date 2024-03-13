@@ -1555,6 +1555,17 @@ namespace WLL_NGO.Netcode
             return TeamController.GetPlayerTeam(this).SelectedPlayer == this;
         }
 
+        public bool IsTeammate(PlayerController otherPlayer)
+        {
+            return TeamController.GetPlayerTeam(this) == TeamController.GetPlayerTeam(otherPlayer);
+        }
+
+        public int GetRole()
+        {
+            PlayerInitializer pi = GetComponent<PlayerInitializer>();
+            return pi.PlayerRole;
+        }
+
         void IncreaseCharge(float time)
         {
             float ch = charge.Value;

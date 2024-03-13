@@ -24,6 +24,8 @@ namespace WLL_NGO.AI
         float keepPositionTolleranceDefault;
         bool superShot = false;
         BallController ball;
+        float diveSpeed = 5;
+        float takeTheBallRange = 1f;
 
         private void Awake()
         {
@@ -113,11 +115,21 @@ namespace WLL_NGO.AI
 
             if (areaBounds.Contains(ball.Position))
             {
-                Debug.Log("Ball is in area");
+                // If an opponent controls the ball try to take it
+                if(ball.Owner != null)
+                {
+                    //if (!player.IsTeammate(ball.Owner)) 
+                    if (player.IsTeammate(ball.Owner)) // TEST 
+                    {
+                        // The player who controls the ball is an opponent, so we try to get the ball from them
+                        TakeBallFromOpponent(ball.Owner);
+
+                    }
+                }
+
             }
             else
             {
-                Debug.Log("Ball is not in area");
                 if(ball.Owner != null && ball.Owner != this)
                 {
                     // Move the goalkeeper in the best position
@@ -133,6 +145,28 @@ namespace WLL_NGO.AI
             }
         }
 
+        private void TakeBallFromOpponent(PlayerController ballOwner)
+        {
+
+            //if (ballOwner == null || player.IsTeammate(ballOwner))
+            //    return;
+
+            // Ball direction
+            Vector3 ballDir = ball.Position - player.Position;
+            Vector3 ballSpeed = ball.Velocity;
+
+            if(ballDir.magnitude > takeTheBallRange)
+            {
+                player.SetLookDirection(ballDir);
+                ((NotHumanInputHandler) player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
+            }
+            else
+            {
+                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector2.zero);
+            }
+            // Move towards the ball
+            
+        }
 
         void KeepPosition()
         {
