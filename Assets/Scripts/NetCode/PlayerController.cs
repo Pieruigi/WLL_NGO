@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Collections;
@@ -190,6 +191,12 @@ namespace WLL_NGO.Netcode
         string detailAnimParam = "Detail";
         float height = 1.7f;
         float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
+
+        int role = -1;
+        public PlayerRole Role
+        {
+            get { return (PlayerRole)role; }
+        }
         #endregion
 
         /// <summary>
@@ -880,6 +887,9 @@ namespace WLL_NGO.Netcode
                 case (byte)TackleType.Kick:
                     ret = 1.67f;
                     break;
+                case (byte)TackleType.Slap:
+                    ret = 0.8f;
+                    break;
             }
             
             return ret;
@@ -1274,6 +1284,7 @@ namespace WLL_NGO.Netcode
             switch (playerStateInfo.Value.subState)
             {
                 case (byte)StunType.ByKick:
+                case (byte)StunType.BySlap:
                 //case (byte)StunType.ByKickBack:
                     Vector3 dir = transform.forward;
                     if (playerStateInfo.Value.detail == (byte)StunDetail.Front)
@@ -1337,6 +1348,46 @@ namespace WLL_NGO.Netcode
 
                     rb.velocity = dir * currentSpeed;
                     break;
+
+                case (byte)TackleType.Slap:
+
+                    Debug.Log("GK - slapping...");
+                    dir = transform.forward;
+                    time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    acc = 10;
+                    maxSpeed = 3;
+                    if(time < .5f)
+                    {
+                        currentSpeed += acc * NetworkTimer.Instance.DeltaTick;
+                        if (currentSpeed > maxSpeed)
+                            currentSpeed = maxSpeed;
+
+                        float range = 2f;
+                        // Check for all the opponent players within the slap range
+                        List<PlayerController> others = new List<PlayerController>(TeamController.GetOpponentTeam(this).GetPlayers().Where(p => Vector3.Distance(p.Position, Position) < range && p.playerStateInfo.Value.state != (byte)PlayerState.Stunned));
+                        Debug.Log($"GK - others:{others.Count}");
+                        // Stun others
+                        foreach (PlayerController other in others)
+                        {
+                            Debug.Log($"GK - slapping player:{other.name}");
+
+                            Vector3 hitDir = other.Position - Position;
+                            byte detail = (byte)StunDetail.Front;
+                            if (Vector3.Dot(hitDir, other.transform.forward) > 0)
+                                detail = (byte)StunDetail.Back;
+                            
+                            PlayerStateInfo psi = new PlayerStateInfo() { state = (byte)PlayerState.Stunned, /*It's like by kick for now*/ subState = (byte)StunType.ByKick, detail = detail };
+                            //other.playerStateInfo.Value = psi;
+                            other.SetPlayerStateInfo(psi);
+                        }
+                    }
+                    else
+                    {
+                        currentSpeed -= acc * NetworkTimer.Instance.DeltaTick;
+                        if (currentSpeed < 0)
+                            currentSpeed = 0;
+                    }
+                    break;
                                     
             }
 
@@ -1376,8 +1427,10 @@ namespace WLL_NGO.Netcode
         void HandleOnPlayerStateInfoChanged(PlayerStateInfo oldState, PlayerStateInfo newState)
         {
             if(oldState == newState) return;
-          
-            switch(newState.state)
+
+            Debug.Log($"GK - changing state:{newState.state}, {newState.subState}");
+
+            switch (newState.state)
             {
                 case (byte)PlayerState.Normal:
                     ballHandlingTrigger.SetEnable(true);
@@ -1386,8 +1439,11 @@ namespace WLL_NGO.Netcode
                 case (byte)PlayerState.Tackling:
                     if (IsServer)
                     {
+                        
                         // Get the action cooldown
                         playerStateCooldown = GetTackleCooldown(newState.subState);
+                        Debug.Log($"GK - cooldown:{playerStateCooldown}");
+
 
                         // Start animation on server
                         animator.SetInteger(typeAnimParam, newState.subState);
@@ -1454,7 +1510,8 @@ namespace WLL_NGO.Netcode
         /// </summary>
         private void HandleOnBallEnter()
         {
-            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
+            if(playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+                SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
 
             BallController.Instance.BallEnterTheHandlingTrigger(this);
         }
@@ -1492,6 +1549,17 @@ namespace WLL_NGO.Netcode
            handlingTheBall = false;
         }
 
+        
+
+        public void GiveSlap()
+        {
+            if (playerStateInfo.Value.state != (byte)PlayerState.Normal) return;
+
+            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Tackling, subState = (byte) TackleType.Slap, detail = 0 });
+        }
+
+        
+
         void CheckForBallHandling()
         {
             if (!handlingTheBall)
@@ -1514,11 +1582,7 @@ namespace WLL_NGO.Netcode
                 playerStateCooldown -= Time.deltaTime;
                 if(playerStateCooldown < 0)
                 {
-                    //var ps = playerStateInfo.Value;
-                    //ps.state = (byte)PlayerState.Normal;
-                    //ps.subState = 0;
-                    //ps.detail = 0;
-                    //playerStateInfo.Value = ps;
+                   
                     SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
                 }
                     
@@ -1528,6 +1592,7 @@ namespace WLL_NGO.Netcode
 
         void SetPlayerStateInfo(PlayerStateInfo playerStateInfo)
         {
+            if(!IsServer) return;
             this.playerStateInfo.Value = playerStateInfo;
         }
 
@@ -1560,12 +1625,12 @@ namespace WLL_NGO.Netcode
             return TeamController.GetPlayerTeam(this) == TeamController.GetPlayerTeam(otherPlayer);
         }
 
-        public int GetRole()
-        {
-            PlayerInitializer pi = GetComponent<PlayerInitializer>();
-            return pi.PlayerRole;
-        }
+        
 
+        public void SetRole(int role)
+        {
+            this.role = role;
+        }
         void IncreaseCharge(float time)
         {
             float ch = charge.Value;

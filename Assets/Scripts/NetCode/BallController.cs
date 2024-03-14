@@ -592,6 +592,15 @@ namespace WLL_NGO.Netcode
             
         }
         
+        public Vector3 GetVelocityWithoutEffect()
+        {
+            Vector3 vel = Velocity;
+
+            if (vel.magnitude > 0 && shootingData.EffectTime > 0)
+                vel -= shootingData.CurrentEffectVelocity;
+
+            return vel;
+        }
         
 
         /// <summary>
@@ -605,7 +614,7 @@ namespace WLL_NGO.Netcode
             Debug.Log($"Tackle evaluation - {playerA} VS {playerB}");
 
 
-            if (playerA.GetRole() == (int)PlayerRole.GK)
+            if (playerA.Role == PlayerRole.GK)
                 return playerA;
 
             return playerA;

@@ -25,7 +25,7 @@ namespace WLL_NGO.AI
         bool superShot = false;
         BallController ball;
         float diveSpeed = 5;
-        float takeTheBallRange = 1f;
+        float takeTheBallRange = 2f;
 
         private void Awake()
         {
@@ -113,56 +113,118 @@ namespace WLL_NGO.AI
                 return;
             
 
-            if (areaBounds.Contains(ball.Position))
+            
+            if(ball.Owner != null) // The ball is controller by someone 
             {
-                // If an opponent controls the ball try to take it
-                if(ball.Owner != null)
+                if(ball.Owner == this)// Goalkeeper is controlling the ball
                 {
-                    //if (!player.IsTeammate(ball.Owner)) 
-                    if (player.IsTeammate(ball.Owner)) // TEST 
+                    player.ResetLookDirection();
+                }
+                else // Someone else is controlling the ball
+                {
+                    if (areaBounds.Contains(ball.Position))
                     {
-                        // The player who controls the ball is an opponent, so we try to get the ball from them
-                        TakeBallFromOpponent(ball.Owner);
+                        // The ball is inside the goalkeeper area...
+                        if (!player.IsTeammate(ball.Owner))
+                        {
+                            // ... and controlled by an opponent player, so lets try to get it
+                            TakeBallFromOpponent(ball.Owner);
 
+                        }
+                    }
+                    else
+                    {
+                        // Ball is out the goalkeeper area, just keep position
+                        KeepPosition();
                     }
                 }
-
+                
             }
-            else
+            else // The ball is not controlled at all
             {
-                if(ball.Owner != null && ball.Owner != this)
+                Vector3 ballVel = ball.GetVelocityWithoutEffect();
+                Vector3 ballDir = netCenter - ball.Position;
+                float dot = Vector3.Dot(Vector3.ProjectOnPlane(ball.Velocity, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
+                if(dot < 0) // The ball is going to the opponent goal line
                 {
-                    // Move the goalkeeper in the best position
                     KeepPosition();
                 }
-                else
+                else // Is coming
                 {
-                    if(ball.Owner == this)
+                    // How much time it will take for the ball to reach the net line
+                    Vector3 xVel = Vector3.ProjectOnPlane(ballVel, Vector3.right);
+                    Vector3 xDir = Vector3.ProjectOnPlane(ballDir, Vector3.right);
+                    float time = xDir.magnitude / xVel.magnitude;
+                    // Get the future position of the ball ( maybe the ball is not reaching the net )
+                    Vector3 bPos = ball.Position + ballVel * time;
+                    if (Mathf.Abs(bPos.z) > (netWidth / 2f) + .5f || Mathf.Abs(bPos.z) > netHeight + .5f) // Out of goal
                     {
-                        player.ResetLookDirection();
+                        // Keep position or try to get the ball if it's in area
+                        KeepPosition();
+                    }
+                    else // Ok, it's coming, really
+                    {
+
                     }
                 }
+
             }
+
+            //if (areaBounds.Contains(ball.Position))
+            //{
+            //    // If an opponent controls the ball try to take it
+            //    if(ball.Owner != null && ball.Owner != this)
+            //    {
+            //        if (!player.IsTeammate(ball.Owner)) 
+            //        {
+            //            // The player who controls the ball is an opponent, so we try to get the ball from them
+            //            TakeBallFromOpponent(ball.Owner);
+
+            //        }
+            //    }
+
+
+            //}
+            //else
+            //{
+            //    if(ball.Owner != null && ball.Owner != this)
+            //    {
+                    
+            //    }
+            //    else
+            //    {
+            //        if(ball.Owner == this)
+            //        {
+            //            player.ResetLookDirection();
+            //        }
+            //    }
+            //}
         }
 
         private void TakeBallFromOpponent(PlayerController ballOwner)
         {
 
-            //if (ballOwner == null || player.IsTeammate(ballOwner))
-            //    return;
+            if (ballOwner == null || player.IsTeammate(ballOwner))
+                return;
 
+         
             // Ball direction
             Vector3 ballDir = ball.Position - player.Position;
             Vector3 ballSpeed = ball.Velocity;
 
             if(ballDir.magnitude > takeTheBallRange)
             {
+                
                 player.SetLookDirection(ballDir);
                 ((NotHumanInputHandler) player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
             }
             else
             {
-                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector2.zero);
+                
+                //((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector2.zero);
+                // Hit the opponent
+                //if(player.sta)
+                player.GiveSlap();
             }
             // Move towards the ball
             

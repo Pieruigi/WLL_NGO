@@ -109,6 +109,11 @@ namespace WLL_NGO.Netcode
             return player.PlayerInfo.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
         }
 
+        public static TeamController GetOpponentTeam(PlayerController player)
+        {
+            return !player.PlayerInfo.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+        }
+
         /// <summary>
         /// Returns all the players in the team
         /// </summary>
