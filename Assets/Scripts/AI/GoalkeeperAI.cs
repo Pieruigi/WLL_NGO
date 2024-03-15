@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
@@ -111,7 +112,8 @@ namespace WLL_NGO.AI
         {
             if (player.IsSelected())
                 return;
-            
+
+            if (player.GetState() != (byte)PlayerState.Normal) return;
 
             
             if(ball.Owner != null) // The ball is controller by someone 
@@ -171,15 +173,34 @@ namespace WLL_NGO.AI
                         float t = xDist / ballVelNoEffect.magnitude;
                         if (t < tolleranceTime)
                         {
-                            float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up).normalized, Vector3.ProjectOnPlane(player.Position-ball.Position ,Vector3.up), Vector3.up);
-                            if(angle > 0f)
+                            // Get the target position
+                            Vector3 targetPos = (ballVelNoEffect * t) + (.5f * Physics.gravity.y * Mathf.Pow(t, 2)) * Vector3.up;
+
+                            // The distance along the Z axis when the ball reaches the player line
+                            float zDist = Mathf.Abs(player.Position.z - (ball.Position.z + ballVelNoEffect.z * t));
+
+                            Debug.Log($"GK - target position:{targetPos}");
+                            if(zDist < .25f)
                             {
-                                Debug.Log($"GK - Dive right, angle:{angle}");
+                                // Center shot
+                                Debug.Log($"GK - Dive center");
+                                player.Dive(targetPos, (byte)DiveType.Center, (byte)DiveDetail.Middle);
                             }
                             else
                             {
-                                Debug.Log($"GK - Dive left, angle:{angle}");
+                                float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up).normalized, Vector3.ProjectOnPlane(player.Position - ball.Position, Vector3.up), Vector3.up);
+                                if (angle > 0f)
+                                {
+                                    Debug.Log($"GK - Dive right, angle:{angle}");
+                                    player.Dive(targetPos, (byte)DiveType.Right, (byte)DiveDetail.Middle);
+                                }
+                                else
+                                {
+                                    Debug.Log($"GK - Dive left, angle:{angle}");
+                                    player.Dive(targetPos, (byte)DiveType.Left, (byte)DiveDetail.Middle);
+                                }
                             }
+                            
 
                         }
                     }

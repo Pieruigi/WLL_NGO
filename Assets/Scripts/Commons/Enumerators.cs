@@ -12,7 +12,7 @@ namespace WLL_NGO
     /// Busy: you are busy in some way, for example on kick off
     /// Stunned: you are stunned, means you neither can't move nor shoot
     /// </summary>
-    public enum PlayerState : byte { Normal, Receiver, Busy, Stunned, Tackling, Shooting, Goalkeeping }
+    public enum PlayerState : byte { Normal, Receiver, Busy, Stunned, Tackling, Shooting, Diving }
 
     public enum TackleType : byte { Slide, Kick, Slap, Elbow }
 
@@ -26,9 +26,9 @@ namespace WLL_NGO
 
     public enum  ShotTiming : byte { Bad, Normal, Good, Perfect }
     
-    public enum GoalkeepingType : byte { DiveLow, DiveMid, DiveHigh }
+    public enum DiveType : byte { Left, Center, Right }
 
-    public enum DiveDetail : byte { Left, Center, Right }
+    public enum DiveDetail : byte { Low, Middle, High }
 
     public enum PlayerRole : byte { GK, DF, MD, AT }
 

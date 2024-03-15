@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.AI;
 using WLL_NGO.Interfaces;
+using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.Rendering.DebugUI;
 using static UnityEngine.UI.GridLayoutGroup;
 
@@ -162,6 +163,9 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         float deceleration = 30f;
 
+        [SerializeField]
+        float diveMaxSpeed = 5;
+
         public Vector3 Position
         {
             get { return rb.position; }
@@ -191,6 +195,7 @@ namespace WLL_NGO.Netcode
         string detailAnimParam = "Detail";
         float height = 1.7f;
         float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
+        Vector3 diveTarget = Vector3.zero;
 
         int role = -1;
         public PlayerRole Role
@@ -896,6 +901,8 @@ namespace WLL_NGO.Netcode
             
         }
 
+        
+
         public float GetStunnedCooldown(byte type, byte detail)
         {
             float ret = 0;
@@ -1192,6 +1199,9 @@ namespace WLL_NGO.Netcode
                 case (byte)PlayerState.Receiver:
                     UpdateReceiverMovement();
                     break;
+                case (byte)PlayerState.Diving:
+                    UpdateDiveMovement();
+                    break;
             }
 
             
@@ -1274,6 +1284,13 @@ namespace WLL_NGO.Netcode
                 mDir = new Vector3(moveInput.x, 0f, moveInput.y);
 
             rb.velocity = mDir * currentSpeed + rb.velocity.y * Vector3.up;
+        }
+
+        void UpdateDiveMovement()
+        {
+            if(!IsServer) return;
+
+
         }
 
         void UpdateStunnedMovement()
@@ -1476,6 +1493,10 @@ namespace WLL_NGO.Netcode
                     playerStateCooldown = BallController.Instance.GetShootingDataRemainingTime() + .5f;
                     //ballHandlingTrigger.SetEnable(false);
                     break;
+
+                case (byte)PlayerState.Diving:
+                    //playerStateCooldown = 
+                    break;
             }
         }
         #endregion
@@ -1625,7 +1646,16 @@ namespace WLL_NGO.Netcode
             return TeamController.GetPlayerTeam(this) == TeamController.GetPlayerTeam(otherPlayer);
         }
 
-        
+        public int GetState()
+        {
+            return playerStateInfo.Value.state;
+        }
+
+        public void Dive(Vector3 targetPosition, byte subState, byte detail)
+        {
+            diveTarget = targetPosition;
+            SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Diving, subState = subState, detail = detail });
+        }
 
         public void SetRole(int role)
         {
