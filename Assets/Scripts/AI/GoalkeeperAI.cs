@@ -142,21 +142,23 @@ namespace WLL_NGO.AI
             }
             else // The ball is not controlled at all
             {
-                Vector3 ballVel = ball.GetVelocityWithoutEffect();
+                
+                Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
                 Vector3 ballDir = netCenter - ball.Position;
-                float dot = Vector3.Dot(Vector3.ProjectOnPlane(ball.Velocity, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
-                if(dot < 0) // The ball is going to the opponent goal line
+                float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
+                if(ballVelNoEffect.magnitude == 0 || dot < 0) // The ball is going to the opponent goal line
                 {
                     KeepPosition();
                 }
                 else // Is coming
                 {
-                    // How much time it will take for the ball to reach the net line
-                    Vector3 xVel = Vector3.ProjectOnPlane(ballVel, Vector3.right);
+                    // How much time it will take for the ball to reach the net line ( computing velocity along the X axis )
+                   
+                    Vector3 xVel = Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.right);
                     Vector3 xDir = Vector3.ProjectOnPlane(ballDir, Vector3.right);
                     float time = xDir.magnitude / xVel.magnitude;
                     // Get the future position of the ball ( maybe the ball is not reaching the net )
-                    Vector3 bPos = ball.Position + ballVel * time;
+                    Vector3 bPos = ball.Position + ( ballVelNoEffect * time ) + ( 0.5f * Physics.gravity.y * Mathf.Pow(time, 2)) * Vector3.up;
                     if (Mathf.Abs(bPos.z) > (netWidth / 2f) + .5f || Mathf.Abs(bPos.z) > netHeight + .5f) // Out of goal
                     {
                         // Keep position or try to get the ball if it's in area
@@ -164,7 +166,22 @@ namespace WLL_NGO.AI
                     }
                     else // Ok, it's coming, really
                     {
+                        float tolleranceTime = 1f;
+                        float xDist = Mathf.Abs(ball.Position.x - player.Position.x);
+                        float t = xDist / ballVelNoEffect.magnitude;
+                        if (t < tolleranceTime)
+                        {
+                            float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up).normalized, Vector3.ProjectOnPlane(player.Position-ball.Position ,Vector3.up), Vector3.up);
+                            if(angle > 0f)
+                            {
+                                Debug.Log($"GK - Dive right, angle:{angle}");
+                            }
+                            else
+                            {
+                                Debug.Log($"GK - Dive left, angle:{angle}");
+                            }
 
+                        }
                     }
                 }
 
@@ -241,8 +258,11 @@ namespace WLL_NGO.AI
 
             // Compute the goalkeeper target position
             Vector3 targetPosition = netCenter + direction.normalized * keepPositionDistance;
+            
             if(Vector3.Distance(player.Position, targetPosition) > keepPositionTollerance)
             {
+                Debug.Log($"GK - move {gameObject.name} from {player.Position} to target position:{targetPosition}");
+
                 keepPositionTollerance = .25f;
                 Vector3 worldDirecton = targetPosition - player.Position;
                 worldDirecton.y = 0;
@@ -251,6 +271,7 @@ namespace WLL_NGO.AI
             }
             else
             {
+                Debug.Log($"GK - stopping {gameObject.name} to position:{player.Position}");
                 keepPositionTollerance = keepPositionTolleranceDefault;
                 ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector3.zero);
             }

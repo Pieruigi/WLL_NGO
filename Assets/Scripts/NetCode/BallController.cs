@@ -470,7 +470,7 @@ namespace WLL_NGO.Netcode
             // Invert the sign of the first component of the velocity if the ball is higher than the target ( we must move down )
             float sign = rb.position.y > targetPosition.y ? -1 : 1;
 
-            // Compute horizontal and vertical components: the first term is the velocity to reach the original target, the second contrasts the gravity
+            // Compute horizontal and vertical components: the first term is the velocity to reach the original target, the second is to contrast gravity
             Vector3 velY = (sign * (direction.magnitude * math.sin(math.radians(b)) / t) + (.5f * math.abs(Physics.gravity.y) * t)) * Vector3.up;
             Vector3 velH = dirOnFloor.normalized * (dirOnFloor.magnitude / t);
             Vector3 velE = Vector3.zero;
