@@ -171,6 +171,12 @@ namespace WLL_NGO.Netcode
             get { return rb.position; }
         }
 
+        public Vector3 Velocity
+        {
+            get { return rb.velocity; }
+            set { rb.velocity = value; }
+        }
+
         #region action fields
         //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
         NetworkVariable<PlayerStateInfo> playerStateInfo = new NetworkVariable<PlayerStateInfo>(new PlayerStateInfo() { state = (byte)PlayerState.Normal, subState = 0, detail = 0 });
@@ -193,15 +199,21 @@ namespace WLL_NGO.Netcode
         string stunAnimTrigger = "Stun";
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
-        float height = 1.7f;
+        float jumpHeightThreshold = 1.7f;
         float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
-        Vector3 diveTarget = Vector3.zero;
-
+        
         int role = -1;
         public PlayerRole Role
         {
             get { return (PlayerRole)role; }
         }
+
+        public float PlayerHeight
+        {
+            get { return 1.7f; }
+        }
+
+        UnityAction diveUpdateFunction;
         #endregion
 
         /// <summary>
@@ -727,7 +739,7 @@ namespace WLL_NGO.Netcode
 
             // Compute estimated speed
             // Depending on the timing and the player power
-            float speed = 30;
+            float speed = 10;
 
             // Shoot
             BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
@@ -751,7 +763,7 @@ namespace WLL_NGO.Netcode
             float delay = BallController.Instance.GetShootingDataRemainingTime();
 
             // If the it point has a minimum height we must jump
-            if (hitPoint > height)
+            if (hitPoint > jumpHeightThreshold)
             {
 
                 float jumpTime = Mathf.Sqrt(2f * hitPoint / Mathf.Abs(Physics.gravity.y));
@@ -1290,6 +1302,7 @@ namespace WLL_NGO.Netcode
         {
             if(!IsServer) return;
 
+            diveUpdateFunction.Invoke();
 
         }
 
@@ -1651,16 +1664,17 @@ namespace WLL_NGO.Netcode
             return playerStateInfo.Value.state;
         }
 
-        public void Dive(Vector3 targetPosition, byte subState, byte detail)
+        public void SetPlayerStateInfo(byte state, byte subState, byte detail, float cooldown)
         {
-            diveTarget = targetPosition;
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Diving, subState = subState, detail = detail });
+            playerStateCooldown = cooldown;
         }
 
         public void SetRole(int role)
         {
             this.role = role;
         }
+
         void IncreaseCharge(float time)
         {
             float ch = charge.Value;
@@ -1785,6 +1799,11 @@ namespace WLL_NGO.Netcode
         public IInputHandler GetInputHandler()
         {
             return inputHandler;
+        }
+
+        public void SetDiveUpdateFunction(UnityAction function)
+        {
+            diveUpdateFunction = function;
         }
 
         #endregion
