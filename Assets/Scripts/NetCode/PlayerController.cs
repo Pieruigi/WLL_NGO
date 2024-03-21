@@ -739,7 +739,7 @@ namespace WLL_NGO.Netcode
 
             // Compute estimated speed
             // Depending on the timing and the player power
-            float speed = 10;
+            float speed = 30;
 
             // Shoot
             BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
