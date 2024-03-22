@@ -20,11 +20,14 @@ namespace WLL_NGO
         CapsuleCollider coll;
         bool inside = false;
         bool disabled = false;
+
+        PlayerController player;
+      
       
         private void Awake()
         {
             coll = GetComponent<CapsuleCollider>();
-            
+            player = GetComponentInParent<PlayerController>();
         }
 
         private void FixedUpdate()
@@ -72,6 +75,11 @@ namespace WLL_NGO
                     OnBallExit.Invoke();
                 }
             }
+            
+            //if(player.IsServer) 
+            //    player.SetBallHandlingTriggerEnableClientRpc(value);
+
+            
         }
 
     }

@@ -197,6 +197,7 @@ namespace WLL_NGO.Netcode
         Animator animator;
         string tackleAnimTrigger = "Tackle";
         string stunAnimTrigger = "Stun";
+        string diveAnimTrigger = "Dive";
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
         float jumpHeightThreshold = 1.7f;
@@ -224,6 +225,7 @@ namespace WLL_NGO.Netcode
 
         [SerializeField]
         Transform ballHook;
+        Transform ballHookDefault;
 
         bool handlingTheBall = false;
         float ballHookLerpSpeed = 10f;
@@ -279,6 +281,8 @@ namespace WLL_NGO.Netcode
             get { return index.Value; }
         }
 
+        GoalkeeperAI goalkeeperAI;
+
         private void Awake()
         {
             // Get the rigidbody
@@ -286,10 +290,12 @@ namespace WLL_NGO.Netcode
 
             // Get the animator
             animator = GetComponent<Animator>();
-            
-            // Set handling trigger callbacks
-            ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
-            ballHandlingTrigger.OnBallExit += HandleOnBallExit;
+
+            //// Set handling trigger callbacks
+            //ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
+            //ballHandlingTrigger.OnBallExit += HandleOnBallExit;
+            ballHookDefault = ballHook;
+            goalkeeperAI = GetComponent<GoalkeeperAI>();
 
             // Init netcode for p&r
             clientInputBuffer = new CircularBuffer<InputPayload> (bufferSize);
@@ -344,7 +350,10 @@ namespace WLL_NGO.Netcode
 
                 //Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
                 Debug.Log($"Spawned player controller, playerInfoId:{playerInfoId.Value}");
-                
+
+                // Set handling trigger callbacks
+                ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
+                ballHandlingTrigger.OnBallExit += HandleOnBallExit;
             }
 
 
@@ -1458,12 +1467,13 @@ namespace WLL_NGO.Netcode
         {
             if(oldState == newState) return;
 
-            Debug.Log($"GK - changing state:{newState.state}, {newState.subState}");
+            Debug.Log($"GK - changing state:{newState.state}, {newState.subState}, old:{oldState.state}");
 
             switch (newState.state)
             {
                 case (byte)PlayerState.Normal:
-                    ballHandlingTrigger.SetEnable(true);
+                    if(Role != PlayerRole.GK || oldState.state == (byte)PlayerState.Receiver || oldState.state == (byte)PlayerState.Shooting)
+                        ballHandlingTrigger.SetEnable(true);
                     break;
 
                 case (byte)PlayerState.Tackling:
@@ -1508,7 +1518,9 @@ namespace WLL_NGO.Netcode
                     break;
 
                 case (byte)PlayerState.Diving:
-                    //playerStateCooldown = 
+                    animator.SetInteger(detailAnimParam, newState.detail);
+                    animator.SetInteger(typeAnimParam, newState.subState);
+                    animator.SetTrigger(diveAnimTrigger);
                     break;
             }
         }
@@ -1565,9 +1577,18 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StartHandlingTheBall()
         {
+            // The player is the goalkeeper and they are not blocking the ball 
+            if (Role == PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
+                return;
+
             if (handlingTheBall)
                 return;
             handlingTheBall = true;
+
+            if (Role == PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Diving)
+                ballHook = goalkeeperAI.GetBallHook();
+            else
+                ballHook = ballHookDefault;
 
             // Set the player who owns the ball as the selected one
             TeamController.GetPlayerTeam(this).SetPlayerSelected(this);
@@ -1578,9 +1599,11 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void StopHandlingTheBall()
         {
-            if(!handlingTheBall)
-                return;
+            //if(!handlingTheBall)
+            //    return;
            handlingTheBall = false;
+
+           ballHook = ballHookDefault;
         }
 
         
@@ -1674,6 +1697,25 @@ namespace WLL_NGO.Netcode
         {
             this.role = role;
         }
+
+        //public void DisableBallHandlingTrigger()
+        //{
+        //    ballHandlingTrigger.SetEnable(false);
+        //}
+
+        //public void EnableBallHandlingTrigger()
+        //{
+        //    ballHandlingTrigger.SetEnable(true);
+        //}
+
+        //[ClientRpc]
+        //public void SetBallHandlingTriggerEnableClientRpc(bool value)
+        //{
+        //    if (IsServer)
+        //        return;
+
+        //    ballHandlingTrigger.SetEnable(value);
+        //}
 
         void IncreaseCharge(float time)
         {

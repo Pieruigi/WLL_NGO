@@ -34,7 +34,12 @@ namespace WLL_NGO
             if(pc.Index == 0) // Goalkeeper
             {
                 pc.SetRole((int)PlayerRole.GK);
-                gameObject.AddComponent<GoalkeeperAI>();
+                //gameObject.AddComponent<GoalkeeperAI>();
+            }
+            else
+            {
+                pc.SetRole((int)PlayerRole.DF);
+                //Destroy(gameObject.GetComponent<GoalkeeperAI>());
             }
         }
     }

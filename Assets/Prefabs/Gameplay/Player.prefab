@@ -36,6 +36,8 @@ Transform:
   - {fileID: 7184429214639328339}
   - {fileID: 689867595230150792}
   - {fileID: 8157422459577399060}
+  - {fileID: 4831928549048719878}
+  - {fileID: 3426915553607322885}
   m_Father: {fileID: 2584126692251767088}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4030349836265827069
@@ -139,6 +141,7 @@ GameObject:
   - component: {fileID: -1664083998021181684}
   - component: {fileID: 7767129766027385350}
   - component: {fileID: 6351814172465425121}
+  - component: {fileID: -2175603980815443504}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -174,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2450753999
+  GlobalObjectIdHash: 1622984999
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -199,6 +202,7 @@ MonoBehaviour:
   rotationSpeed: 720
   acceleration: 20
   deceleration: 60
+  diveMaxSpeed: 5
   ballHandlingTrigger: {fileID: 4246186199695800569}
   ballHook: {fileID: 689867595230150792}
 --- !u!114 &545642384408625938
@@ -228,18 +232,46 @@ MonoBehaviour:
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
-    OriginatingState: 2081823275
+    OriginatingState: 177351492
     DestinationState: -585404693
     TransitionDuration: 0.050000012
     TriggerNameHash: 453933295
     TransitionIndex: 0
   - IsCrossFadeExit: 0
     Layer: 0
-    OriginatingState: 2081823275
+    OriginatingState: 177351492
     DestinationState: -1440981379
     TransitionDuration: 0.042370975
     TriggerNameHash: 453933295
     TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 177351492
+    DestinationState: -390943322
+    TransitionDuration: 0.022580802
+    TriggerNameHash: 914991998
+    TransitionIndex: 2
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 177351492
+    DestinationState: 857018311
+    TransitionDuration: 0.021834135
+    TriggerNameHash: 453933295
+    TransitionIndex: 3
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 177351492
+    DestinationState: -765567726
+    TransitionDuration: 0.016140342
+    TriggerNameHash: 914991998
+    TransitionIndex: 4
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 177351492
+    DestinationState: 227439857
+    TransitionDuration: 0.01988262
+    TriggerNameHash: 914991998
+    TransitionIndex: 5
   m_Animator: {fileID: -1664083998021181684}
 --- !u!95 &-1664083998021181684
 Animator:
@@ -312,6 +344,51 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 1
+--- !u!114 &-2175603980815443504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1791793885155437252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 532e2c3f35cb0874dbe4053b5e3970ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handBallHook: {fileID: 4831928549048719878}
+  ballBlockingTrigger: {fileID: 820826638927456213}
+--- !u!1 &2743787981200143928
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4831928549048719878}
+  m_Layer: 0
+  m_Name: GK_HandHook
+  m_TagString: Untagged
+  m_Icon: {fileID: 2488908585195742037, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4831928549048719878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2743787981200143928}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.05, z: 0.76}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5021535250000037411}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3185703323297390753
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +420,74 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5021535250000037411}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3870760584208966120
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3426915553607322885}
+  - component: {fileID: 1831745640175686054}
+  - component: {fileID: 820826638927456213}
+  m_Layer: 0
+  m_Name: GK_BallBlockingTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3426915553607322885
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3870760584208966120}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5021535250000037411}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &1831745640175686054
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3870760584208966120}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &820826638927456213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3870760584208966120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 170121a321d6ab141a6c43bfc0051f8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5666755828175910430
 GameObject:
   m_ObjectHideFlags: 0

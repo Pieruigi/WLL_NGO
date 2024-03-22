@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
+using WLL_NGO.AI;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
 using static WLL_NGO.Netcode.PlayerController;
@@ -96,6 +97,19 @@ namespace WLL_NGO.Netcode
         public Vector3 Velocity
         {
             get { return rb.velocity; }
+            //set { rb.velocity = value; }
+        }
+
+        public bool Kinematic
+        {
+            get { return rb.isKinematic; }
+            //set { rb.isKinematic = value; }
+        }
+
+        public bool UseGravity
+        {
+            get { return rb.useGravity; }
+            //set { rb.useGravity = value; }
         }
 
         SphereCollider coll;
@@ -244,18 +258,20 @@ namespace WLL_NGO.Netcode
             NetworkObject player = null;
             owner = newRef.TryGet(out player) ? player.GetComponent<PlayerController>() : null;
 
-            
             if(owner != null)
             {
-                // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic unless we set 
-                // useTrigger to false in the handling trigger.
-                rb.isKinematic = true;
-                //rb.useGravity = false;
-                // Reset velocity and agular velocity
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                // Tell the player to take control of the ball
-                owner.StartHandlingTheBall();
+                if(owner.Role != PlayerRole.GK || owner.GetState() != (byte)PlayerState.Diving || !owner.GetComponent<GoalkeeperAI>().IsBouncingTheBallBack)
+                {
+                    // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic unless we set 
+                    // useTrigger to false in the handling trigger.
+                    rb.isKinematic = true;
+                    // Reset velocity and agular velocity
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    // Tell the player to take control of the ball
+                    owner.StartHandlingTheBall();
+                }
+                
             }
             else
             {
@@ -601,6 +617,8 @@ namespace WLL_NGO.Netcode
 
             return vel;
         }
+        
+       
         
 
         /// <summary>

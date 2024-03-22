@@ -11,8 +11,23 @@ using static UnityEngine.GraphicsBuffer;
 
 namespace WLL_NGO.AI
 {
-    public class GoalkeeperAI : MonoBehaviour
+    public class GoalkeeperAI : NetworkBehaviour
     {
+        
+        [SerializeField]
+        Transform handBallHook;
+
+        //[SerializeField]
+        //BallHandlingTrigger ballBlockingTrigger;
+
+        NetworkVariable<bool> isBouncingTheBallBack = new NetworkVariable<bool>(false);
+        public bool IsBouncingTheBallBack
+        {
+            get { return isBouncingTheBallBack.Value; }
+        }
+
+
+
         PlayerController player;
 
         float keepPositionTollerance = .75f;
@@ -28,6 +43,7 @@ namespace WLL_NGO.AI
         bool superShot = false;
         BallController ball;
         
+        
         float takeTheBallRange = 2f;
         bool diving = false;
         float diveSpeedMax = 8;
@@ -36,13 +52,17 @@ namespace WLL_NGO.AI
         int diveHigh = 0; // -1: low, 0: middle, 1: high
         float diveSpeed = 5;
         float diveTime = 0;
+        //bool blockTheBall = false;
         float diveCooldown;
+        float ballHookLerpSpeed = 10; 
+        
 
         private void Awake()
         {
             player = GetComponent<PlayerController>();
             player.SetDiveUpdateFunction(UpdateDive);
             keepPositionTolleranceDefault = keepPositionTollerance;
+
         }
 
         private void Start()
@@ -50,16 +70,44 @@ namespace WLL_NGO.AI
             Initialize();
         }
 
+        //public override void OnNetworkSpawn()
+        //{
+        //    base.OnNetworkSpawn();
+
+        //    isBlockingTheBall.OnValueChanged += HandleOnIsBlockingTheBallChanged;
+        //}
+
+       
+
+        //public override void OnNetworkDespawn()
+        //{
+        //    base.OnNetworkDespawn();
+
+        //    isBlockingTheBall.OnValueChanged -= HandleOnIsBlockingTheBallChanged;
+        //}
+
+
+
         // Update is called once per frame
         void Update()
         {
-            if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying())
+            if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying() || player.Role != PlayerRole.GK)
                 return;
 
             if (superShot)
                 UpdateSuperShot();
             else
                 UpdateNormal();
+                
+        }
+
+        private void FixedUpdate()
+        {
+            if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying() || player.Role != PlayerRole.GK)
+                return;
+
+            if(!superShot)
+                CheckForBallBlocking();
         }
 
         private void OnEnable()
@@ -67,6 +115,8 @@ namespace WLL_NGO.AI
             //PlayerController.OnSpawned += HandleOnPlayerSpawned;
             BallController.OnBallSpawned += HandleOnBallSpawned;
             BallController.OnOwnerChanged += HandleOnOwnerChanged;
+            //ballBlockingTrigger.OnBallEnter += OnBallEnterBlockingTrigger;
+            //ballBlockingTrigger.OnBallExit += OnBallExitBlockingTrigger;
         }
 
         
@@ -75,7 +125,32 @@ namespace WLL_NGO.AI
             //PlayerController.OnSpawned -= HandleOnPlayerSpawned;
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             BallController.OnOwnerChanged -= HandleOnOwnerChanged;
+            //ballBlockingTrigger.OnBallEnter -= OnBallEnterBlockingTrigger;
+            //ballBlockingTrigger.OnBallExit -= OnBallExitBlockingTrigger;
         }
+
+
+
+
+        //private void OnBallExitBlockingTrigger()
+        //{
+        //    isBlockingTheBall.Value = false;
+
+        //}
+
+        //private void OnBallEnterBlockingTrigger()
+        //{
+        //    if (blockTheBall)
+        //    {
+        //        isBlockingTheBall.Value = true;
+        //    }
+
+        //}
+
+        //private void HandleOnIsBlockingTheBallChanged(bool previousValue, bool newValue)
+        //{
+        //    // Set new hook
+        //}
 
         void HandleOnBallSpawned()
         {
@@ -173,9 +248,17 @@ namespace WLL_NGO.AI
 
             }
 
-         
+           
         }
         
+        void CheckForBallBlocking()
+        {
+            if (isBouncingTheBallBack.Value)
+            {
+                ball.Position = Vector3.MoveTowards(ball.Position, handBallHook.position, ballHookLerpSpeed * Time.fixedDeltaTime);
+            }
+        }
+
         void StartDiving()
         {
             
@@ -197,6 +280,12 @@ namespace WLL_NGO.AI
             diveHigh = 0;
             diving = false;
             diveTime = projT;
+            
+            //blockTheBall = true;
+            //player.DisableBallHandlingTrigger();
+            isBouncingTheBallBack.Value = false;
+
+
             if (rgtProj.magnitude < .25f)
             {
                 Debug.Log("GK - dive center");
@@ -352,6 +441,12 @@ namespace WLL_NGO.AI
                 }
             }
             
+        }
+
+        public Transform GetBallHook()
+        {
+            Debug.Log("Getting ball hook");
+            return handBallHook;
         }
     }
 
