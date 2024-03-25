@@ -271,10 +271,10 @@ namespace WLL_NGO.Netcode
                     // Tell the player to take control of the ball
                     owner.StartHandlingTheBall();
                 }
-                else
-                {
-                    player.GetComponent<GoalkeeperAI>().BounceTheBallBack();
-                }
+                //else
+                //{
+                //    player.GetComponent<GoalkeeperAI>().BounceTheBallBack();
+                //}
             }
             else
             {

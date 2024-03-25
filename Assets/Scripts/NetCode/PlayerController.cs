@@ -7,6 +7,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.AI;
@@ -282,6 +283,7 @@ namespace WLL_NGO.Netcode
         }
 
         GoalkeeperAI goalkeeperAI;
+        //public GoalkeeperAI GoalkeeperAI { get { return goalkeeperAI; } }
 
         private void Awake()
         {
@@ -1556,10 +1558,19 @@ namespace WLL_NGO.Netcode
         /// </summary>
         private void HandleOnBallEnter()
         {
-            if(playerStateInfo.Value.state == (byte)PlayerState.Receiver)
-                SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
+            if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
+            {
+                goalkeeperAI.BounceTheBallBack();
+                
+            }
+            else
+            {
+                if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+                    SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
 
-            BallController.Instance.BallEnterTheHandlingTrigger(this);
+                BallController.Instance.BallEnterTheHandlingTrigger(this);
+            }
+            
         }
 
         /// <summary>
@@ -1578,8 +1589,8 @@ namespace WLL_NGO.Netcode
         public void StartHandlingTheBall()
         {
             // The player is the goalkeeper and they are not blocking the ball 
-            if (Role == PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
-                return;
+            //if (Role == PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
+            //    return;
 
             if (handlingTheBall)
                 return;

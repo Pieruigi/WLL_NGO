@@ -252,7 +252,7 @@ namespace WLL_NGO.AI
             
             //blockTheBall = true;
             //player.DisableBallHandlingTrigger();
-            isBouncingTheBallBack.Value = true;
+            isBouncingTheBallBack.Value = false;
 
 
             if (rgtProj.magnitude < .25f)
@@ -406,6 +406,7 @@ namespace WLL_NGO.AI
                     if(diveTime < 0)
                     {
                         player.Velocity = Vector3.zero + player.Velocity.y * Vector3.up;
+                        //diving = false;
                     }
                 }
             }
@@ -421,7 +422,10 @@ namespace WLL_NGO.AI
         public void BounceTheBallBack()
         {
             Debug.Log("Bouncing the ball back...");
+
+            isBouncingTheBallBack.Value = false;
             ball.Velocity = -ball.Velocity;
+            //ball.Position += transform.forward * 2f;
         }
     }
 
