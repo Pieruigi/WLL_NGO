@@ -91,8 +91,8 @@ namespace WLL_NGO.AI
             if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying() || player.Role != PlayerRole.GK)
                 return;
 
-            if(!superShot)
-                CheckForBallBlocking();
+            //if(!superShot)
+            //    CheckForBallBlocking();
         }
 
         private void OnEnable()
@@ -220,13 +220,13 @@ namespace WLL_NGO.AI
            
         }
         
-        void CheckForBallBlocking()
-        {
-            if (isBouncingTheBallBack.Value)
-            {
-                ball.Position = Vector3.MoveTowards(ball.Position, handBallHook.position, ballHookLerpSpeed * Time.fixedDeltaTime);
-            }
-        }
+        //void CheckForBallBlocking()
+        //{
+        //    if (!isBouncingTheBallBack.Value)
+        //    {
+        //        ball.Position = Vector3.MoveTowards(ball.Position, handBallHook.position, ballHookLerpSpeed * Time.fixedDeltaTime);
+        //    }
+        //}
 
         void StartDiving()
         {
@@ -252,7 +252,7 @@ namespace WLL_NGO.AI
             
             //blockTheBall = true;
             //player.DisableBallHandlingTrigger();
-            isBouncingTheBallBack.Value = false;
+            isBouncingTheBallBack.Value = true;
 
 
             if (rgtProj.magnitude < .25f)
@@ -423,7 +423,7 @@ namespace WLL_NGO.AI
         {
             Debug.Log("Bouncing the ball back...");
 
-            isBouncingTheBallBack.Value = false;
+            //isBouncingTheBallBack.Value = false;
             ball.Velocity = -ball.Velocity;
             //ball.Position += transform.forward * 2f;
         }
