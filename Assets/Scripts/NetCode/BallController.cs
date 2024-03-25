@@ -97,7 +97,7 @@ namespace WLL_NGO.Netcode
         public Vector3 Velocity
         {
             get { return rb.velocity; }
-            //set { rb.velocity = value; }
+            set { rb.velocity = value; }
         }
 
         public bool Kinematic
@@ -271,7 +271,10 @@ namespace WLL_NGO.Netcode
                     // Tell the player to take control of the ball
                     owner.StartHandlingTheBall();
                 }
-                
+                else
+                {
+                    player.GetComponent<GoalkeeperAI>().BounceTheBallBack();
+                }
             }
             else
             {

@@ -37,7 +37,6 @@ Transform:
   - {fileID: 689867595230150792}
   - {fileID: 8157422459577399060}
   - {fileID: 4831928549048719878}
-  - {fileID: 3426915553607322885}
   m_Father: {fileID: 2584126692251767088}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4030349836265827069
@@ -357,7 +356,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handBallHook: {fileID: 4831928549048719878}
-  ballBlockingTrigger: {fileID: 820826638927456213}
 --- !u!1 &2743787981200143928
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,74 +418,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5021535250000037411}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3870760584208966120
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3426915553607322885}
-  - component: {fileID: 1831745640175686054}
-  - component: {fileID: 820826638927456213}
-  m_Layer: 0
-  m_Name: GK_BallBlockingTrigger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3426915553607322885
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3870760584208966120}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5021535250000037411}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1831745640175686054
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3870760584208966120}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &820826638927456213
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3870760584208966120}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 170121a321d6ab141a6c43bfc0051f8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5666755828175910430
 GameObject:
   m_ObjectHideFlags: 0

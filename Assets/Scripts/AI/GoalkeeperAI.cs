@@ -70,22 +70,7 @@ namespace WLL_NGO.AI
             Initialize();
         }
 
-        //public override void OnNetworkSpawn()
-        //{
-        //    base.OnNetworkSpawn();
-
-        //    isBlockingTheBall.OnValueChanged += HandleOnIsBlockingTheBallChanged;
-        //}
-
        
-
-        //public override void OnNetworkDespawn()
-        //{
-        //    base.OnNetworkDespawn();
-
-        //    isBlockingTheBall.OnValueChanged -= HandleOnIsBlockingTheBallChanged;
-        //}
-
 
 
         // Update is called once per frame
@@ -115,8 +100,7 @@ namespace WLL_NGO.AI
             //PlayerController.OnSpawned += HandleOnPlayerSpawned;
             BallController.OnBallSpawned += HandleOnBallSpawned;
             BallController.OnOwnerChanged += HandleOnOwnerChanged;
-            //ballBlockingTrigger.OnBallEnter += OnBallEnterBlockingTrigger;
-            //ballBlockingTrigger.OnBallExit += OnBallExitBlockingTrigger;
+          
         }
 
         
@@ -125,32 +109,13 @@ namespace WLL_NGO.AI
             //PlayerController.OnSpawned -= HandleOnPlayerSpawned;
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             BallController.OnOwnerChanged -= HandleOnOwnerChanged;
-            //ballBlockingTrigger.OnBallEnter -= OnBallEnterBlockingTrigger;
-            //ballBlockingTrigger.OnBallExit -= OnBallExitBlockingTrigger;
+            
         }
 
 
 
 
-        //private void OnBallExitBlockingTrigger()
-        //{
-        //    isBlockingTheBall.Value = false;
-
-        //}
-
-        //private void OnBallEnterBlockingTrigger()
-        //{
-        //    if (blockTheBall)
-        //    {
-        //        isBlockingTheBall.Value = true;
-        //    }
-
-        //}
-
-        //private void HandleOnIsBlockingTheBallChanged(bool previousValue, bool newValue)
-        //{
-        //    // Set new hook
-        //}
+       
 
         void HandleOnBallSpawned()
         {
@@ -162,6 +127,10 @@ namespace WLL_NGO.AI
         {
             Debug.Log($"Owner changed:{oldOwner}, {newOwner}");
 
+            if (player.Role != PlayerRole.GK)
+                return;
+
+           
             if (newOwner == player)
             {
                 player.SetInputHandler(new HumanInputHandler());
@@ -283,7 +252,7 @@ namespace WLL_NGO.AI
             
             //blockTheBall = true;
             //player.DisableBallHandlingTrigger();
-            isBouncingTheBallBack.Value = false;
+            isBouncingTheBallBack.Value = true;
 
 
             if (rgtProj.magnitude < .25f)
@@ -447,6 +416,12 @@ namespace WLL_NGO.AI
         {
             Debug.Log("Getting ball hook");
             return handBallHook;
+        }
+
+        public void BounceTheBallBack()
+        {
+            Debug.Log("Bouncing the ball back...");
+            ball.Velocity = -ball.Velocity;
         }
     }
 
