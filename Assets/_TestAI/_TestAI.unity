@@ -192,6 +192,12 @@ MonoBehaviour:
   - {fileID: 82156668}
   - {fileID: 710814360}
   - {fileID: 979949424}
+  waitingLine: 10
+  waitingTime: 5
+  ball: {fileID: 1373425456}
+  homeScore: 0
+  awayScore: 0
+  hasBall: 0
 --- !u!4 &51784147
 Transform:
   m_ObjectHideFlags: 0
@@ -1737,6 +1743,12 @@ MonoBehaviour:
   - {fileID: 691588918}
   - {fileID: 1930528750}
   - {fileID: 619650640}
+  waitingLine: 10
+  waitingTime: 5
+  ball: {fileID: 1373425456}
+  homeScore: 0
+  awayScore: 0
+  hasBall: 0
 --- !u!4 &949189126
 Transform:
   m_ObjectHideFlags: 0
@@ -2218,6 +2230,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1373425455}
+  - component: {fileID: 1373425456}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -2241,6 +2254,18 @@ Transform:
   - {fileID: 1550960362}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1373425456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373425454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b54cf9cc0540b948aed499989eb9f87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1426237004
 GameObject:
   m_ObjectHideFlags: 0
