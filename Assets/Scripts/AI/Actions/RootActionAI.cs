@@ -1,43 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace WLL_NGO.AI
 {
-    public class RootActionAI : ActionAI
+    public class RootActionAI : TeamActionAI
     {
-        TeamAI teamAI;
-
+        
         protected override bool CheckConditions()
         {
             return true;
         }
 
-        protected override void DoUpdate()
+        protected override void Activate()
         {
-
-            if (teamAI.HasBall())
-            {
-                //CreateAction(typeof(AttackActionAI));
-                //Attack();
-            }
+            object[] conditions = new object[] { TeamAI };
+            if (AttackActionAI.EnterConditions(conditions))
+                CreateAction<AttackActionAI>(Owner, this);
             else
-            {
+                CreateAction<DefendActionAI>(Owner, this);
 
-                //Defend();
-            }
+
         }
 
-        protected override bool IsCompleted(out bool succeeded)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Initialize(float updateTime = 0, ActionAI previousAction = null, object[] parameters = null)
-        {
-            base.Initialize(updateTime, previousAction, parameters);
-            teamAI = (TeamAI)parameters[0];
-        }
     }
 
 }

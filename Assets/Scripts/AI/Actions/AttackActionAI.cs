@@ -1,31 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 
 namespace WLL_NGO.AI
 {
-    public class AttackActionAI : ActionAI
+    public class AttackActionAI : TeamActionAI
     {
-        [SerializeField] bool conditions = false;
-        [SerializeField] bool succeeded = false;
-        [SerializeField] bool completed = false;
+        
+        public static bool EnterConditions(object[] parameters)
+        {
+            TeamAI team = (TeamAI)parameters[0];
+            Debug.Log($"CheckConditions:{team.HasBall()}");
+            return team.HasBall();
+        }
 
         protected override bool CheckConditions()
         {
-            //throw new System.NotImplementedException();
-            return conditions;
+            
+            return EnterConditions(new object[] { TeamAI });
         }
 
-        protected override void DoUpdate()
+        protected override void Activate()
         {
             Debug.Log("Action - Updating...");
         }
+                
 
-        protected override bool IsCompleted(out bool succeeded)
-        {
-            succeeded = this.succeeded;
-            return completed;
-        }
+        
     }
 
 }

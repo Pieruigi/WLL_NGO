@@ -10,27 +10,41 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
-    public class TeamAI/*<T>*/ : MonoBehaviour /*where T : ActionAI*/
+    public class TeamAI : MonoBehaviour
     {
         [SerializeField] bool home;
 
         [SerializeField] List<PlayerAI> players;
         [SerializeField] float waitingLine;
-        [SerializeField] float waitingTime;
+        public float WaitingLine
+        {
+            get { return waitingLine; } 
+        }
 
+        [SerializeField] float waitingTime;
+        public float WaitingTime
+        {
+            get { return waitingTime; }
+        }
 #if TEST_AI
         [SerializeField]TestBallController ball;
+        public TestBallController BallController { get { return ball; } }
         [SerializeField]int homeScore;
         [SerializeField]int awayScore;
+        [SerializeField] TestNetController netController;
+        public TestNetController NetController { get { return netController;} }
 #else
         BallController ball;
+        public TestBallController BallController { get { return ball; } }
+        [SerializeField] NetController netController;
+        public NetController NetController { get { return netController;} }
 #endif
 
 #if TEST_AI
         [SerializeField] bool hasBall;
 #endif
 
-        [SerializeField] List<ActionAI> actions = new List<ActionAI>();
+        [SerializeField] ActionAI rootAction;
 
 
         float updateTime = .5f;
@@ -79,12 +93,11 @@ namespace WLL_NGO.AI
 
         void DoUpdate()
         {
-            if(actions.Count == 0)
+            if(!rootAction)
             {
                 // Create the root action
-                ActionAI action = ActionAI.CreateAction<RootActionAI>(updateTime: 0, previousAction: null, parameters: new object[] { this });
-                action.name = $"{gameObject.name}_{action.name}";
-                actions.Add(action);
+                rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null);
+                
             }
            
         }
