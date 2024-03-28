@@ -5,7 +5,7 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
-    public class DefendActionAI : TeamActionAI
+    public class DefenceActionAI : TeamActionAI
     {
 
         protected override void Activate()

@@ -26,7 +26,10 @@ namespace WLL_NGO.AI
 
         protected override void Activate()
         {
+            // Tell each player to defend the position
 
+            
+            // That's just a test, we need to create a DefendZoneActionAI instead
             List<PlayerAI> players = new List<PlayerAI>(TeamAI.Players);
             ActionAI action = CreateAction<ReachDestinationActionAI>(players[1], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position });
             //action = CreateAction<ReachDestinationActionAI>(players[2], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position - players[2].transform.forward*.8f });

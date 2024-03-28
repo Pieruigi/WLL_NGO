@@ -30,6 +30,10 @@ namespace WLL_NGO.AI
         {
             get { return waitingTime; }
         }
+
+        [SerializeField]
+        List<ZoneTrigger> defenceZoneList;
+
 #if TEST_AI
         [SerializeField]TestBallController ball;
         public TestBallController BallController { get { return ball; } }
@@ -114,13 +118,17 @@ namespace WLL_NGO.AI
            
         }
 
-
-
         public bool HasBall()
         {
 #if TEST_AI
-        return hasBall;
+            return hasBall;
 #endif
+        }
+
+        public PlayerAI GetZoneDefender(ZoneTrigger zone)
+        {
+            int id = defenceZoneList.IndexOf(zone);
+            return players[id + 1];
         }
     }
 
