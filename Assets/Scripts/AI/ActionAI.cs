@@ -19,26 +19,31 @@ namespace WLL_NGO.AI
     /// </summary>
     public abstract class ActionAI: MonoBehaviour
     {
-        //public UnityAction<bool> OnActionCompleted;
-        //public UnityAction OnActionInterrupted;
+        public UnityAction<ActionAI, bool> OnActionCompleted;
+        public UnityAction<ActionAI> OnActionInterrupted;
 
         [SerializeField] ActionUpdateFunction updateFunction;
         public ActionUpdateFunction UpdateFunction
         {
             get { return updateFunction; }
-            set { updateFunction = value; }
+            private set { updateFunction = value; }
         }
 
         public ActionAI PreviousAction { get; private set; } = null;
-        public ActionAI NextAction { get; private set; } = null;
+        public List<ActionAI> NextActionList { get; private set; } = new List<ActionAI>();
 
         public MonoBehaviour Owner { get; private set; }
 
         bool interrupted = false;
         bool initialized = false;
-        //bool completed = false;
+        bool completed = false;
         bool active = false;
-
+        //bool loop = false;
+        //protected bool Loop
+        //{
+        //    get { return loop; }
+        //    private set { loop = value; }
+        //}    
         //float updateTime = 0;
         //float timeElapsed = 0;
         //UnityAction<ActionAI> interruptedCallback;
@@ -50,14 +55,15 @@ namespace WLL_NGO.AI
         
         protected virtual void Update()
         {
-            if (updateFunction != ActionUpdateFunction.Update || interrupted || !initialized)
+            if (updateFunction != ActionUpdateFunction.Update || interrupted || !initialized || completed)
                 return;
 
             if(!CheckConditions())
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
-                Destroy(gameObject);
+                OnActionInterrupted?.Invoke(this);
+                CheckForDestroy();
             }
 
             if (!active)
@@ -65,39 +71,59 @@ namespace WLL_NGO.AI
                 active = true;
                 Activate();
             }
-            
-            
+
+            Loop();
+
+            bool succeeded;
+            if(IsCompleted(out succeeded))
+            {
+                completed = true;
+                OnActionCompleted?.Invoke(this, succeeded);
+                CheckForDestroy();
+            }
 
         }
 
         protected virtual void LateUpdate()
         {
-            if (updateFunction != ActionUpdateFunction.LateUpdate || interrupted || !initialized)
+            if (updateFunction != ActionUpdateFunction.LateUpdate || interrupted || !initialized || completed)
                 return;
 
             if (!CheckConditions())
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
-                Destroy(gameObject);
+                OnActionInterrupted?.Invoke(this);
+                CheckForDestroy();
             }
             if (!active)
             {
                 active = true;
                 Activate();
+            }
+
+            Loop();
+
+            bool succeeded;
+            if (IsCompleted(out succeeded))
+            {
+                completed = true;
+                OnActionCompleted?.Invoke(this, succeeded);
+                CheckForDestroy();
             }
         }
 
         protected virtual void FixedUpdate()
         {
-            if (updateFunction != ActionUpdateFunction.FixedUpdate || interrupted || !initialized)
+            if (updateFunction != ActionUpdateFunction.FixedUpdate || interrupted || !initialized || completed)
                 return;
 
             if (!CheckConditions())
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
-                Destroy(gameObject);
+                OnActionInterrupted?.Invoke(this);
+                CheckForDestroy();
             }
 
             if (!active)
@@ -106,25 +132,44 @@ namespace WLL_NGO.AI
                 Activate();
             }
 
+            //if (loop)
+            Loop();
+
+            bool succeeded;
+            if (IsCompleted(out succeeded))
+            {
+                completed = true;
+                OnActionCompleted?.Invoke(this, succeeded);
+                CheckForDestroy();
+            }
+
         }
 
-        protected virtual void OnDestroy()
+        /// <summary>
+        /// When an action is completed or interrupted it gets destroyed and the parent action is restarted.
+        /// If you want the parent to keep going add a new action or restart this one when the action is notified.
+        /// Override this function if you want a different behaviour.
+        /// </summary>
+        protected virtual void CheckForDestroy()
         {
-            if (PreviousAction)
+            if (PreviousAction) // We don't want to destroy the root action
             {
-                PreviousAction.NextAction = null;
-                PreviousAction.Restart();
+                if (active)
+                {
+                    PreviousAction.NextActionList.Remove(this);
+                    if (PreviousAction.NextActionList.Count == 0)
+                        PreviousAction.Restart();
+
+                    Destroy(gameObject);
+                }
+                
             }
                 
         }
 
-        protected virtual void Restart()
-        {
-            //completed = false;
-            //interrupted = false;
-            active = false;
-        }
+        
 
+        protected virtual void Loop(){}
         
         /// <summary>
         /// 
@@ -147,13 +192,24 @@ namespace WLL_NGO.AI
             if (previousAction != null)
             {
                 action.PreviousAction = previousAction;
-                previousAction.NextAction = action;
+                previousAction.NextActionList.Add(action);
                 action.transform.parent = previousAction.transform;
+                action.OnActionCompleted += previousAction.HandleOnChildActionCompleted;
+                action.OnActionInterrupted += previousAction.HandleOnChildActionInterrupted;
             }
             action.Initialize(parameters);
             return action;
         }
 
+        protected virtual void HandleOnChildActionInterrupted(ActionAI childAction){}
+
+        protected virtual void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded){}
+
+        public virtual bool IsCompleted(out bool succeeded)
+        {
+            succeeded = false;
+            return false;
+        }
         
         public virtual void Initialize(object[] parameters = null) 
         {
@@ -162,7 +218,13 @@ namespace WLL_NGO.AI
             
         }
 
-        
+        public virtual void Restart()
+        {
+            active = false;
+            completed = false;
+            interrupted = false;
+        }
+
 
 
 

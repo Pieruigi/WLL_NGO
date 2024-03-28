@@ -8,6 +8,7 @@ namespace WLL_NGO.AI
 {
     public class WaitingActionAI : TeamActionAI
     {
+        
         public static bool EnterConditions(object[] conditions)
         {
             TeamAI team = (TeamAI)conditions[0];
@@ -25,13 +26,24 @@ namespace WLL_NGO.AI
 
         protected override void Activate()
         {
-            //throw new System.NotImplementedException();
+
+            List<PlayerAI> players = new List<PlayerAI>(TeamAI.Players);
+            ActionAI action = CreateAction<ReachDestinationActionAI>(players[1], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position });
+            //action = CreateAction<ReachDestinationActionAI>(players[2], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position - players[2].transform.forward*.8f });
         }
 
         protected override bool CheckConditions()
         {
             return EnterConditions(new object[] { TeamAI });
         }
+
+        protected override void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded)
+        {
+            childAction.Initialize(new object[] { TeamAI.BallController.Position });
+            childAction.Restart();
+
+        }
+
     }
 
 }

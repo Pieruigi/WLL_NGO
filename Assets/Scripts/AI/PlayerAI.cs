@@ -2,17 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAI : MonoBehaviour
+namespace WLL_NGO.AI
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerAI : MonoBehaviour
     {
-        
+        public TeamAI TeamAI { get; set; }
+
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

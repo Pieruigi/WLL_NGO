@@ -15,6 +15,10 @@ namespace WLL_NGO.AI
         [SerializeField] bool home;
 
         [SerializeField] List<PlayerAI> players;
+        public ICollection<PlayerAI> Players
+        {
+            get { return players.AsReadOnly(); }
+        }
         [SerializeField] float waitingLine;
         public float WaitingLine
         {
@@ -53,6 +57,14 @@ namespace WLL_NGO.AI
         private void Awake()
         {
             timeElapsed = updateTime;
+
+#if TEST_AI
+            // In netcode we need to fo this for each player after spawning
+            foreach (PlayerAI player in players)
+            {
+                player.TeamAI = this;
+            }
+#endif
         }
 
 
