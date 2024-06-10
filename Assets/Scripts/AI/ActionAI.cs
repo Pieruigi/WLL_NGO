@@ -146,7 +146,7 @@ namespace WLL_NGO.AI
         }
 
         /// <summary>
-        /// When an action is completed or interrupted it gets destroyed and the parent action is restarted.
+        /// When an action is completed or interrupted it is destroyed and the parent action is restarted.
         /// If you want the parent to keep going add a new action or restart this one when the action is notified.
         /// Override this function if you want a different behaviour.
         /// </summary>

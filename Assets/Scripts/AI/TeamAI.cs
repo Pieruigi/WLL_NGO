@@ -31,8 +31,11 @@ namespace WLL_NGO.AI
             get { return waitingTime; }
         }
 
-        [SerializeField]
-        List<ZoneTrigger> defenceZoneList;
+        [SerializeField] float maxDefensiveDistance = 4;
+        
+
+        //[SerializeField]
+        //List<ZoneTrigger> defenceZoneList;
 
 #if TEST_AI
         [SerializeField]TestBallController ball;
@@ -125,10 +128,24 @@ namespace WLL_NGO.AI
 #endif
         }
 
-        public PlayerAI GetZoneDefender(ZoneTrigger zone)
+        //public PlayerAI GetZoneDefender(ZoneTrigger zone)
+        //{
+        //    int id = defenceZoneList.IndexOf(zone);
+        //    return players[id + 1];
+        //}
+
+        public bool IsTeammate(PlayerAI player)
         {
-            int id = defenceZoneList.IndexOf(zone);
-            return players[id + 1];
+            return players.Contains(player);
+        }
+
+        /// <summary>
+        /// We should return a value depending on the AI level, the defensive line and the target position 
+        /// </summary>
+        /// <returns></returns>
+        public float GetDefensiveDistance()
+        {
+            return maxDefensiveDistance;
         }
     }
 

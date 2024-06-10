@@ -34,10 +34,13 @@ namespace WLL_NGO.AI
             // Reach destination
             Vector3 dir = destination - PlayerAI.transform.position;
             dir.y = 0;
+            float delta = Time.deltaTime;
+            if (UpdateFunction == ActionUpdateFunction.FixedUpdate)
+                delta = Time.fixedDeltaTime;
             if(dir.magnitude < 1.5)
                 reached = true;
             else
-                PlayerAI.transform.position += dir*3*Time.deltaTime;
+                PlayerAI.transform.position += dir*1*delta;
             
         }
 
@@ -51,6 +54,8 @@ namespace WLL_NGO.AI
         public override void Initialize(object[] parameters = null)
         {
             base.Initialize(parameters);
+            if (parameters == null)
+                return;
             destination = (Vector3)parameters[0];
             destination.y = 0;
         }

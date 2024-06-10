@@ -11,7 +11,7 @@ namespace WLL_NGO.AI
         public static bool EnterConditions(object[] parameters)
         {
             TeamAI team = (TeamAI)parameters[0];
-            Debug.Log($"CheckConditions:{team.HasBall()}");
+            
             return team.HasBall();
         }
 
