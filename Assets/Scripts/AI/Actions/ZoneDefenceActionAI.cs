@@ -11,7 +11,8 @@ namespace WLL_NGO.AI
         {
             foreach(PlayerAI player in TeamAI.Players)
             {
-                CreateAction<ZoneDefencePlayerActionAI>(player, this, ActionUpdateFunction.Update);
+                if(player.Role != PlayerRole.GK)
+                    CreateAction<ZoneDefencePlayerActionAI>(player, this, ActionUpdateFunction.Update);
             }
         }
 

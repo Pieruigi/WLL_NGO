@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.AI.Test;
@@ -13,9 +14,9 @@ namespace WLL_NGO.AI
     public class TeamAI : MonoBehaviour
     {
         [SerializeField] bool home;
-
+        
         [SerializeField] List<PlayerAI> players;
-        public ICollection<PlayerAI> Players
+        public IList<PlayerAI> Players
         {
             get { return players.AsReadOnly(); }
         }
@@ -32,10 +33,11 @@ namespace WLL_NGO.AI
         }
 
         [SerializeField] float maxDefensiveDistance = 4;
-        
+
 
         //[SerializeField]
         //List<ZoneTrigger> defenceZoneList;
+       
 
 #if TEST_AI
         [SerializeField]TestBallController ball;
@@ -44,6 +46,8 @@ namespace WLL_NGO.AI
         [SerializeField]int awayScore;
         [SerializeField] TestNetController netController;
         public TestNetController NetController { get { return netController;} }
+
+
 #else
         BallController ball;
         public TestBallController BallController { get { return ball; } }
@@ -71,9 +75,11 @@ namespace WLL_NGO.AI
             {
                 player.TeamAI = this;
             }
+            
 #endif
         }
 
+        
 
         private void FixedUpdate()
         {
@@ -147,6 +153,8 @@ namespace WLL_NGO.AI
         {
             return maxDefensiveDistance;
         }
+
+        
     }
 
 }

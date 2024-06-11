@@ -228,6 +228,11 @@ namespace WLL_NGO.Netcode
         Transform ballHook;
         Transform ballHookDefault;
 
+        public bool HasBall
+        {
+            get { return BallController.Instance.Owner == this; }
+        }
+
         bool handlingTheBall = false;
         float ballHookLerpSpeed = 10f;
 

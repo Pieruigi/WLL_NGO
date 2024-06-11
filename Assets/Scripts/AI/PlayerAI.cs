@@ -23,6 +23,28 @@ namespace WLL_NGO.AI
             get { return role; }
         }
 
+#if TEST_AI
+        [SerializeField]
+        bool hasBall;
+#endif
+
+#if TEST_AI
+        public Vector3 Position { get { return transform.position; } }
+#endif
+
+        public bool HasBall
+        {
+            get
+            {
+#if TEST_AI
+                return hasBall;
+#else
+                return playerController.HasBall;
+#endif
+
+            }
+        }
+
         private void Awake()
         {
 #if !TEST_AI
