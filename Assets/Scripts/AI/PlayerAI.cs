@@ -45,6 +45,13 @@ namespace WLL_NGO.AI
             }
         }
 
+        PlayerAI targetPlayer = null;
+        public PlayerAI TargetPlayer
+        {
+            get { return targetPlayer; }
+            set { targetPlayer = value; }
+        }
+
         private void Awake()
         {
 #if !TEST_AI

@@ -13,9 +13,12 @@ namespace WLL_NGO.AI
     {
         List<PlayerAI> opponentsInZone = new List<PlayerAI>();
         ZoneTrigger defensiveZone;
-        PlayerAI targetPlayer;
+        //PlayerAI targetPlayer;
         ActionAI moveAction;
         TeamAI opponentTeam;
+
+        float timer = 0;
+        float loopTime = .5f;
 
         public override void Initialize(object[] parameters = null)
         {
@@ -32,10 +35,10 @@ namespace WLL_NGO.AI
 
             opponentsInZone.Clear();
             //opponents = defensiveZone.Opponents.ToList();
-            targetPlayer = null;
+            PlayerAI.TargetPlayer = null;
             
             opponentTeam = FindObjectsOfType<TeamAI>().First<TeamAI>(t=>t != PlayerAI.TeamAI);
-            
+           
         }
 
         private void OnDisable()
@@ -49,7 +52,7 @@ namespace WLL_NGO.AI
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnPlayerExit;
             defensiveZone.Activate(false);
             opponentsInZone.Clear();
-            targetPlayer = null;
+            PlayerAI.TargetPlayer = null;
             
 
         }
@@ -110,6 +113,14 @@ namespace WLL_NGO.AI
         {
             base.Loop();
 
+            if(timer > 0)
+                timer -= UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
+
+            if (timer > 0)
+                return;
+
+            timer = loopTime;
+
             CheckTarget(); 
 
            
@@ -120,24 +131,39 @@ namespace WLL_NGO.AI
         void CheckTarget()
         {
             // If there is a target we move accordingly, otherwise we move back to the default position
-            if (!targetPlayer)
+            if (!PlayerAI.TargetPlayer)
             {
-                targetPlayer = opponentsInZone.Find(o => o.HasBall);
-                if(!targetPlayer)
+                // No target yet
+                // Get the opponent within the player defending zone with the all if any
+                PlayerAI.TargetPlayer = opponentsInZone.Find(o => o.HasBall);
+                // No target means no opponent is holding the ball within the player zone, so let's check others
+                if(!PlayerAI.TargetPlayer)
                 {
+                    // Get all the opponents within the player zone
                     List<PlayerAI> list = opponentsInZone;
+                    // If there are no opponents in the player zone then list all the opponents in the field
                     if (list.Count == 0)
                         list = opponentTeam.Players.ToList();
-                    targetPlayer = GetTheClosestOpponent(list);
+                    // Get the opponent with the ball eventually ( or a free opponent )
+                    //list = PlayerAI.TeamAI.Players.Where(p=>p.);
+
+                    // Get all the 
+                    list = PlayerAI.TeamAI.Players.Where(o => o.TargetPlayer).ToList();
+                    list = opponentTeam.Players.Where(o=>!list.Contains(o)).ToList();
+                    
+                    
+                    PlayerAI.TargetPlayer = GetTheClosestOpponent(list);
+                    
+                    
                 }
                     
             }
-            else
+            else // The player has already a target
             {
                 if(opponentsInZone.Count > 0)
                 {
-                    // The target the player is following is in its zone
-                    if (opponentsInZone.Contains(targetPlayer))
+                    // The target the player is following is in their zone
+                    if (opponentsInZone.Contains(PlayerAI.TargetPlayer))
                     {
                         // Is there another player with the ball?
                         PlayerAI tmp = opponentsInZone.Find(p => p.HasBall);
@@ -149,10 +175,13 @@ namespace WLL_NGO.AI
                     else
                     {
                         // The target the player is following is not in its zone... we can move back to our zone and start following another player
-                        targetPlayer = GetTheClosestOpponent(opponentsInZone);
+                        PlayerAI.TargetPlayer = GetTheClosestOpponent(opponentsInZone);
                     }
                 }
             }
+
+            
+
            
             Vector3 pos = Vector3.ProjectOnPlane(PlayerAI.TeamAI.NetController.transform.position - targetPlayer.Position, Vector3.up);
             pos = pos.normalized * PlayerAI.TeamAI.GetDefensiveDistance();
