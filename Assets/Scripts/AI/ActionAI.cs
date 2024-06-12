@@ -38,6 +38,7 @@ namespace WLL_NGO.AI
         bool initialized = false;
         bool completed = false;
         bool active = false;
+        bool restartOnNoChildren = false;
         //bool loop = false;
         //protected bool Loop
         //{
@@ -157,8 +158,9 @@ namespace WLL_NGO.AI
                 if (active)
                 {
                     PreviousAction.NextActionList.Remove(this);
-                    if (PreviousAction.NextActionList.Count == 0)
+                    if (PreviousAction.NextActionList.Count == 0 && PreviousAction.restartOnNoChildren)
                         PreviousAction.Restart();
+                        
 
                     Destroy(gameObject);
                 }
@@ -180,7 +182,7 @@ namespace WLL_NGO.AI
         /// <param name="previousAction"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, ActionUpdateFunction updateFunction = ActionUpdateFunction.FixedUpdate, object[] parameters = null) where T : ActionAI
+        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.FixedUpdate, object[] parameters = null) where T : ActionAI
         {
             GameObject actionObject = new GameObject($"{owner.gameObject.name}_{typeof(T).Name}");
             //ActionAI action = actionObject.AddComponent<T>();
@@ -188,6 +190,7 @@ namespace WLL_NGO.AI
             action.Owner = owner;
             action.PreviousAction = previousAction;
             action.UpdateFunction = updateFunction;
+            action.restartOnNoChildren = restartOnNoChildren;
             //action.interruptedCallback = interruptedCallback;
             if (previousAction != null)
             {
@@ -220,6 +223,7 @@ namespace WLL_NGO.AI
 
         public virtual void Restart()
         {
+            Debug.Log("BBBBBBBBBBBBBBBBBBBBBBBBB");
             active = false;
             completed = false;
             interrupted = false;

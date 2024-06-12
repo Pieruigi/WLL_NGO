@@ -10,10 +10,11 @@ namespace WLL_NGO.AI
 
         protected override void Activate()
         {
+            
             if(WaitingActionAI.EnterConditions(new object[] { TeamAI}))
-                CreateAction<WaitingActionAI>(Owner, this);
+                CreateAction<WaitingActionAI>(Owner, this, true);
             else
-                CreateAction<PressingActionAI>(Owner, this);
+                CreateAction<PressingActionAI>(Owner, this, true);
             
         }
 

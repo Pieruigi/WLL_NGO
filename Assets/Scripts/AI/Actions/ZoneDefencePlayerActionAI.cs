@@ -134,7 +134,7 @@ namespace WLL_NGO.AI
             if (!PlayerAI.TargetPlayer)
             {
                 // No target yet
-                // Get the opponent within the player defending zone with the all if any
+                // Get the opponent within the player defending zone with the ball if any
                 PlayerAI.TargetPlayer = opponentsInZone.Find(o => o.HasBall);
                 // No target means no opponent is holding the ball within the player zone, so let's check others
                 if(!PlayerAI.TargetPlayer)
@@ -183,15 +183,15 @@ namespace WLL_NGO.AI
             
 
            
-            Vector3 pos = Vector3.ProjectOnPlane(PlayerAI.TeamAI.NetController.transform.position - targetPlayer.Position, Vector3.up);
+            Vector3 pos = Vector3.ProjectOnPlane(PlayerAI.TeamAI.NetController.transform.position - PlayerAI.TargetPlayer.Position, Vector3.up);
             pos = pos.normalized * PlayerAI.TeamAI.GetDefensiveDistance();
-            pos += targetPlayer.Position;
+            pos += PlayerAI.TargetPlayer.Position;
             //Vector3 dir = pos - transform.position;
             //dir = dir.normalized;
 #if TEST_AI
             if (!moveAction)
             {
-                moveAction = CreateAction<ReachDestinationActionAI>(PlayerAI, this, ActionUpdateFunction.Update, new object[] { pos });
+                moveAction = CreateAction<ReachDestinationActionAI>(PlayerAI, this, false, ActionUpdateFunction.Update, new object[] { pos });
                 moveAction.OnActionCompleted += HandleOnMoveActionCompleted;
             }
             moveAction.Initialize(new object[] { pos });

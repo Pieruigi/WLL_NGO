@@ -193,8 +193,9 @@ MonoBehaviour:
   - {fileID: 710814360}
   - {fileID: 979949424}
   waitingLine: 10
-  waitingTime: 5
+  waitingTime: 1000
   maxDefensiveDistance: 4
+  defenceZoneTriggers: []
   ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
@@ -472,6 +473,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   caretaker: {fileID: 619650640}
   idlePoint: {fileID: 354180687}
+  inTriggerList: []
 --- !u!65 &102757443
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1207,6 +1209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   caretaker: {fileID: 1930528750}
   idlePoint: {fileID: 1436348840}
+  inTriggerList: []
 --- !u!65 &586300125
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2307,8 +2310,12 @@ MonoBehaviour:
   - {fileID: 1930528750}
   - {fileID: 619650640}
   waitingLine: 10
-  waitingTime: 5
+  waitingTime: 1000
   maxDefensiveDistance: 4
+  defenceZoneTriggers:
+  - {fileID: 1384244175}
+  - {fileID: 586300124}
+  - {fileID: 102757442}
   ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
@@ -2912,6 +2919,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   caretaker: {fileID: 691588918}
   idlePoint: {fileID: 639406458}
+  inTriggerList: []
 --- !u!65 &1384244176
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3620,7 +3628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1876271877}
   m_Layer: 0
-  m_Name: Home_DefenseZoneGroup
+  m_Name: Home_Zone_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

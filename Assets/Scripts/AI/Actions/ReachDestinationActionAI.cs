@@ -29,7 +29,7 @@ namespace WLL_NGO.AI
             if (!loop)
                 return;
 
-            Debug.Log("REACH - Looping");
+            
             //timer -= Time.deltaTime;
             // Reach destination
             Vector3 dir = destination - PlayerAI.transform.position;

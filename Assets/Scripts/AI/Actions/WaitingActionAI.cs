@@ -28,12 +28,7 @@ namespace WLL_NGO.AI
         {
             // Tell each player to defend the position
 
-
-            // That's just a test, we need to create a DefendZoneActionAI instead
-            //List<PlayerAI> players = new List<PlayerAI>(TeamAI.Players);
-            //ActionAI action = CreateAction<ReachDestinationActionAI>(players[1], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position });
-            //action = CreateAction<ReachDestinationActionAI>(players[2], this, ActionUpdateFunction.Update, new object[] { TeamAI.BallController.Position - players[2].transform.forward*.8f });
-            ActionAI action = CreateAction<ZoneDefenceActionAI>(Owner, this, ActionUpdateFunction.Update);
+            ActionAI action = CreateAction<ZoneDefenceActionAI>(Owner, this, false, ActionUpdateFunction.Update);
         }
 
         protected override bool CheckConditions()
@@ -41,12 +36,13 @@ namespace WLL_NGO.AI
             return EnterConditions(new object[] { TeamAI });
         }
 
-        protected override void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded)
-        {
-            childAction.Initialize(new object[] { TeamAI.BallController.Position });
-            childAction.Restart();
+        //protected override void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded)
+        //{
 
-        }
+        //    childAction.Initialize(new object[] { TeamAI.BallController.Position });
+        //    childAction.Restart();
+
+        //}
 
     }
 

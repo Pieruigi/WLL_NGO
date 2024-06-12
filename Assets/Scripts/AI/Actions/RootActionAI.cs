@@ -17,9 +17,9 @@ namespace WLL_NGO.AI
         {
             object[] conditions = new object[] { TeamAI };
             if (AttackActionAI.EnterConditions(conditions))
-                CreateAction<AttackActionAI>(Owner, this);
+                CreateAction<AttackActionAI>(Owner, this, true);
             else
-                CreateAction<DefenceActionAI>(Owner, this);
+                CreateAction<DefenceActionAI>(Owner, this, true);
 
 
         }

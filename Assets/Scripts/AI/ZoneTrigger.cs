@@ -15,6 +15,7 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         PlayerAI caretaker;
+        public PlayerAI Caretaker { get { return caretaker; } }
 
         [SerializeField]
         Transform idlePoint;
@@ -22,6 +23,10 @@ namespace WLL_NGO.AI
         {
             get { return idlePoint.position; }
         }
+
+        [SerializeField]
+        List<PlayerAI> inTriggerList = new List<PlayerAI>();
+        public List<PlayerAI> InTriggerList { get { return inTriggerList; } }
 
         private void Awake()
         {
@@ -40,8 +45,14 @@ namespace WLL_NGO.AI
                 return;
             PlayerAI player = other.GetComponent<PlayerAI>();
 
-            if(player.TeamAI != caretaker.TeamAI)
+            if (inTriggerList.Contains(player)) // To be sure
+                return;
+
+            inTriggerList.Add(player); // We add any player
+
+            if (player.TeamAI != caretaker.TeamAI)
             {
+                // We only report opponents
                 OnOpponentPlayerEnter?.Invoke(this, player);
             }
             
@@ -52,7 +63,10 @@ namespace WLL_NGO.AI
             if (!other.CompareTag(Tags.Player))
                 return;
             PlayerAI player = other.GetComponent<PlayerAI>();
-            if(player.TeamAI != caretaker.TeamAI)
+
+            inTriggerList.Remove(player);
+
+            if (player.TeamAI != caretaker.TeamAI)
             {
                 OnOpponentPlayerExit?.Invoke(this, player);
             }
@@ -79,6 +93,8 @@ namespace WLL_NGO.AI
             
             GetComponent<Collider>().enabled = value;
         }
+
+        
     }
 
 }

@@ -52,6 +52,12 @@ namespace WLL_NGO.AI
             set { targetPlayer = value; }
         }
 
+        public bool IsTeammate(PlayerAI player)
+        {
+            return TeamAI == player.TeamAI;
+        }
+
+
         private void Awake()
         {
 #if !TEST_AI

@@ -11,8 +11,13 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
+    
+
     public class TeamAI : MonoBehaviour
     {
+        public static TeamAI HomeTeamAI {  get; private set; }
+        public static TeamAI AwayTeamAI { get; private set; }
+
         [SerializeField] bool home;
         
         [SerializeField] List<PlayerAI> players;
@@ -37,7 +42,11 @@ namespace WLL_NGO.AI
 
         //[SerializeField]
         //List<ZoneTrigger> defenceZoneList;
-       
+        //int formationId = 0;
+        //public int FormationId { get { return formationId; } }
+
+        [SerializeField] List<ZoneTrigger> defenceZoneTriggers;
+        public List<ZoneTrigger> DefenceZoneTriggers { get { return defenceZoneTriggers; } }
 
 #if TEST_AI
         [SerializeField]TestBallController ball;
@@ -67,6 +76,11 @@ namespace WLL_NGO.AI
 
         private void Awake()
         {
+            if (home)
+                HomeTeamAI = this;
+            else
+                AwayTeamAI = this;
+
             timeElapsed = updateTime;
 
 #if TEST_AI
@@ -77,6 +91,8 @@ namespace WLL_NGO.AI
             }
             
 #endif
+            
+            
         }
 
         
@@ -121,7 +137,7 @@ namespace WLL_NGO.AI
             if(!rootAction)
             {
                 // Create the root action
-                rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null);
+                rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null, restartOnNoChildren: true);
                 
             }
            
@@ -154,7 +170,7 @@ namespace WLL_NGO.AI
             return maxDefensiveDistance;
         }
 
-        
+       
     }
 
 }
