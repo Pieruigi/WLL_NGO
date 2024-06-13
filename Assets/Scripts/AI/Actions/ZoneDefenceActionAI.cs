@@ -54,7 +54,7 @@ namespace WLL_NGO.AI
 
         private void HandleOnOpponentPlayerEnter(ZoneTrigger trigger, PlayerAI player)
         {
-            if (player.HasBall || !trigger.Caretaker.TargetPlayer)
+            if (player.HasBall || !trigger.Caretaker.TargetPlayer || trigger.Caretaker.IsDoublingGuard)
                 trigger.Caretaker.TargetPlayer = player;
             
         }
@@ -63,8 +63,27 @@ namespace WLL_NGO.AI
         {
             // We must check the waiting line too
             Debug.Log($"Player exit:{player}");
-            if(!player.HasBall)
+            if (!player.HasBall)
+            {
                 trigger.Caretaker.TargetPlayer = null;
+            }
+            else
+            {
+                // Double guard only if the target is entering the zone of a teammate
+                foreach (var t in TeamAI.DefenceZoneTriggers)
+                {
+                    if (t == trigger)
+                        continue;
+                    if (t.InTriggerList.Contains(player))
+                    {
+                        trigger.Caretaker.StartDoubleGuard(player);
+                        return;
+                    }
+                    trigger.Caretaker.TargetPlayer = null;
+                }
+                
+            }
+            
         }
 
         protected override void Loop()
@@ -101,33 +120,6 @@ namespace WLL_NGO.AI
                 if (player.TargetPlayer) // We already have a target
                 {
 
-
-                    //if (player.TargetPlayer.HasBall) // The target player is holding the ball
-                    //{
-                    //    if(trigger.InTriggerList.Contains(player.TargetPlayer)) // The target player is also in the current player zone... done!
-                    //    {
-                    //        continue;
-                    //    }
-                    //    else // The target player is not in the current player zone, we must check a timer
-                    //    {
-                    //        // TO-DO: set a timer in the trigger exit and check here
-                    //    }
-                    //}
-                    //else // The target player is not holding the ball
-                    //{
-                    //    // If there is an opponent in the current player zone that is holding the ball we change target
-                    //    PlayerAI tmp = trigger.InTriggerList.Find(p => !p.IsTeammate(player) && p.HasBall);
-                    //    if (tmp) // Found an opponent with the ball in the current player zone
-                    //    {
-                    //        // Switch the target and continue
-                    //        player.TargetPlayer = tmp;
-                    //        continue;
-                    //    }
-                    //    else // No opponent with ball found in our zone
-                    //    {
-                    //        if(trigger.InTriggerList.Contains(player.TargetPlayer))
-                    //    }
-                    //}
                     Vector3 pos = Vector3.ProjectOnPlane(TeamAI.NetController.transform.position - player.TargetPlayer.Position, Vector3.up);
                     pos = pos.normalized * TeamAI.GetDefensiveDistance();
                     pos += player.TargetPlayer.Position;
@@ -137,11 +129,11 @@ namespace WLL_NGO.AI
                         moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new object[] { pos });
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
-                    Debug.Log($"Move action:{moveActions[player]}");
                     moveActions[player].Initialize(new object[] { pos });
                 }
                 else // We don't have any target yet 
                 {
+                    
                     if (!moveActions[player])
                     {
                         moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new object[] { trigger.DefaultPosition }); ;

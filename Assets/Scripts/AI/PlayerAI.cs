@@ -49,14 +49,35 @@ namespace WLL_NGO.AI
         public PlayerAI TargetPlayer
         {
             get { return targetPlayer; }
-            set { targetPlayer = value; }
+            set 
+            { 
+                if (doubleGuard)
+                {
+                    Debug.Log($"AI - savedTarget:{value}");
+                    savedTarget = value;
+                    return;
+                }
+                    
+                targetPlayer = value; 
+            }
         }
+        /// <summary>
+        ///  Safe code to be sure we won't lose targets ( eventually set by triggers ) when player target can not be changed ( ex in double guard )
+        /// </summary>
+        PlayerAI savedTarget = null;
+                                    
+
 
         public bool IsTeammate(PlayerAI player)
         {
             return TeamAI == player.TeamAI;
         }
 
+        float doubleGuardTime = 3f;
+        //public float DoubleGuardTime { get { return doubleGuardTime; }  }
+        float doubleGuardElapsed;
+        bool doubleGuard = false;
+        public bool IsDoublingGuard { get { return  doubleGuard; } }
 
         private void Awake()
         {
@@ -64,6 +85,32 @@ namespace WLL_NGO.AI
             playerController = GetComponent<PlayerController>();
             role = playerController.PlayerRole;
 #endif
+        }
+
+        private void Update()
+        {
+            if (doubleGuard)
+            {
+                doubleGuardElapsed += Time.deltaTime;
+                if(doubleGuardElapsed > doubleGuardTime || !targetPlayer.hasBall)
+                    StopDoubleGuard();
+            }
+        }
+
+        public void StartDoubleGuard(PlayerAI player)
+        {
+            doubleGuardElapsed = 0;
+            savedTarget = null; // You should release this target because is no longer in your zone
+            targetPlayer = player;
+            doubleGuard = true;
+            
+        }
+
+        void StopDoubleGuard()
+        {
+            doubleGuard = false;
+            targetPlayer = savedTarget;
+
         }
     }
 

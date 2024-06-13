@@ -11,6 +11,8 @@ namespace WLL_NGO.AI
         float timer = 0;
         Vector3 destination = Vector3.zero;
         bool reached = false;
+
+        float tollerance = .5f;
         
         protected override void Activate()
         {
@@ -34,10 +36,8 @@ namespace WLL_NGO.AI
             // Reach destination
             Vector3 dir = destination - PlayerAI.transform.position;
             dir.y = 0;
-            float delta = Time.deltaTime;
-            if (UpdateFunction == ActionUpdateFunction.FixedUpdate)
-                delta = Time.fixedDeltaTime;
-            if(dir.magnitude < 1.5)
+            float delta = UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
+            if(dir.magnitude < tollerance)
                 reached = true;
             else
                 PlayerAI.transform.position += dir*1*delta;
