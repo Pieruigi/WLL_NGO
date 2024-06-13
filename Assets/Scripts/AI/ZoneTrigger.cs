@@ -33,7 +33,9 @@ namespace WLL_NGO.AI
         /// to a middle field defending zone )
         /// </summary>
         float defaultOffset = 0;
-        
+
+        [SerializeField]
+        bool resizeEnabled = false;
         
         [SerializeField]
         bool moveOnResize = false;
@@ -52,16 +54,21 @@ namespace WLL_NGO.AI
             if (!activated)
                 return;
 
-            float ratio = 2f * Caretaker.TeamAI.WaitingLine / GameFieldInfo.GetFieldLength();
-          
-            if (transform.parent.localScale.x != ratio)
+            if (resizeEnabled)
             {
-                
-                Vector3 scale = transform.parent.localScale;
-                scale.x = ratio;
-          
-                transform.parent.localScale = scale;
+                float ratio = 2f * Caretaker.TeamAI.WaitingLine / GameFieldInfo.GetFieldLength();
+
+                if (transform.parent.localScale.x != ratio)
+                {
+
+                    Vector3 scale = transform.parent.localScale;
+                    scale.x = ratio;
+
+                    transform.parent.localScale = scale;
+                }
             }
+
+            
         }
 
         private void OnDestroy()
@@ -124,6 +131,10 @@ namespace WLL_NGO.AI
         {
             activated = value;
             GetComponent<Collider>().enabled = value;
+            if (!activated)
+            {
+                inTriggerList.Clear();
+            }
         }
 
 

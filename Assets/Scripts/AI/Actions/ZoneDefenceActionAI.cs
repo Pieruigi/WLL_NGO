@@ -30,7 +30,7 @@ namespace WLL_NGO.AI
                 player.TargetPlayer = null;
                 moveActions.Add(player, null);
             }
-                
+            timer = loopTime;
         }
 
         private void OnDisable()

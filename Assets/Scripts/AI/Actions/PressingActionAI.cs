@@ -1,20 +1,174 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace WLL_NGO.AI
 {
     public class PressingActionAI : TeamActionAI
     {
+        float timer = 0;
+        float loopTime = .5f;
+
+        [SerializeField]
+        Dictionary<PlayerAI, ActionAI> moveActions = new Dictionary<PlayerAI, ActionAI>();
+
         protected override void Activate()
         {
-            
+            // Set triggers callbacks
+            ZoneTrigger.OnOpponentPlayerEnter += HandleOnOpponentPlayerEnter;
+            ZoneTrigger.OnOpponentPlayerExit += HandleOnOpponentPlayerExit;
+            // Activate triggers
+            foreach (ZoneTrigger zt in TeamAI.PressingTriggers)
+                zt.Activate(true);
+
+            // Clear player target and dictionary
+            moveActions.Clear();
+            foreach (PlayerAI player in TeamAI.Players)
+            {
+                player.TargetPlayer = null;
+                moveActions.Add(player, null);
+            }
+            timer = loopTime;
         }
 
         protected override bool CheckConditions()
         {
             // We don't really need any condition here because if you get the ball the whole defend action branch will be destroyed
             return !WaitingActionAI.EnterConditions(new object[] { TeamAI });
+        }
+
+        private void OnDisable()
+        {
+            ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
+            ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
+
+            // Deactivate triggers
+            foreach (ZoneTrigger zt in TeamAI.PressingTriggers)
+                zt.Activate(false);
+        }
+
+        private void HandleOnOpponentPlayerEnter(ZoneTrigger trigger, PlayerAI player)
+        {
+            if (player.HasBall || !trigger.Caretaker.TargetPlayer || trigger.Caretaker.IsDoublingGuard)
+                trigger.Caretaker.TargetPlayer = player;
+
+        }
+
+        private void HandleOnOpponentPlayerExit(ZoneTrigger trigger, PlayerAI player)
+        {
+            // We must check the waiting line too
+            Debug.Log($"Player exit:{player}");
+            if (!player.HasBall)
+            {
+                trigger.Caretaker.TargetPlayer = null;
+            }
+            else
+            {
+                // Double guard only if the target is entering the zone of a teammate
+                foreach (var t in TeamAI.PressingTriggers)
+                {
+                    if (t == trigger)
+                        continue;
+                    if (t.InTriggerList.Contains(player))
+                    {
+                        trigger.Caretaker.StartDoubleGuard(player);
+                        return;
+                    }
+                    trigger.Caretaker.TargetPlayer = null;
+                }
+
+            }
+
+        }
+
+        protected override void Loop()
+        {
+            base.Loop();
+
+
+            if (timer > 0)
+                timer -= UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
+
+            if (timer > 0)
+                return;
+
+            timer = loopTime;
+
+            CheckTargets();
+        }
+
+        private void CheckTargets()
+        {
+
+            foreach (PlayerAI player in TeamAI.Players)
+            {
+
+
+                // Not for the goalkeeper
+                if (player.Role == PlayerRole.GK)
+                    continue;
+
+                ZoneTrigger trigger = TeamAI.PressingTriggers.Find(t => t.Caretaker == player);
+
+                // We always want to target an opponent player on pressing
+                if (!player.TargetPlayer)
+                {
+                    // Check if there is an opponent in the player trigger
+                    player.TargetPlayer = trigger.InTriggerList.Find(p=>!p.IsTeammate(player));
+
+                    // No, look for a free opponent 
+                    if(!player.TargetPlayer)
+                    {
+                        // If the player has no target we check for another player with no markings
+                        TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
+                        foreach (var oppPlayer in oppTeam.Players)
+                        {
+                            if (oppPlayer.Role == PlayerRole.GK)
+                                continue;
+                            if (!TeamAI.Players.Any(p => p.TargetPlayer == oppPlayer))
+                            {
+                                player.TargetPlayer = oppPlayer;
+                                break;
+                            }
+                        }
+                    }
+
+                    
+                }
+
+
+                
+
+                if (player.TargetPlayer) // We already have a target
+                {
+
+                    Vector3 pos = Vector3.ProjectOnPlane(TeamAI.NetController.transform.position - player.TargetPlayer.Position, Vector3.up);
+                    pos = pos.normalized * (player.TargetPlayer.HasBall ? 0.5f : TeamAI.GetDefensiveDistance());
+                    pos += player.TargetPlayer.Position;
+                    if (!moveActions[player])
+                    {
+
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new object[] { pos });
+                        //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
+                    }
+                    moveActions[player].Initialize(new object[] { pos });
+                }
+                //else // We don't have any target yet 
+                //{
+                //    // If the player has no target we check for another player with no markings
+                //    TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
+                //    foreach(var oppPlayer in oppTeam.Players)
+                //    {
+                //        if(!TeamAI.Players.Any(p=>p.TargetPlayer == oppPlayer))
+                //        {
+                //            player.TargetPlayer = oppPlayer;
+                //            break;
+                //        }
+                //    }
+                //}
+            }
         }
     }
 

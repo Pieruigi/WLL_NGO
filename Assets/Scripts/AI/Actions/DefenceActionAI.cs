@@ -14,7 +14,7 @@ namespace WLL_NGO.AI
             if(WaitingActionAI.EnterConditions(new object[] { TeamAI}))
                 CreateAction<WaitingActionAI>(Owner, this, true);
             else
-                CreateAction<PressingActionAI>(Owner, this, true);
+                CreateAction<PressingActionAI>(Owner, this, false);
             
         }
 
