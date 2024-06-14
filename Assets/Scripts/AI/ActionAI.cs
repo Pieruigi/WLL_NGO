@@ -39,34 +39,27 @@ namespace WLL_NGO.AI
         bool completed = false;
         bool active = false;
         bool restartOnNoChildren = false;
-        //bool loop = false;
-        //protected bool Loop
-        //{
-        //    get { return loop; }
-        //    private set { loop = value; }
-        //}    
-        //float updateTime = 0;
-        //float timeElapsed = 0;
-        //UnityAction<ActionAI> interruptedCallback;
-
-                
-        protected abstract bool CheckConditions();
-        protected abstract void Activate();
-        //protected abstract bool IsCompleted(out bool succeeded);
+      
+        Func<bool> ConditionFunction;
         
         protected virtual void Update()
         {
             if (updateFunction != ActionUpdateFunction.Update || interrupted || !initialized || completed)
                 return;
 
-            if(!CheckConditions())
+            if(ConditionFunction != null && !ConditionFunction.Invoke(/*conditionParameters*/))
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
                 OnActionInterrupted?.Invoke(this);
                 CheckForDestroy();
+
             }
 
+            if (interrupted)
+                return;
+
+            
             if (!active)
             {
                 active = true;
@@ -90,13 +83,17 @@ namespace WLL_NGO.AI
             if (updateFunction != ActionUpdateFunction.LateUpdate || interrupted || !initialized || completed)
                 return;
 
-            if (!CheckConditions())
+            if (ConditionFunction != null && !ConditionFunction.Invoke(/*conditionParameters*/))
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
                 OnActionInterrupted?.Invoke(this);
                 CheckForDestroy();
             }
+
+            if (interrupted)
+                return;
+
             if (!active)
             {
                 active = true;
@@ -119,13 +116,17 @@ namespace WLL_NGO.AI
             if (updateFunction != ActionUpdateFunction.FixedUpdate || interrupted || !initialized || completed)
                 return;
 
-            if (!CheckConditions())
+            if (ConditionFunction != null && !ConditionFunction.Invoke(/*conditionParameters*/))
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
                 OnActionInterrupted?.Invoke(this);
                 CheckForDestroy();
+                
             }
+
+            if (interrupted)
+                return;
 
             if (!active)
             {
@@ -157,12 +158,8 @@ namespace WLL_NGO.AI
             {
                 if (active)
                 {
-                    PreviousAction.NextActionList.Remove(this);
-                    if (PreviousAction.NextActionList.Count == 0 && PreviousAction.restartOnNoChildren)
-                        PreviousAction.Restart();
-                        
-
-                    Destroy(gameObject);
+                    DestroyAction();
+                   
                 }
                 
             }
@@ -176,13 +173,15 @@ namespace WLL_NGO.AI
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="owner"></param>
-        /// <param name="updateTime"></param>
-        /// <param name="previousAction"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.FixedUpdate, object[] parameters = null) where T : ActionAI
+        /// <typeparam name="T">The type of action ( must be of type ActionAI )</typeparam>
+        /// <param name="owner">The logic entity that is creating the current action ( for example a team or a specific player in the field )</param>
+        /// <param name="previousAction">The parent action</param>
+        /// <param name="restartOnNoChildren">True if you want to player the Activate() method again once all the children have completed</param>
+        /// <param name="updateFunction">Does the action run in Update, LateUpdate or FixedUpdate?</param>
+        /// <param name="parameters">Initialization parameters</param>
+        /// <param name="conditionFunction">A delegate function returning a bool to check action condition ( on false the action is interrupted )</param>
+        /// <returns>The action just created</returns>
+        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.Update, object[] parameters = null, Func<bool> conditionFunction = null) where T : ActionAI
         {
             GameObject actionObject = new GameObject($"{owner.gameObject.name}_{typeof(T).Name}");
             //ActionAI action = actionObject.AddComponent<T>();
@@ -201,8 +200,13 @@ namespace WLL_NGO.AI
                 action.OnActionInterrupted += previousAction.HandleOnChildActionInterrupted;
             }
             action.Initialize(parameters);
+            action.ConditionFunction = conditionFunction;
             return action;
         }
+
+        protected virtual void Activate() { }
+
+        
 
         protected virtual void HandleOnChildActionInterrupted(ActionAI childAction){}
 
@@ -216,22 +220,36 @@ namespace WLL_NGO.AI
         
         public virtual void Initialize(object[] parameters = null) 
         {
-            Debug.Log("Action - Initialize");
             initialized = true;
-            
         }
+
+        protected virtual void Release() { }
 
         public virtual void Restart()
         {
-            Debug.Log("BBBBBBBBBBBBBBBBBBBBBBBBB");
             active = false;
             completed = false;
             interrupted = false;
         }
 
+        public virtual void DestroyAction()
+        {
+            PreviousAction.NextActionList.Remove(this);
+            if (PreviousAction.NextActionList.Count == 0 && PreviousAction.restartOnNoChildren)
+                PreviousAction.Restart();
 
+            Release();
+            Destroy(gameObject);
+        }
 
-
+        /// <summary>
+        /// You can override the condition function passed in to the CreateAction method here. 
+        /// </summary>
+        /// <param name="function"></param>
+        public void SetConditionFunction(Func<bool> function)
+        {
+            ConditionFunction = function;
+        }
     }
 
 }

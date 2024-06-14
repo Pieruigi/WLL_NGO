@@ -33,13 +33,7 @@ namespace WLL_NGO.AI
             timer = loopTime;
         }
 
-        protected override bool CheckConditions()
-        {
-            // We don't really need any condition here because if you get the ball the whole defend action branch will be destroyed
-            return !WaitingActionAI.EnterConditions(new object[] { TeamAI });
-        }
-
-        private void OnDisable()
+        protected override void Release()
         {
             ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
@@ -47,6 +41,14 @@ namespace WLL_NGO.AI
             // Deactivate triggers
             foreach (ZoneTrigger zt in TeamAI.PressingTriggers)
                 zt.Activate(false);
+
+            foreach (var player in TeamAI.Players)
+            {
+                if (moveActions[player])
+                    moveActions[player].DestroyAction();
+
+            }
+            moveActions.Clear();
         }
 
         private void HandleOnOpponentPlayerEnter(ZoneTrigger trigger, PlayerAI player)
@@ -137,9 +139,6 @@ namespace WLL_NGO.AI
 
                     
                 }
-
-
-                
 
                 if (player.TargetPlayer) // We already have a target
                 {

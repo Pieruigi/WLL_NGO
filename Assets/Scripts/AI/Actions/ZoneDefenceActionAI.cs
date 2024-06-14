@@ -33,7 +33,7 @@ namespace WLL_NGO.AI
             timer = loopTime;
         }
 
-        private void OnDisable()
+        protected override void Release() 
         {
             ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
@@ -41,16 +41,17 @@ namespace WLL_NGO.AI
             // Deactivate triggers
             foreach (ZoneTrigger zt in TeamAI.DefenceZoneTriggers)
                 zt.Activate(false);
+
+            foreach (PlayerAI player in TeamAI.Players)
+            {
+                if (moveActions[player])
+                    moveActions[player].DestroyAction();
+                
+            }
+            moveActions.Clear();
         }
 
-        
-
-        protected override bool CheckConditions()
-        {
-            return true;
-        }
-
-        
+                
 
         private void HandleOnOpponentPlayerEnter(ZoneTrigger trigger, PlayerAI player)
         {

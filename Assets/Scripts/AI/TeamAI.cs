@@ -51,6 +51,7 @@ namespace WLL_NGO.AI
         [SerializeField] List<ZoneTrigger> pressingTriggers;
         public List<ZoneTrigger> PressingTriggers { get { return pressingTriggers; } }
 
+
 #if TEST_AI
         [SerializeField]TestBallController ball;
         public TestBallController BallController { get { return ball; } }

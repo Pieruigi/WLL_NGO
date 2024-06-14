@@ -9,40 +9,14 @@ namespace WLL_NGO.AI
     public class WaitingActionAI : TeamActionAI
     {
         
-        public static bool EnterConditions(object[] conditions)
-        {
-            TeamAI team = (TeamAI)conditions[0];
-#if TEST_AI
-            TestBallController ball = team.BallController;
-#else
-            BallController ball = team.BallController;
-#endif
-            Vector3 ballDir = ball.Position - team.NetController.transform.position;
-            ballDir.y = 0;
-
-            return (ballDir.magnitude > team.WaitingLine && team.WaitingTime > 0);
-            
-        }
 
         protected override void Activate()
         {
-            // Tell each player to defend the position
-
-            ActionAI action = CreateAction<ZoneDefenceActionAI>(Owner, this, false, ActionUpdateFunction.Update);
+            // Simply tell each player to defend their position
+            ActionAI action = CreateAction<ZoneDefenceActionAI>(Owner, this, false, ActionUpdateFunction.Update, conditionFunction: () => { return true; });
         }
 
-        protected override bool CheckConditions()
-        {
-            return EnterConditions(new object[] { TeamAI });
-        }
-
-        //protected override void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded)
-        //{
-
-        //    childAction.Initialize(new object[] { TeamAI.BallController.Position });
-        //    childAction.Restart();
-
-        //}
+        
 
     }
 

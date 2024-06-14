@@ -21,10 +21,7 @@ namespace WLL_NGO.AI
             Debug.Log($"REACH - Setting loop:{loop}");
         }
 
-        protected override bool CheckConditions()
-        {
-            return true;
-        }
+
 
         protected override void Loop()
         {
@@ -47,7 +44,6 @@ namespace WLL_NGO.AI
         public override bool IsCompleted(out bool succeeded)
         {
             succeeded = true;
-            //loop = false;
             return reached;
         }
 
