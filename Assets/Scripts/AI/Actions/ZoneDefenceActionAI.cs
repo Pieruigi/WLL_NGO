@@ -90,10 +90,10 @@ namespace WLL_NGO.AI
         protected override void Loop()
         {
             base.Loop();
-            
+
 
             if (timer > 0)
-                timer -= UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
+                timer -= DeltaTime;//UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
 
             if (timer > 0)
                 return;

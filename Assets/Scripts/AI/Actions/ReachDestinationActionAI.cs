@@ -28,17 +28,16 @@ namespace WLL_NGO.AI
             if (!loop)
                 return;
 
-            
+#if TEST_AI
             //timer -= Time.deltaTime;
             // Reach destination
             Vector3 dir = destination - PlayerAI.transform.position;
             dir.y = 0;
-            float delta = UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
             if(dir.magnitude < tollerance)
                 reached = true;
             else
-                PlayerAI.transform.position += dir*1*delta;
-            
+                PlayerAI.transform.position += dir.normalized*PlayerAI.Speed*DeltaTime;
+#endif
         }
 
         public override bool IsCompleted(out bool succeeded)

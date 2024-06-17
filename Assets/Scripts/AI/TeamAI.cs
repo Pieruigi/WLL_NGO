@@ -51,7 +51,6 @@ namespace WLL_NGO.AI
         [SerializeField] List<ZoneTrigger> pressingTriggers;
         public List<ZoneTrigger> PressingTriggers { get { return pressingTriggers; } }
 
-
 #if TEST_AI
         [SerializeField]TestBallController ball;
         public TestBallController BallController { get { return ball; } }
@@ -74,9 +73,17 @@ namespace WLL_NGO.AI
 
         [SerializeField] ActionAI rootAction;
 
+        [SerializeField] bool iaDisabled = false;
+
 
         float updateTime = .5f;
         float timeElapsed = 0;
+
+        /// <summary>
+        /// 0: 2-1
+        /// 1: 1-2
+        /// </summary>
+        int formationId = 0;
 
         private void Awake()
         {
@@ -138,6 +145,8 @@ namespace WLL_NGO.AI
 
         void DoUpdate()
         {
+            if (iaDisabled) return;
+
             if(!rootAction)
             {
                 // Create the root action

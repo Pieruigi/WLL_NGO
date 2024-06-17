@@ -41,6 +41,11 @@ namespace WLL_NGO.AI
         bool restartOnNoChildren = false;
       
         Func<bool> ConditionFunction;
+
+        protected float DeltaTime
+        {
+            get { return UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime; }
+        }
         
         protected virtual void Update()
         {

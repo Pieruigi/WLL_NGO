@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WLL_NGO.AI.Test;
 using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
@@ -79,6 +80,16 @@ namespace WLL_NGO.AI
         bool doubleGuard = false;
         public bool IsDoublingGuard { get { return  doubleGuard; } }
 
+        public float Speed
+        {
+            get
+            {
+#if TEST_AI
+                return 1.5f;
+#endif
+            }
+        }
+
         private void Awake()
         {
 #if !TEST_AI
@@ -89,12 +100,21 @@ namespace WLL_NGO.AI
 
         private void Update()
         {
+#if TEST_AI
+            if (hasBall)
+            {
+                TestBallController.Instance.transform.position = transform.position + transform.forward * 1f + Vector3.up * .5f;
+            }
+#endif
+
             if (doubleGuard)
             {
                 doubleGuardElapsed += Time.deltaTime;
                 if(doubleGuardElapsed > doubleGuardTime || !targetPlayer.hasBall)
                     StopDoubleGuard();
             }
+
+
         }
 
         public void StartDoubleGuard(PlayerAI player)
