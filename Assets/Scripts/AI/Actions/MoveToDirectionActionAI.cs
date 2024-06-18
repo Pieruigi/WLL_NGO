@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace WLL_NGO.AI
 {
-    public class MoveToDirection : PlayerActionAI
+    public class MoveToDirectionActionAI : PlayerActionAI
     {
 
         Vector3 direction;

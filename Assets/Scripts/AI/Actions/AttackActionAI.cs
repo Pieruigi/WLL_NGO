@@ -12,7 +12,7 @@ namespace WLL_NGO.AI
         {
             base.Activate();
 
-            CreateAction<RandomAttackActionAI>(Owner, this, false, ActionUpdateFunction.Update, null, () => { return true; });
+            CreateAction<BlockAttackActionAI>(Owner, this, false, ActionUpdateFunction.Update, null, () => { return true; });
         }
     }
 

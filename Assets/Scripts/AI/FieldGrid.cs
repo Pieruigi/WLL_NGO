@@ -97,7 +97,15 @@ namespace WLL_NGO.AI
 
         //}
 
-        public int ForwardBlockCount(PlayerAI player)
+        public Vector3 GetRandomPositionInsideBlock(int blockId)
+        {
+            Vector3 pos = blocks[blockId].transform.position;
+            pos.y = 0;
+            Debug.Log($"Block {blocks[blockId].name}, pos:{pos}");
+            return pos;
+        }
+
+        public int ForwardBlocksLeft(PlayerAI player)
         {
             int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
             int row = currId / colCount;
@@ -111,7 +119,7 @@ namespace WLL_NGO.AI
             
         }
 
-        public int BackwardBlockCount(PlayerAI player)
+        public int BackwardBlocksLeft(PlayerAI player)
         {
             int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
             int row = currId / colCount;
@@ -125,6 +133,34 @@ namespace WLL_NGO.AI
 
         }
 
+
+        public int RightBlocksLeft(PlayerAI player)
+        {
+            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+            int row = currId / colCount;
+            int col = currId % colCount;
+
+            bool home = player.TeamAI == TeamAI.HomeTeamAI;
+            if (home)
+                return rowCount - 1 - row;
+            else
+                return row;
+
+        }
+
+        public int LeftBlocksLeft(PlayerAI player)
+        {
+            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+            int row = currId / colCount;
+            int col = currId % colCount;
+
+            bool home = player.TeamAI == TeamAI.HomeTeamAI;
+            if (!home)
+                return rowCount - 1 - row;
+            else
+                return row;
+
+        }
     }
 
 }
