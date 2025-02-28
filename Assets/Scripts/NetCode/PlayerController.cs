@@ -21,24 +21,24 @@ namespace WLL_NGO.Netcode
     
 
     /// <summary>
-    /// Player controller with server authority and client side prediction and reconciliation explained.
-    /// The game time is splitted in frames ( called ticks ) with length equal to 1/serverFrameRate ( ex: 1/60ms=1.67ms ) ( Check the NetworkTimer class ).
-    /// On each tick the client reads the input and moves the player accordingly storing the new state to the client state buffer; at the same time stores the input and 
-    /// the current tick in another buffer and sent it to the server ( check HandleClientTick() );. 
-    /// The server receives from the client the input which is used to move the player by simulating the physics tick by tick; each new state is then stored in a state 
+    /// Player controller with server authority and client side prediction and reconciliation.
+    /// The game time is splitted in frames ( called ticks ); each frame lasts 1/serverFrameRate ( ex: 1/60ms=1.67ms ) ( Check the NetworkTimer class ).
+    /// On each tick the client reads the input and moves the player accordingly, then stores the new state in a buffer, the input and the current tick in another buffer and 
+    /// sends both to the server ( check HandleClientTick() );. 
+    /// The server receives the input which is used to move the player by simulating the physics tick by tick; each new state is then stored in a state 
     /// buffer with the corresponding tick; the last processed state on server is then sent back to the client ( check HandleServerTick() ).
-    /// The client receives the last state from the server and compares it with the state having the same tick from its buffer: if these two states are not equal a 
-    /// reconciliation is needed.
+    /// The client receives the last state from the server and compares it to the state with the same tick previously stored in its buffer: if there is some difference then a
+    /// reconciliation is made.
     /// If a reconciliation is needed the client sets the player back to the last received state resimulating the physics from that tick to the current tick ( the reason we
     /// need to resimulate is that the state received by the server is behind the client current tick due to the lag ).
     /// If a player is not a local player ( ex. the opponent team ) or is not selected ( you can select only one player at the time in your team ) we call the 
     /// ApplyNotOwnedOrUnselectedClientState(lastServerState) with the last server state we just received ( basically is kind of a reconciliation without 
-    /// any prediction ); this happens because we don't have any input in order to make any prediction client side: if the player is owned by another client the input 
-    /// is from that client and if we owned the player but its not the selected one at this moment then the input is directly set on the server by the AI.
+    /// any prediction ); this happens because we don't have input to make any prediction client side: if the player is owned by another client the input 
+    /// is from that client and if we own the player but its not the selected one then input is set on server by the AI.
     /// 
     /// Input controller.
-    /// The player controller always receives input both from human and AI; this means that the AI never tells the player to move or shoot, instead sets the input 
-    /// like a human would do ( for example to shoot the AI sets the corresponding button to true and after a while sets it back to false thus triggering 
+    /// The player controller always receives input from both human and AI; this means that the AI never tells the player to move or shoot by calling the controller, instead sets the input 
+    /// like a human would do ( for example to shoot the AI sets the corresponding button to true and after a while sets it back to false, thus triggering 
     /// the shooting routine ). Since the IA only works on server, the input will be enqued in the server input queue without being passed by the client.
     /// 
     /// Animations.
@@ -1282,37 +1282,85 @@ namespace WLL_NGO.Netcode
 
         }
 
+
         void UpdateNormalMovement(InputData inputData)
         {
             Vector2 moveInput = inputData.joystick;
             // Normalize input 
             moveInput.Normalize();
-            float speed = currentSpeed;
+            
+            Vector3 targetVel; // Horizontal target velocity
+            float acc = 0;
             if (moveInput.magnitude > 0)
             {
                 Vector3 lDir = new Vector3(moveInput.x, 0f, moveInput.y);
-                if(lookDirection != Vector3.zero)
+                if (lookDirection != Vector3.zero)
                     lDir = lookDirection;
 
                 transform.forward = Vector3.MoveTowards(transform.forward, lDir, rotationSpeed * NetworkTimer.Instance.DeltaTick);
-                //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
-                speed += acceleration * NetworkTimer.Instance.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
-                if (speed > maxSpeed) speed = maxSpeed;
-            }
+
+                targetVel = new Vector3(moveInput.x, 0f, moveInput.y) * maxSpeed;
+                acc = acceleration;
+    }
             else
             {
-                //speed -= deceleration * Time.fixedDeltaTime;
-                speed -= deceleration * NetworkTimer.Instance.DeltaTick;
-                if (speed < 0) speed = 0;
+                targetVel = Vector3.zero;
+                acc = deceleration;
             }
-            currentSpeed = speed;
-
+            
             Vector3 mDir = transform.forward;
             if (lookDirection != Vector3.zero)
                 mDir = new Vector3(moveInput.x, 0f, moveInput.y);
 
-            rb.velocity = mDir * currentSpeed + rb.velocity.y * Vector3.up;
+            Vector3 vel = Vector3.MoveTowards(Vector3.ProjectOnPlane(rb.velocity, Vector3.up), targetVel, acc * NetworkTimer.Instance.DeltaTick);
+            currentSpeed = vel.magnitude;
+
+            rb.velocity = vel + rb.velocity.y * Vector3.up;
+          
         }
+
+        // void UpdateNormalMovement(InputData inputData)
+        // {
+        //     Vector2 moveInput = inputData.joystick;
+        //     // Normalize input 
+        //     moveInput.Normalize();
+        //     float speed = currentSpeed;
+
+        //     if (moveInput.magnitude > 0)
+        //     {
+        //         Vector3 lDir = new Vector3(moveInput.x, 0f, moveInput.y);
+        //         if (lookDirection != Vector3.zero)
+        //             lDir = lookDirection;
+
+        //         transform.forward = Vector3.MoveTowards(transform.forward, lDir, rotationSpeed * NetworkTimer.Instance.DeltaTick);
+        //         //speed += acceleration * Time.fixedDeltaTime; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
+        //         speed += acceleration * NetworkTimer.Instance.DeltaTick; // We are assuming that the ServerTickRate is equal to the PhysicalTickRate
+        //         if (speed > maxSpeed) speed = maxSpeed;
+        //     }
+        //     else
+        //     {
+        //         //speed -= deceleration * Time.fixedDeltaTime;
+        //         speed -= deceleration * NetworkTimer.Instance.DeltaTick;
+        //         if (speed < 0) speed = 0;
+        //     }
+        //     currentSpeed = speed;
+
+        //     Vector3 mDir = transform.forward;
+        //     if (lookDirection != Vector3.zero)
+        //         mDir = new Vector3(moveInput.x, 0f, moveInput.y);
+
+        //     Vector3 currVelDir = rb.velocity.normalized;
+        //     if (currentSpeed > 0)
+        //     {
+
+        //         currVelDir = Vector3.MoveTowards(currVelDir, mDir, 5f * NetworkTimer.Instance.DeltaTick);
+        //         Debug.Log("CURRVELDIR:" + currVelDir);
+        //         Debug.Log("MDIR:" + mDir);
+        //     }    
+
+        //     rb.velocity = currVelDir * currentSpeed + rb.velocity.y * Vector3.up;
+        //     //rb.velocity = mDir * currentSpeed + rb.velocity.y * Vector3.up;
+        // }
 
         void UpdateDiveMovement()
         {
@@ -1676,7 +1724,6 @@ namespace WLL_NGO.Netcode
 
         public void SetLookDirection(Vector3 lookDirection)
         {
-            Debug.Log($"LookDirection - set:{lookDirection}");
             lookDirection.y = 0f;
             this.lookDirection = lookDirection.normalized;
             
@@ -1684,7 +1731,6 @@ namespace WLL_NGO.Netcode
 
         public void ResetLookDirection()
         {
-            Debug.Log($"LookDirection - reset:{lookDirection}");
             lookDirection = Vector3.zero;
         }
 

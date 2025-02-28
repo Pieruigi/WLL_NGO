@@ -199,8 +199,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 3.5
   rotationSpeed: 720
-  acceleration: 20
-  deceleration: 60
+  acceleration: 10
+  deceleration: 10
   diveMaxSpeed: 5
   ballHandlingTrigger: {fileID: 4246186199695800569}
   ballHook: {fileID: 689867595230150792}
