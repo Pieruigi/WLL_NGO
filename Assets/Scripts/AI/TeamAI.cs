@@ -1,4 +1,4 @@
-#define TEST_AI
+//#define TEST_AI
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ namespace WLL_NGO.AI
 
 #else
         BallController ball;
-        public TestBallController BallController { get { return ball; } }
+        public BallController BallController { get { return ball; } }
         [SerializeField] NetController netController;
         public NetController NetController { get { return netController;} }
 #endif
@@ -160,6 +160,8 @@ namespace WLL_NGO.AI
         {
 #if TEST_AI
             return hasBall;
+#else 
+            return false;
 #endif
         }
 

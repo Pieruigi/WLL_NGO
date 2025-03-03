@@ -41,7 +41,7 @@ namespace WLL_NGO.AI
         
         float keepPositionTolleranceDefault;
         bool superShot = false;
-        BallController ball;
+        //BallController ball;
         
         
         float takeTheBallRange = 2f;
@@ -119,8 +119,8 @@ namespace WLL_NGO.AI
 
         void HandleOnBallSpawned()
         {
-            //Debug.Log($"Ball spawned:{BallController.Instance}");
-            ball = BallController.Instance;
+            Debug.Log($"TEST - Ball spawned:{BallController.Instance}");
+            //ball = BallController.Instance;
         }
 
         private void HandleOnOwnerChanged(PlayerController oldOwner, PlayerController newOwner)
@@ -170,52 +170,55 @@ namespace WLL_NGO.AI
 
             if (player.GetState() != (byte)PlayerState.Normal) return;
 
-            
-            if(ball.Owner != null) // The ball is controller by someone 
-            {
-                if(ball.Owner == this)// Goalkeeper is controlling the ball
-                {
-                    player.ResetLookDirection();
-                }
-                else // Someone else is controlling the ball
-                {
-                    if (areaBounds.Contains(ball.Position))
-                    {
-                        // The ball is inside the goalkeeper area...
-                        if (!player.IsTeammate(ball.Owner))
-                        {
-                            // ... and controlled by an opponent player, so lets try to get it
-                            TakeBallFromOpponent(ball.Owner);
+            if (BallController.Instance == null)
+                return;
 
+            
+            if (BallController.Instance.Owner != null) // The ball is controlled by someone 
+                {
+                    if (BallController.Instance.Owner == this)// Goalkeeper is controlling the ball
+                    {
+                        player.ResetLookDirection();
+                    }
+                    else // Someone else is controlling the ball
+                    {
+                        if (areaBounds.Contains(BallController.Instance.Position))
+                        {
+                            // The ball is inside the goalkeeper area...
+                            if (!player.IsTeammate(BallController.Instance.Owner))
+                            {
+                                // ... and controlled by an opponent player, so lets try to get it
+                                TakeBallFromOpponent(BallController.Instance.Owner);
+
+                            }
+                        }
+                        else
+                        {
+                            // Ball is out the goalkeeper area, just keep position
+                            KeepPosition();
                         }
                     }
-                    else
+
+                }
+                else // The ball is not controlled at all
+                {
+
+                    Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
+                    Vector3 ballDir = netCenter - BallController.Instance.Position;
+                    float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
+                    //if(ballVelNoEffect.magnitude == 0 || dot < 0) // The ball is going to the opponent goal line
+                    if (!IsBallMovingThisDirection() || !IsBallReachingTheNet() || !IsTimeToDive())
                     {
-                        // Ball is out the goalkeeper area, just keep position
                         KeepPosition();
                     }
-                }
-                
-            }
-            else // The ball is not controlled at all
-            {
-                
-                Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
-                Vector3 ballDir = netCenter - ball.Position;
-                float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
-                //if(ballVelNoEffect.magnitude == 0 || dot < 0) // The ball is going to the opponent goal line
-                if(!IsBallMovingThisDirection() || !IsBallReachingTheNet() || !IsTimeToDive())
-                {
-                    KeepPosition();
-                }
-                else // Is coming
-                {
-                    if (IsTimeToDive())
-                        StartDiving();
-                    
-                }
+                    else // Is coming
+                    {
+                        if (IsTimeToDive())
+                            StartDiving();
 
-            }
+                    }
+
+                }
 
            
         }
@@ -231,18 +234,18 @@ namespace WLL_NGO.AI
         void StartDiving()
         {
             
-            Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
+            Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
             //Vector3 nextBallPos = ball.Position + ballVelNoEffect * diveTolleranceTime;
 
-            Vector3 ballDirFwdProj = Vector3.Project(ball.Position - player.Position, transform.forward);
+            Vector3 ballDirFwdProj = Vector3.Project(BallController.Instance.Position - player.Position, transform.forward);
             Vector3 ballVelFwdProj = Vector3.Project(ballVelNoEffect, transform.forward);
             float projT = ballDirFwdProj.magnitude / ballVelFwdProj.magnitude;
 
-            Vector3 nextBallPos = ball.Position + (ballVelNoEffect * projT) + (.5f * Physics.gravity.y * Mathf.Pow(projT, 2)) * Vector3.up;
+            Vector3 nextBallPos = BallController.Instance.Position + (ballVelNoEffect * projT) + (.5f * Physics.gravity.y * Mathf.Pow(projT, 2)) * Vector3.up;
 
             Debug.Log($"GK - next ball pos:{nextBallPos}");
             Vector3 nextBallDir = Vector3.ProjectOnPlane(nextBallPos-player.Position, Vector3.up);
-            Debug.Log($"GK - positions:{ball.Position}, nextPos:{nextBallPos}, playerPos:{player.Position}");
+            Debug.Log($"GK - positions:{BallController.Instance.Position}, nextPos:{nextBallPos}, playerPos:{player.Position}");
             Vector3 rgtProj = Vector3.Project(nextBallDir, transform.right);
             float cooldown = 1.5f;
             diveCooldown = cooldown;
@@ -288,13 +291,13 @@ namespace WLL_NGO.AI
 
         bool IsTimeToDive()
         {
-            Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
-            Vector3 ballDir = Vector3.ProjectOnPlane(ball.Position - player.Position, Vector3.up);
+            Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
+            Vector3 ballDir = Vector3.ProjectOnPlane(BallController.Instance.Position - player.Position, Vector3.up);
             float dotBefore = Vector3.Dot(ballDir, transform.forward);
             //Debug.Log($"GK - Dot before:{dotBefore}");
             // Get the ball position in X secs
             float time = diveTolleranceTime;
-            Vector3 nextBallPos = ball.Position + ballVelNoEffect * time;
+            Vector3 nextBallPos = BallController.Instance.Position + ballVelNoEffect * time;
             
             ballDir = Vector3.ProjectOnPlane(nextBallPos - player.Position, Vector3.up);
             float dotAfter = Vector3.Dot(ballDir, transform.forward);
@@ -309,21 +312,21 @@ namespace WLL_NGO.AI
         {
             
             // How much time it will take for the ball to reach the net line ( computing velocity along the X axis )
-            Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
-            Vector3 ballDir = netCenter - ball.Position;
-            Debug.Log($"GK - ball vel:{ball.GetVelocityWithoutEffect()}");
+            Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
+            Vector3 ballDir = netCenter - BallController.Instance.Position;
+            Debug.Log($"GK - ball vel:{BallController.Instance.GetVelocityWithoutEffect()}");
             Vector3 xVel = Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.right);
             Vector3 xDir = Vector3.ProjectOnPlane(ballDir, Vector3.right);
             float time = xDir.magnitude / xVel.magnitude;
             // Get the future position of the ball ( maybe the ball is not reaching the net )
-            Vector3 bPos = ball.Position + (ballVelNoEffect * time) + (0.5f * Physics.gravity.y * Mathf.Pow(time, 2)) * Vector3.up;
+            Vector3 bPos = BallController.Instance.Position + (ballVelNoEffect * time) + (0.5f * Physics.gravity.y * Mathf.Pow(time, 2)) * Vector3.up;
             return Mathf.Abs(bPos.z) < (netWidth / 2f) + .5f && Mathf.Abs(bPos.z) < netHeight + .5f;
         }
 
         bool IsBallMovingThisDirection()
         {
-            Vector3 ballVelNoEffect = ball.GetVelocityWithoutEffect();
-            Vector3 ballDir = netCenter - ball.Position;
+            Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
+            Vector3 ballDir = netCenter - BallController.Instance.Position;
             float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
             return ballVelNoEffect.magnitude > 0 && dot > 0;
         }
@@ -337,8 +340,8 @@ namespace WLL_NGO.AI
 
          
             // Ball direction
-            Vector3 ballDir = ball.Position - player.Position;
-            Vector3 ballSpeed = ball.Velocity;
+            Vector3 ballDir = BallController.Instance.Position - player.Position;
+            Vector3 ballSpeed = BallController.Instance.Velocity;
 
             if(ballDir.magnitude > takeTheBallRange)
             {
@@ -361,10 +364,10 @@ namespace WLL_NGO.AI
         void KeepPosition()
         {
             // Look at the ball
-            player.SetLookDirection(ball.Position - player.Position);
+            player.SetLookDirection(BallController.Instance.Position - player.Position);
 
             // Get ball direction
-            Vector3 direction = ball.Position - netCenter;
+            Vector3 direction = BallController.Instance.Position - netCenter;
             direction.y = 0;
 
             // Compute the goalkeeper target position
@@ -424,7 +427,7 @@ namespace WLL_NGO.AI
             Debug.Log("Bouncing the ball back...");
 
             //isBouncingTheBallBack.Value = false;
-            ball.Velocity = -ball.Velocity;
+            BallController.Instance.Velocity = -BallController.Instance.Velocity;
             //ball.Position += transform.forward * 2f;
         }
     }

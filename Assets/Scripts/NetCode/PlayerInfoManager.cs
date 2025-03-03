@@ -27,7 +27,7 @@ namespace WLL_NGO.Netcode
         [SerializeField]
         NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
 
-        int playersNeeded = 1;
+        int playersNeeded = 2;
 
        
 
