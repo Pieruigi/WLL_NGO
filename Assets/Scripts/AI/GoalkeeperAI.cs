@@ -130,11 +130,11 @@ namespace WLL_NGO.AI
            
             if (newOwner == player)
             {
-                player.SetInputHandler(new HumanInputHandler());
+                //player.SetInputHandler(new HumanInputHandler());
                 player.ResetLookDirection();
             }
-            else if (oldOwner == player) 
-                player.SetInputHandler(new NotHumanInputHandler());
+            // else if (oldOwner == player) 
+            //     player.SetInputHandler(new NotHumanInputHandler());
         }
 
 
@@ -344,7 +344,7 @@ namespace WLL_NGO.AI
             {
                 
                 player.SetLookDirection(ballDir);
-                ((NotHumanInputHandler) player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
+                ((InputHandler) player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
             }
             else
             {
@@ -378,13 +378,13 @@ namespace WLL_NGO.AI
                 Vector3 worldDirecton = targetPosition - player.Position;
                 worldDirecton.y = 0;
             
-                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(worldDirecton));
+                ((InputHandler)player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(worldDirecton));
             }
             else
             {
                 //Debug.Log($"GK - stopping {gameObject.name} to position:{player.Position}");
                 keepPositionTollerance = keepPositionTolleranceDefault;
-                ((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector3.zero);
+                ((InputHandler)player.GetInputHandler()).SetJoystick(Vector3.zero);
             }
         }
        

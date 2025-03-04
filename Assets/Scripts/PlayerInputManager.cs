@@ -44,7 +44,7 @@ namespace WLL_NGO
 
     //TODO: we can keep just one handler 
     [System.Serializable]
-    public class HumanInputHandler : IInputHandler
+    public class InputHandler : IInputHandler
     {
         Vector2 joystick;
         
@@ -87,42 +87,42 @@ namespace WLL_NGO
         }
     }
 
-    [System.Serializable]
-    public class NotHumanInputHandler : IInputHandler
-    {
-        Vector2 joystick;
+    // [System.Serializable]
+    // public class NotHumanInputHandler : IInputHandler
+    // {
+    //     Vector2 joystick;
         
-        bool button1, button2, button3;
+    //     bool button1, button2, button3;
 
-        public InputData GetInput()
-        {
-            return new InputData()
-            {
-                joystick = this.joystick,
-                button1 = this.button1,
-                button2 = this.button2,
-                button3 = this.button3
-            };
-        }
+    //     public InputData GetInput()
+    //     {
+    //         return new InputData()
+    //         {
+    //             joystick = this.joystick,
+    //             button1 = this.button1,
+    //             button2 = this.button2,
+    //             button3 = this.button3
+    //         };
+    //     }
 
-        public void SetJoystick(Vector2 value)
-        {
-            joystick = value;
-        }
+    //     public void SetJoystick(Vector2 value)
+    //     {
+    //         joystick = value;
+    //     }
 
-        public void SetButton1(bool value)
-        {
-            button1 = value;
-        }
-        public void SetButton2(bool value)
-        {
-            button2 = value;
-        }
-        public void SetButton3(bool value)
-        {
-            button3 = value;
-        }
-    }
+    //     public void SetButton1(bool value)
+    //     {
+    //         button1 = value;
+    //     }
+    //     public void SetButton2(bool value)
+    //     {
+    //         button2 = value;
+    //     }
+    //     public void SetButton3(bool value)
+    //     {
+    //         button3 = value;
+    //     }
+    // }
 
     public class PlayerInputManager: Singleton<PlayerInputManager>
     {
@@ -131,31 +131,31 @@ namespace WLL_NGO
         {
           
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
-            TeamController.OnSelectedPlayerChanged += HandleOnSelectedPlayerChanged;
+            //TeamController.OnSelectedPlayerChanged += HandleOnSelectedPlayerChanged;
         }
 
         private void OnDisable()
         {
             PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
-            TeamController.OnSelectedPlayerChanged -= HandleOnSelectedPlayerChanged;
+            //TeamController.OnSelectedPlayerChanged -= HandleOnSelectedPlayerChanged;
         }
 
-        private void HandleOnSelectedPlayerChanged(TeamController team, PlayerController oldPlayer, PlayerController newPlayer)
-        {
-            // Nothing to change on bots 
-            if (team.IsBot())
-                return;
+        // private void HandleOnSelectedPlayerChanged(TeamController team, PlayerController oldPlayer, PlayerController newPlayer)
+        // {
+        //     // Nothing to change on bots 
+        //     if (team.IsBot())
+        //         return;
 
-            if(oldPlayer != null)
-            {
-                oldPlayer.SetInputHandler(new NotHumanInputHandler());
-            }
+        //     if(oldPlayer != null)
+        //     {
+        //         oldPlayer.SetInputHandler(new NotHumanInputHandler());
+        //     }
             
-            if(newPlayer != null)
-            {
-                newPlayer.SetInputHandler(new HumanInputHandler());
-            }
-        }
+        //     if(newPlayer != null)
+        //     {
+        //         newPlayer.SetInputHandler(new HumanInputHandler());
+        //     }
+        // }
 
         /// <summary>
         /// TO REMOVE. We need to check the team for the selected player
@@ -164,7 +164,7 @@ namespace WLL_NGO
         void HandleOnPlayerControllerSpawned(PlayerController pc)
         {
     
-            pc.SetInputHandler(new NotHumanInputHandler());
+            pc.SetInputHandler(new InputHandler());
         }
 
        
