@@ -49,13 +49,13 @@ namespace WLL_NGO.Netcode
                 PlayerController pc = go.GetComponent<PlayerController>();
 
                 pc.Init(playerInfo, i);
-                Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(i) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(i);
+                Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetKickOffHomeSpawnPoint(i) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(i);
                 Rigidbody rb = go.GetComponent<Rigidbody>();
                 rb.position = spawnPoint.position;
                 rb.rotation = spawnPoint.rotation;
                 NetworkObject no = go.GetComponent<NetworkObject>();
                 no.Spawn();
-
+                
             }
             //NetworkObject no = playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>();
             //Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);

@@ -73,7 +73,7 @@ namespace WLL_NGO.AI
         // Update is called once per frame
         void Update()
         {
-            if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying() || player.Role != PlayerRole.GK)
+            if (!NetworkManager.Singleton.IsServer || MatchController.Instance.MatchState != MatchState.Playing || player.Role != PlayerRole.GK)
                 return;
 
             if (superShot)
@@ -85,7 +85,7 @@ namespace WLL_NGO.AI
 
         private void FixedUpdate()
         {
-            if (!NetworkManager.Singleton.IsServer || !MatchController.Instance.IsPlaying() || player.Role != PlayerRole.GK)
+            if (!NetworkManager.Singleton.IsServer || MatchController.Instance.MatchState != MatchState.Playing || player.Role != PlayerRole.GK)
                 return;
 
             //if(!superShot)

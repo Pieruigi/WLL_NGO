@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using WLL_NGO.Netcode;
@@ -29,7 +30,7 @@ namespace WLL_NGO.Netcode
 
         int playersNeeded = 2;
 
-       
+
 
         public override void OnNetworkSpawn()
         {
@@ -71,7 +72,7 @@ namespace WLL_NGO.Netcode
 #endif
         void HandleOnPlayerInfoListChanged(NetworkListEvent<PlayerInfo> changeEvent)
         {
-            
+
             if (IsClient)
             {
                 // Every time the server modifies the player list all the players are notified
@@ -80,14 +81,15 @@ namespace WLL_NGO.Netcode
                     Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
                     PlayerInfo localPlayer = players[changeEvent.Index];
                     // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
-                    if(!localPlayer.Initialized)
+                    if (!localPlayer.Initialized)
                         InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
-                };
+                }
+                ;
             }
 
             if (IsServer)
             {
-              
+
             }
 
             Debug.Log($"Player list has changed");
@@ -100,7 +102,7 @@ namespace WLL_NGO.Netcode
             Debug.Log("Scene has been loaded");
         }
 
-        
+
 
         /// <summary>
         /// Executed on the server to initialize the local client
@@ -110,9 +112,9 @@ namespace WLL_NGO.Netcode
         [ServerRpc(RequireOwnership = false)]
         void InizialitePlayerServerRpc(ulong clientId, string data)
         {
-            for(int i=0; i<players.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
-                if(players[i].ClientId == clientId)
+                if (players[i].ClientId == clientId)
                 {
                     var p = players[i];
                     p.Initialize(data);
@@ -129,7 +131,7 @@ namespace WLL_NGO.Netcode
         [ServerRpc(RequireOwnership = false)]
         public void SetPlayerReadyServerRpc(ulong clientId)
         {
-            for(int i=0; i<players.Count;i++)
+            for (int i = 0; i < players.Count; i++)
             {
                 if (players[i].ClientId == clientId)
                 {
@@ -148,9 +150,9 @@ namespace WLL_NGO.Netcode
         void RemovePlayer(ulong clientId)
         {
             int index = -1;
-            for(int i=0; i<players.Count && index<0; i++)
+            for (int i = 0; i < players.Count && index < 0; i++)
             {
-                if(players[i].ClientId == clientId)
+                if (players[i].ClientId == clientId)
                     index = i;
             }
             if (index >= 0)
@@ -165,7 +167,7 @@ namespace WLL_NGO.Netcode
         {
             // Check whether the player must play in the home or away team
             int homeCount = 0;
-            for(int i=0; i<players.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
                 if (players[i].Home)
                     homeCount++;
@@ -197,7 +199,7 @@ namespace WLL_NGO.Netcode
             if (players.Count < playersNeeded)
                 return false;
 
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 if (!player.Initialized)
                     return false;
@@ -212,39 +214,62 @@ namespace WLL_NGO.Netcode
 
             foreach (var player in players)
             {
-                if(!player.Ready) return false;
+                if (!player.Ready) return false;
             }
             return true;
         }
 
         public PlayerInfo GetLocalPlayerInfo(bool bot)
         {
-            foreach(var player in players)
+            foreach (var player in players)
             {
-                if(player.ClientId == NetworkManager.LocalClientId && bot) return player;
+                if (player.ClientId == NetworkManager.LocalClientId && bot) return player;
             }
             return default;
         }
 
         public PlayerInfo GetPlayerInfoById(string playerInfoId)
         {
-            foreach(PlayerInfo player in players)
+            foreach (PlayerInfo player in players)
             {
-                if(player.Id == playerInfoId) return player;
+                if (player.Id == playerInfoId) return player;
             }
 
             return default;
         }
-        
+
         public List<PlayerInfo> GetPlayerInfoAll(bool home)
         {
             List<PlayerInfo> ret = new List<PlayerInfo>();
-            foreach(var player in players)
+            foreach (var player in players)
             {
-                if(player.Home == home) ret.Add(player);
+                if (player.Home == home) ret.Add(player);
             }
             return ret;
         }
+
+        public PlayerInfo GetHomePlayerInfo()
+        {
+            foreach (var p in players)
+            {
+                if (p.Home)
+                    return p;
+            }
+
+            return default;
+        }
+
+        public PlayerInfo GetAwayPlayerInfo()
+        {
+            foreach (var p in players)
+            {
+                if (!p.Home)
+                    return p;
+            }
+
+            return default;
+        }
+
     }
 
 }

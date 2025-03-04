@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,7 +14,7 @@ namespace WLL_NGO.Netcode
     /// <summary>
     /// NotReady: waiting for all players to be ready
     /// </summary>
-    
+
 
     public class MatchController : SingletonNetwork<MatchController>
     {
@@ -29,6 +31,11 @@ namespace WLL_NGO.Netcode
         //}
 
         NetworkVariable<byte> matchState = new NetworkVariable<byte>((byte)MatchState.NotReady);
+        
+        public MatchState MatchState
+        {
+            get{ return (MatchState)matchState.Value; }
+        }
 
         int playerPerTeam = 5;
         public int PlayerPerTeam
@@ -70,6 +77,7 @@ namespace WLL_NGO.Netcode
         /// <param name="newValue"></param>
         private void HandleOnMatchStateChanged(byte previousValue, byte newValue)
         {
+            Debug.Log($"TEST - Changing state state from {previousValue} to {newValue}");
             switch (newValue)
             {
                 case (byte)MatchState.StartingMatch:
@@ -79,12 +87,14 @@ namespace WLL_NGO.Netcode
                     //foreach(PlayerController p in )
                     List<PlayerController> players = TeamController.HomeTeam.GetPlayers();
                     Debug.Log($"PlayerController.Count:{players.Count}");
-                    TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam-1]);
+                    TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam - 1]);
                     //TeamController.HomeTeam.SetPlayerSelected(players[0]);
 
-                    // NOT IMPLEMENTED: we must do kick off first
-                    SetPlayingState();
+                    //SetPlayingState(true);
+                    SetKickOffState(true);
 
+                    break;
+                case (byte)MatchState.KickOff:
                     break;
             }
 
@@ -92,13 +102,27 @@ namespace WLL_NGO.Netcode
             OnStateChanged?.Invoke(previousValue, newValue);
         }
 
-        async void SetPlayingState()
+        async void SetPlayingState(bool delayed = false)
         {
             if (!IsServer)
                 return;
 
-            await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+            if (delayed)
+                await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+
             matchState.Value = (byte)MatchState.Playing;
+            
+        }
+
+        async void SetKickOffState(bool delayed = false)
+        {
+            if (!IsServer)
+                return;
+                
+            if (delayed)
+                await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+
+            matchState.Value = (byte)MatchState.KickOff;
         }
 
         void SetStartingMatchState()
@@ -106,7 +130,7 @@ namespace WLL_NGO.Netcode
             BallController.OnBallSpawned -= SetStartingMatchState;
             SetMatchState(MatchState.StartingMatch);
         }
-        
+
 
         /// <summary>
         /// Called on server to process match states.
@@ -116,7 +140,7 @@ namespace WLL_NGO.Netcode
             switch (matchState.Value)
             {
                 case (byte)MatchState.NotReady:
-                    if(IsServer)
+                    if (IsServer)
                     {
                         // If all players are ready we can start the game
                         if (PlayerInfoManager.Instance.PlayerInitializedAll() && PlayerInfoManager.Instance.PlayerReadyAll())
@@ -125,7 +149,7 @@ namespace WLL_NGO.Netcode
                             BallSpawner.Instance.SpawnBall();
                         }
                     }
-                   
+
                     break;
             }
         }
@@ -139,10 +163,10 @@ namespace WLL_NGO.Netcode
             matchState.Value = (byte)newMatchState;
         }
 
-        public bool IsPlaying()
-        {
-            return matchState.Value == (byte)MatchState.Playing;
-        }
+        // public bool IsPlaying()
+        // {
+        //     return matchState.Value == (byte)MatchState.Playing;
+        // }
 
 
     }

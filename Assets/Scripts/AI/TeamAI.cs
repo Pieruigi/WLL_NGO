@@ -111,7 +111,7 @@ namespace WLL_NGO.AI
         private void FixedUpdate()
         {
 #if !TEST_AI
-            if (!MatchController.Instance.IsPlaying())
+            if (MatchController.Instance.MatchState != MatchState.Playing)
                 return;
 #endif
             timeElapsed -= Time.fixedDeltaTime;
