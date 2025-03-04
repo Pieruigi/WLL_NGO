@@ -324,7 +324,7 @@ namespace WLL_NGO.Netcode
                 if (Selected)
                     CheckHumanInput();
                 else if (IsHost)
-                    CheckNotHumanInput();
+                    CheckNotHumanInput(); // AI for singleplayer
             }
             else // Client is the owner of the player, so we are on the dedicated server here
             {
@@ -350,7 +350,7 @@ namespace WLL_NGO.Netcode
 
             if (IsServer)
             {
-                
+
                 // Server must set the player ownership
                 NetworkObject no = GetComponent<NetworkObject>();
                 no.ChangeOwnership(PlayerInfo.ClientId);
@@ -372,8 +372,10 @@ namespace WLL_NGO.Netcode
             playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
 
             NetworkTimer.Instance.OnTimeToTick += HandleOnTimeToTick;
-           
+
             OnSpawned?.Invoke(this);
+
+        
         }
 
         public override void OnNetworkDespawn()

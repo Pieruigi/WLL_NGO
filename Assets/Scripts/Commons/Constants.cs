@@ -22,7 +22,7 @@ namespace WLL_NGO
         public const string GoldenGoalQueueName = "1VS1-GoldenGoal";
         public const string ClassicQueueName = "1VS1-Classic";
         public const string PlayWithFriendsQueueName = "PlayWithFriends";
-        public const int ClientMatchmakingTimeout = 9000; // In millis
+        public const int ClientMatchmakingTimeout = 20000; // In millis
 
         public const string DefaultGameScene = "Game";
         public const string LobbyScene = "Lobby";

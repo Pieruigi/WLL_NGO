@@ -79,7 +79,7 @@ namespace WLL_NGO.Netcode
                 {
                     Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
                     PlayerInfo localPlayer = players[changeEvent.Index];
-                    // The local player has been added, we need to send the server our initialization data ( ex. the teamroaster )
+                    // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
                     if(!localPlayer.Initialized)
                         InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
                 };

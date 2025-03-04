@@ -216,6 +216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3c5b04a34654c4a983275c03611c7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  homeMaterial: {fileID: 2100000, guid: d84d4aade1dc6cf47946cca2beeb9b55, type: 2}
+  awayMaterial: {fileID: 2100000, guid: 7ee20cdcce4ee344faf7f42ab4ac9747, type: 2}
+  meshRenderer: {fileID: 4811291496623610298}
 --- !u!114 &5802882370175494855
 MonoBehaviour:
   m_ObjectHideFlags: 0
