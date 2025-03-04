@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Markup;
 using Unity.Netcode;
 using UnityEngine;
 using WLL_NGO.Interfaces;
@@ -41,21 +42,48 @@ namespace WLL_NGO
         }
     }
 
+    //TODO: we can keep just one handler 
     [System.Serializable]
     public class HumanInputHandler : IInputHandler
     {
-
+        Vector2 joystick;
+        
+        bool button1, button2, button3;
 
         public InputData GetInput()
         {
 
             return new InputData()
             {
-                joystick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized,
-                button1 = Input.GetKey(KeyCode.Keypad1),
-                button2 = Input.GetKey(KeyCode.Keypad2),
-                button3 = false
+                // joystick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized,
+                // button1 = Input.GetKey(KeyCode.Keypad1),
+                // button2 = Input.GetKey(KeyCode.Keypad2),
+                // button3 = false
+                joystick = this.joystick,
+                button1 = this.button1,
+                button2 = this.button2,
+                button3 = this.button3
             };
+        }
+
+        public void SetButton1(bool value)
+        {
+            button1 = value;
+        }
+
+        public void SetButton2(bool value)
+        {
+            button2 = value;
+        }
+
+        public void SetButton3(bool value)
+        {
+            button3 = value;
+        }
+
+        public void SetJoystick(Vector2 value)
+        {
+            joystick = value; 
         }
     }
 
@@ -77,9 +105,9 @@ namespace WLL_NGO
             };
         }
 
-        public void SetJoystick(Vector2 joystick)
+        public void SetJoystick(Vector2 value)
         {
-            this.joystick = joystick;
+            joystick = value;
         }
 
         public void SetButton1(bool value)

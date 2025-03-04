@@ -801,7 +801,7 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     Server: __NO_MM;_USE_LOBBY_SCENE
-    Standalone: NO_MM;_USE_LOBBY_SCENE;TEST_AI
+    Standalone: NO_MM;_USE_LOBBY_SCENE;_TEST_AI
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -910,10 +910,10 @@ PlayerSettings:
   apiCompatibilityLevel: 3
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 0daf18ef-3192-44ed-a4f5-85fa0a7c788d
+  cloudProjectId: f6560410-842c-4fed-bcb3-3b2919c299cf
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: World League Live Soccer
+  projectName: TestUnityMultiplayerWithBolt
   organizationId: iosonofrancesco
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

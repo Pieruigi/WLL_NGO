@@ -14,6 +14,9 @@ namespace WLL_NGO.Netcode
     {
         public static UnityAction<TeamController, /*Old*/PlayerController, /*New*/PlayerController> OnSelectedPlayerChanged;
 
+        public static UnityAction<TeamController> OnTeamControllerSpawned;
+        public static UnityAction<TeamController> OnTeamControllerDespawned;
+
         static TeamController homeTeamController, awayTeamController;
         public static TeamController HomeTeam
         {
@@ -38,7 +41,7 @@ namespace WLL_NGO.Netcode
         {
             get { return selectedPlayer; }
         }
-
+       
         private void Awake()
         {
             if (home)
@@ -46,7 +49,7 @@ namespace WLL_NGO.Netcode
             else
                 awayTeamController = this;
 
-            
+
         }
 
         //private void OnEnable()
@@ -62,12 +65,19 @@ namespace WLL_NGO.Netcode
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            
             selectedPlayerRef.OnValueChanged += HandleOnSelectedPlayerRefValueChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+
         }
 
         private void HandleOnSelectedPlayerRefValueChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
         {
-            
+
 
             // Read the new network object
             NetworkObject newNetObj;
@@ -88,7 +98,7 @@ namespace WLL_NGO.Netcode
 
             OnSelectedPlayerChanged?.Invoke(this, preNetObject ? preNetObject.GetComponent<PlayerController>() : null, selectedPlayer);
 
-           
+
         }
 
             

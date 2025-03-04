@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace WLL_NGO.Netcode
 {
     [System.Serializable]
     public struct PlayerInfo: INetworkSerializable, System.IEquatable<PlayerInfo>
     {
+        public static UnityAction<PlayerInfo> OnReadyChanged;
+
         [SerializeField] FixedString32Bytes id; // The player identifier ( ex. the playfab id )
         public string Id
         {
@@ -54,7 +57,13 @@ namespace WLL_NGO.Netcode
         public bool Ready
         {
             get { return ready; }
-            set { ready = value; }
+            set
+            {
+                var old = ready;
+                ready = value;
+                if(old != ready)
+                    OnReadyChanged?.Invoke(this);
+            }
         }
 
 
@@ -133,7 +142,9 @@ namespace WLL_NGO.Netcode
                 reader.ReadValueSafe(out home);
                 reader.ReadValueSafe(out initialized);
                 reader.ReadValueSafe(out data);
-                reader.ReadValueSafe(out ready);
+                reader.ReadValueSafe(out bool r); // We do this to trigger the OnReadyChanged event
+                Ready = r; 
+                Debug.Log("TEST - reading player info");
             }
             else
             {
@@ -145,7 +156,9 @@ namespace WLL_NGO.Netcode
                 writer.WriteValueSafe(initialized);
                 writer.WriteValueSafe(data);
                 writer.WriteValueSafe(ready);
+                Debug.Log("TEST - writing player info");
             }
+            
         }
         #endregion
 

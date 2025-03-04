@@ -84,17 +84,15 @@ namespace WLL_NGO.Netcode
                     // Reset the tick timer
                     NetworkTimer.Instance.StartTimer();
                     // Select the last player
-                    //foreach(PlayerController p in )
-                    List<PlayerController> players = TeamController.HomeTeam.GetPlayers();
-                    Debug.Log($"PlayerController.Count:{players.Count}");
-                    TeamController.HomeTeam.SetPlayerSelected(players[playerPerTeam - 1]);
-                    //TeamController.HomeTeam.SetPlayerSelected(players[0]);
-
+                    
                     //SetPlayingState(true);
                     SetKickOffState(true);
 
                     break;
                 case (byte)MatchState.KickOff:
+                    //TODO: eventually reset stunned or busy states on each player
+                    TeamController.HomeTeam.SetPlayerSelected(TeamController.HomeTeam.GetPlayers()[playerPerTeam-1]);
+                    TeamController.AwayTeam.SetPlayerSelected(TeamController.AwayTeam.GetPlayers()[playerPerTeam-1]);
                     break;
             }
 
@@ -102,13 +100,13 @@ namespace WLL_NGO.Netcode
             OnStateChanged?.Invoke(previousValue, newValue);
         }
 
-        async void SetPlayingState(bool delayed = false)
+        public void SetPlayingState()
         {
             if (!IsServer)
                 return;
 
-            if (delayed)
-                await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+            // if (delayed)
+            //     await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
 
             matchState.Value = (byte)MatchState.Playing;
             

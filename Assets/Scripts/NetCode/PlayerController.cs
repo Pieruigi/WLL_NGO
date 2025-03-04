@@ -425,13 +425,18 @@ namespace WLL_NGO.Netcode
             if (!IsServer)
                 return;
 
+            // If match state is kickoff and the button1 has been pressed we must set the state to playing
+            
             bool value = inputPayload.button1;
+            
+            if (MatchController.Instance.MatchState == MatchState.KickOff && value)
+                MatchController.Instance.SetPlayingState();
 
             if (handlingTheBall)
                 CheckForShootingInput(value, button1LastValue, inputPayload.tick, true);
             else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
                 CheckForShootingInputAsReceiver(value, button1LastValue, inputPayload.tick, true, inputPayload.inputVector);
-            else                 
+            else
                 CheckForTacklingInput(value, button1LastValue, inputPayload.tick);
 
             button1LastValue = value;
