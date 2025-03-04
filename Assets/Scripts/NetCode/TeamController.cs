@@ -52,15 +52,7 @@ namespace WLL_NGO.Netcode
 
         }
 
-        //private void OnEnable()
-        //{
-        //    BallController.OnOwnerChanged += HandleOnBallOwnerChanged;
-        //}
-
-        //private void OnDisable()
-        //{
-        //    BallController.OnOwnerChanged -= HandleOnBallOwnerChanged;
-        //}
+      
 
         public override void OnNetworkSpawn()
         {

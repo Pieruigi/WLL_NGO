@@ -34,8 +34,6 @@ namespace WLL_NGO.UI
         void OnEnable()
         {
             PlayerInfo.OnReadyChanged += HandleOnPlayerReadyChanged;
-            
-            //TeamController.OnTeamControllerSpawned += HandleOnTeamControllerSpawned;
         }
 
 
@@ -46,16 +44,10 @@ namespace WLL_NGO.UI
 
         private void HandleOnPlayerReadyChanged(PlayerInfo playerInfo)
         {
-            if (!playerInfo.IsLocal)
+            if (!playerInfo.IsLocal && !playerInfo.Bot)
                 return;
             teamController = playerInfo.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
         }
-
-        // private void HandleOnTeamControllerSpawned(TeamController teamController)
-        // {
-        //     if (teamController.IsLocalPlayer)
-        //         this.teamController = teamController;
-        // }
 
         void CheckInput()
         {
