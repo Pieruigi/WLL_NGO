@@ -22,7 +22,7 @@ namespace WLL_NGO.Netcode
         /// Param1: old value
         /// Param2: new value
         /// </summary>
-        public UnityAction<int, int> OnStateChanged;
+        public static UnityAction<int, int> OnStateChanged;
 
         //ushort numOfPlayers = 1;
         //public ushort NumberOfPlayers
@@ -31,10 +31,10 @@ namespace WLL_NGO.Netcode
         //}
 
         NetworkVariable<byte> matchState = new NetworkVariable<byte>((byte)MatchState.NotReady);
-        
+
         public MatchState MatchState
         {
-            get{ return (MatchState)matchState.Value; }
+            get { return (MatchState)matchState.Value; }
         }
 
         int playerPerTeam = 5;
@@ -84,15 +84,18 @@ namespace WLL_NGO.Netcode
                     // Reset the tick timer
                     NetworkTimer.Instance.StartTimer();
                     // Select the last player
-                    
+
                     //SetPlayingState(true);
                     SetKickOffState(true);
 
                     break;
                 case (byte)MatchState.KickOff:
+                    // Check the team who's going to kick off (only after a goal)
+                    
+
                     //TODO: eventually reset stunned or busy states on each player
-                    TeamController.HomeTeam.SetPlayerSelected(TeamController.HomeTeam.GetPlayers()[playerPerTeam-1]);
-                    TeamController.AwayTeam.SetPlayerSelected(TeamController.AwayTeam.GetPlayers()[playerPerTeam-1]);
+                    TeamController.HomeTeam.SetPlayerSelected(TeamController.HomeTeam.GetPlayers()[playerPerTeam - 1]);
+                    TeamController.AwayTeam.SetPlayerSelected(TeamController.AwayTeam.GetPlayers()[playerPerTeam - 1]);
                     break;
             }
 
@@ -100,23 +103,23 @@ namespace WLL_NGO.Netcode
             OnStateChanged?.Invoke(previousValue, newValue);
         }
 
-        public void SetPlayingState()
-        {
-            if (!IsServer)
-                return;
+        // public void SetPlayingState()
+        // {
+        //     if (!IsServer)
+        //         return;
 
-            // if (delayed)
-            //     await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
+        //     // if (delayed)
+        //     //     await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
 
-            matchState.Value = (byte)MatchState.Playing;
-            
-        }
+        //     matchState.Value = (byte)MatchState.Playing;
+
+        // }
 
         async void SetKickOffState(bool delayed = false)
         {
             if (!IsServer)
                 return;
-                
+
             if (delayed)
                 await Task.Delay(TimeSpan.FromSeconds(NetworkTimer.Instance.DeltaTick));
 

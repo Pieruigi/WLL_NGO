@@ -310,7 +310,7 @@ namespace WLL_NGO.Netcode
             serverStateBuffer = new CircularBuffer<StatePayload>(bufferSize);
             serverInputQueue = new Queue<InputPayload> ();
          
-            MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
+            //MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
         }
 
 
@@ -338,6 +338,15 @@ namespace WLL_NGO.Netcode
 
         }
 
+        void OnEnable()
+        {
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
+        }
+
+        void OnDisable()
+        {
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -375,7 +384,7 @@ namespace WLL_NGO.Netcode
 
             OnSpawned?.Invoke(this);
 
-        
+
         }
 
         public override void OnNetworkDespawn()
@@ -430,7 +439,7 @@ namespace WLL_NGO.Netcode
             bool value = inputPayload.button1;
             
             if (MatchController.Instance.MatchState == MatchState.KickOff && value)
-                MatchController.Instance.SetPlayingState();
+                MatchController.Instance.SetMatchState(MatchState.Playing);
 
             if (handlingTheBall)
                 CheckForShootingInput(value, button1LastValue, inputPayload.tick, true);

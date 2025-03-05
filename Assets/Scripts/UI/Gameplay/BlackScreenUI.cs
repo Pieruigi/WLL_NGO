@@ -30,12 +30,12 @@ namespace WLL_NGO.UI
 
         void OnEnable()
         {
-            MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
         }
 
         void OnDisable()
         {
-            MatchController.Instance.OnStateChanged -= HandleOnMatchStateChanged;
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
         }
 
         private void HandleOnMatchStateChanged(int oldState, int newState)

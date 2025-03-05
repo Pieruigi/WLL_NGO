@@ -146,7 +146,7 @@ namespace WLL_NGO.Netcode
 
             //timer = new NetworkTimer();
             //Physics.simulationMode = SimulationMode.FixedUpdate;
-            MatchController.Instance.OnStateChanged += HandleOnMatchStateChanged;
+            //MatchController.OnStateChanged += HandleOnMatchStateChanged;
         }
 
         
@@ -184,6 +184,16 @@ namespace WLL_NGO.Netcode
 #endif
         }
 
+
+        void OnEnable()
+        {
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
+        }
+
+        void OnDisable()
+        {
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
+        }
         //private void FixedUpdate()
         //{
         //    if (!IsSpawned)
@@ -200,14 +210,14 @@ namespace WLL_NGO.Netcode
         //        HandleServerTick();
         //    }
 
-            
+
         //}
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
-         
+
             // Owner change event handler
             ownerReference.OnValueChanged += HandleOnOwnerReferenceChanged;
 
@@ -215,7 +225,7 @@ namespace WLL_NGO.Netcode
                 OnBallSpawned?.Invoke();
 
             NetworkTimer.Instance.OnTimeToTick += HandleOnTimeToTick;
-          
+
         }
 
         public override void OnNetworkDespawn()

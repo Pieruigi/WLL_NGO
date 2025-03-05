@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using WLL_NGO.Netcode;
 
@@ -34,6 +35,12 @@ namespace WLL_NGO
             get { return transform.position; }
         }
 
+        bool triggered = false;
+        public bool Triggered
+        {
+            get { return triggered; }
+        }
+
         private void Awake()
         {
             if (home)
@@ -45,6 +52,7 @@ namespace WLL_NGO
             height = trigger.transform.lossyScale.y;
             Debug.Log($"Width:{width}");
             Debug.Log($"Height:{height}");
+                
         }
 
         // Start is called before the first frame update
@@ -57,6 +65,26 @@ namespace WLL_NGO
         void Update()
         {
 
+        }
+
+        void OnEnable()
+        {
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
+        }
+
+        void OnDisable()
+        {
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
+        }
+
+        private void HandleOnMatchStateChanged(int oldState, int newState)
+        {
+            switch (newState)
+            {
+                case (int)MatchState.Playing:
+                    triggered = false;
+                    break;
+            }
         }
 
         public static NetController GetOpponentTeamNetController(TeamController team)
@@ -80,6 +108,23 @@ namespace WLL_NGO
 
             return new Vector3(transform.position.x, h, w);
         }
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (NetworkManager.Singleton.IsClient) return;
+
+            if (!MatchController.Instance || !MatchController.Instance.IsSpawned || MatchController.Instance.MatchState != MatchState.Playing) return;
+
+            if (other != BallController.Instance) return;
+
+            if (!trigger)
+            {
+                triggered = true;
+                MatchController.Instance.SetMatchState(MatchState.Goal);
+            }
+        }
+
+        
     }
 
 }
