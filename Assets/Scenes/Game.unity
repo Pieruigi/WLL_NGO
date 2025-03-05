@@ -2685,6 +2685,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputUIPrefab: {fileID: 8003659534087624655, guid: 1fe8257055e144740bb5584c72906125,
     type: 3}
+  matchUIPrefab: {fileID: 7780467372864483736, guid: 756d66cde92d81e4583a473c56835972,
+    type: 3}
+  blackScreenUIPrefab: {fileID: 4337568245668232037, guid: f880d2cf709bc1948b1d979940e4b1f9,
+    type: 3}
 --- !u!4 &1592231104
 Transform:
   m_ObjectHideFlags: 0

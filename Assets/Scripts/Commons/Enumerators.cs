@@ -22,7 +22,7 @@ namespace WLL_NGO
 
     public enum ButtonState: byte { None, Pressed, Held, Released }
 
-    public enum MatchState : byte { NotReady, StartingMatch, Playing, KickOff }
+    public enum MatchState : byte { NotReady, StartingMatch, Playing, KickOff, Goal, Replay, End }
 
     public enum  ShotTiming : byte { Bad, Normal, Good, Perfect }
     
