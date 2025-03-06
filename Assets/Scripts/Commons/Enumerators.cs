@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace WLL_NGO
 {
-    public enum GameMode { Powered, GoldenGoal, Classic }
+    public enum GameMode { Fast, Classic, Powered }
 
     /// <summary>
     /// Normal: normal state, you can move, shoot, etc

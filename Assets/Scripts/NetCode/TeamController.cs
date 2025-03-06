@@ -41,7 +41,14 @@ namespace WLL_NGO.Netcode
         {
             get { return selectedPlayer; }
         }
-       
+
+        NetworkVariable<int> score = new NetworkVariable<int>(0);
+        public int Score
+        {
+            get { return score.Value; }
+            set { score.Value = value; }
+        }
+
         private void Awake()
         {
             if (home)

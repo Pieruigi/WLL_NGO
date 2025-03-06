@@ -37,6 +37,7 @@ namespace WLL_NGO.Netcode
             get { return (MatchState)matchState.Value; }
         }
 
+        
         int playerPerTeam = 5;
         public int PlayerPerTeam
         {
@@ -44,6 +45,8 @@ namespace WLL_NGO.Netcode
         }
 
         TeamController lastScorer = null;
+
+        //MatchRuler matchRuler;
 
         private void Update()
         {
@@ -70,6 +73,7 @@ namespace WLL_NGO.Netcode
         {
             base.OnNetworkSpawn();
             matchState.OnValueChanged += HandleOnMatchStateChanged;
+
         }
 
         void OnEnable()

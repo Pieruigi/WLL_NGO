@@ -667,8 +667,8 @@ namespace WLL_NGO.Netcode
         {
             if (IsServer)
             {
-                if (MatchController.Instance.MatchState != MatchState.Playing || MatchController.Instance.MatchState != MatchState.KickOff)
-                    return;
+                // if (MatchController.Instance.MatchState != MatchState.Playing || MatchController.Instance.MatchState != MatchState.KickOff)
+                //     return;
 
                 PlayerController winner = player;
                 // If any opponent player is owning the ball we need to call the evaluate function to choose the winner
