@@ -423,6 +423,15 @@ namespace WLL_NGO.Netcode
                 case (byte)MatchState.StartingMatch:
                     //timer = new NetworkTimer();
                     break;
+                case (byte)MatchState.Goal:
+                    inputHandler.ResetInput();
+                    if (Role != PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Normal)
+                    {
+                        Velocity = Vector3.zero;
+                        //currentSpeed = 0;
+                    }
+                    
+                    break;
             }
 
 
@@ -1533,6 +1542,7 @@ namespace WLL_NGO.Netcode
                 
             };
         }
+        
 
         #endregion
 
@@ -1638,9 +1648,9 @@ namespace WLL_NGO.Netcode
             if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
             {
                 bool save = false;
-                if(save)
+                if (save)
                     goalkeeperAI.BounceTheBallBack();
-                
+
             }
             else
             {

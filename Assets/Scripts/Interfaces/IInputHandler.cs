@@ -15,6 +15,8 @@ namespace WLL_NGO.Interfaces
         public void SetButton2(bool value);
 
         public void SetButton3(bool value);
+
+        public void ResetInput();
         
     }
 

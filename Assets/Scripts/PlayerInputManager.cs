@@ -47,7 +47,7 @@ namespace WLL_NGO
     public class InputHandler : IInputHandler
     {
         Vector2 joystick;
-        
+
         bool button1, button2, button3;
 
         public InputData GetInput()
@@ -83,7 +83,13 @@ namespace WLL_NGO
 
         public void SetJoystick(Vector2 value)
         {
-            joystick = value; 
+            joystick = value;
+        }
+
+        public void ResetInput()
+        {
+            joystick = Vector2.zero;
+            button1 = button2 = button3 = false;
         }
     }
 

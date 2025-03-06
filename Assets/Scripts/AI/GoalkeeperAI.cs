@@ -97,22 +97,23 @@ namespace WLL_NGO.AI
             //PlayerController.OnSpawned += HandleOnPlayerSpawned;
             BallController.OnBallSpawned += HandleOnBallSpawned;
             BallController.OnOwnerChanged += HandleOnOwnerChanged;
-          
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
         }
 
-        
+
         private void OnDisable()
         {
             //PlayerController.OnSpawned -= HandleOnPlayerSpawned;
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             BallController.OnOwnerChanged -= HandleOnOwnerChanged;
-            
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
         }
 
-
-
-
-       
+        private void HandleOnMatchStateChanged(int oldState, int newState)
+        {
+            
+            
+        }
 
         void HandleOnBallSpawned()
         {
@@ -390,10 +391,10 @@ namespace WLL_NGO.AI
        
         public void UpdateDive()
         {
-
+ Debug.Log("TEST - Dive");
             if (!diving)
             {
-                Debug.Log("Dive");
+               
                 
                 player.Velocity = diveDir.normalized * diveSpeed + player.Velocity.y * Vector3.up;
                 diving = true;
@@ -413,6 +414,7 @@ namespace WLL_NGO.AI
             
         }
 
+     
         public Transform GetBallHook()
         {
             Debug.Log("Getting ball hook");
