@@ -43,6 +43,8 @@ namespace WLL_NGO.Netcode
             get { return playerPerTeam; }
         }
 
+        TeamController lastScorer = null;
+
         private void Update()
         {
             //if (IsServer)
@@ -70,6 +72,22 @@ namespace WLL_NGO.Netcode
             matchState.OnValueChanged += HandleOnMatchStateChanged;
         }
 
+        void OnEnable()
+        {
+            NetController.OnGoalScored += HandleOnGoalScored;
+        }
+
+        void OnDisable()
+        {
+            NetController.OnGoalScored -= HandleOnGoalScored;
+        }
+
+        private void HandleOnGoalScored(TeamController scorer)
+        {
+            lastScorer = scorer;
+            SetMatchState(MatchState.Goal);
+        }
+
         /// <summary>
         /// Called when match state changes
         /// </summary>
@@ -91,16 +109,66 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)MatchState.KickOff:
                     // Check the team who's going to kick off (only after a goal)
-                    
+                    if (!IsClient) // Last scorer is not null only on server
+                    {
+                        if (lastScorer != null)
+                        {
+                            List<Transform> homeSP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoints() : PlayerSpawnPointManager.Instance.GetKickOffHomeSpawnPoints();
+                            List<Transform> awaySP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetKickOffAwaySpawnPoints() : PlayerSpawnPointManager.Instance.GetAwaySpawnPoints();
 
-                    //TODO: eventually reset stunned or busy states on each player
-                    TeamController.HomeTeam.SetPlayerSelected(TeamController.HomeTeam.GetPlayers()[playerPerTeam - 1]);
-                    TeamController.AwayTeam.SetPlayerSelected(TeamController.AwayTeam.GetPlayers()[playerPerTeam - 1]);
+                            for (int i = 0; i < TeamController.HomeTeam.GetPlayers().Count; i++)
+                            {
+                                TeamController.HomeTeam.GetPlayers()[i].Velocity = Vector3.zero;
+                                TeamController.HomeTeam.GetPlayers()[i].Position = homeSP[i].position;
+                                TeamController.HomeTeam.GetPlayers()[i].Rotation = homeSP[i].rotation;
+                                TeamController.AwayTeam.GetPlayers()[i].Velocity = Vector3.zero;
+                                TeamController.AwayTeam.GetPlayers()[i].Position = awaySP[i].position;
+                                TeamController.AwayTeam.GetPlayers()[i].Rotation = awaySP[i].rotation;
+                                // TeamController.HomeTeam.GetPlayers()[i].Teleport(homeSP[i].position, homeSP[i].rotation);
+                                // TeamController.AwayTeam.GetPlayers()[i].Teleport(awaySP[i].position, awaySP[i].rotation);
+                            }
+
+                            // Reset the ball
+                            BallController.Instance.Position = BallSpawner.Instance.GetKickOffBallPosition();
+                            BallController.Instance.Velocity = Vector3.zero;
+                            BallController.Instance.Velocity = Vector3.zero;
+
+                            lastScorer = null;
+                        }
+
+                        //TODO: eventually reset stunned or busy states on each player
+                        TeamController.HomeTeam.SetPlayerSelected(TeamController.HomeTeam.GetPlayers()[playerPerTeam - 1]);
+                        TeamController.AwayTeam.SetPlayerSelected(TeamController.AwayTeam.GetPlayers()[playerPerTeam - 1]);
+
+                        
+                    }
+                    break;
+                case (int)MatchState.Goal:
+                    EnterGoalState();
+                    break;
+                case (int)MatchState.Replay:
+                    EnterReplayState();
                     break;
             }
 
             // Do something
             OnStateChanged?.Invoke(previousValue, newValue);
+        }
+
+        async void EnterGoalState()
+        {
+            // Do celebration or whatever you want here
+            await Task.Delay(3000);
+            // Move to replay state
+            SetMatchState(MatchState.Replay);
+        }
+
+        async void EnterReplayState()
+        {
+            // Do replay here
+            await Task.Delay(5000);
+            // Move to kick off state
+            SetMatchState(MatchState.KickOff);
         }
 
         // public void SetPlayingState()
@@ -164,10 +232,7 @@ namespace WLL_NGO.Netcode
             matchState.Value = (byte)newMatchState;
         }
 
-        // public bool IsPlaying()
-        // {
-        //     return matchState.Value == (byte)MatchState.Playing;
-        // }
+
 
 
     }

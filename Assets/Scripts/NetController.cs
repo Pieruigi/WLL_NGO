@@ -1,22 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
+using UnityEngine.Events;
 using WLL_NGO.Netcode;
 
 namespace WLL_NGO
 {
     public class NetController : MonoBehaviour
     {
+        public static UnityAction<TeamController> OnGoalScored;
+
         public static NetController HomeNetController;
         public static NetController AwayNetController;
 
         [SerializeField]
         bool home;
 
-        [SerializeField]
-        GameObject trigger;
-
+  
         //[SerializeField]
         //List<Transform> targets;
 
@@ -48,8 +50,8 @@ namespace WLL_NGO
             else
                 AwayNetController = this;
 
-            width = trigger.transform.lossyScale.z;
-            height = trigger.transform.lossyScale.y;
+            width = GetComponent<BoxCollider>().size.z;// trigger.transform.lossyScale.z;
+            height = GetComponent<BoxCollider>().size.y;// trigger.transform.lossyScale.y;
             Debug.Log($"Width:{width}");
             Debug.Log($"Height:{height}");
                 
@@ -81,7 +83,7 @@ namespace WLL_NGO
         {
             switch (newState)
             {
-                case (int)MatchState.Playing:
+                case (int)MatchState.KickOff:
                     triggered = false;
                     break;
             }
@@ -113,14 +115,23 @@ namespace WLL_NGO
         {
             if (NetworkManager.Singleton.IsClient) return;
 
+            Debug.Log($"TEST - Net trigger, is not client");
+
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned || MatchController.Instance.MatchState != MatchState.Playing) return;
 
-            if (other != BallController.Instance) return;
+            Debug.Log($"TEST - Net trigger, MatchController initialized");
 
-            if (!trigger)
+            if (other.gameObject != BallController.Instance.gameObject) return;
+
+            Debug.Log($"TEST - Net trigger, this is the ball");
+
+            if (!triggered)
             {
+
                 triggered = true;
-                MatchController.Instance.SetMatchState(MatchState.Goal);
+                var scorer = home ? TeamController.AwayTeam : TeamController.HomeTeam;
+                Debug.Log($"TEST - Net trigger, scorer:{scorer.gameObject.name}");
+                OnGoalScored?.Invoke(scorer);
             }
         }
 

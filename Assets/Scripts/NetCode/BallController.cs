@@ -100,6 +100,12 @@ namespace WLL_NGO.Netcode
             set { rb.velocity = value; }
         }
 
+        public Vector3 AngularVelocity
+        {
+            get { return rb.angularVelocity; }
+            set { rb.angularVelocity = value; }
+        }
+
         public bool Kinematic
         {
             get { return rb.isKinematic; }

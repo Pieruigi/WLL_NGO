@@ -39,6 +39,26 @@ namespace WLL_NGO
         {
             return kickOffAwayList[index];
         }
+
+        public List<Transform> GetHomeSpawnPoints()
+        {
+            return homeList;
+        }
+
+        public List<Transform> GetKickOffHomeSpawnPoints()
+        {
+            return kickOffHomeList;
+        }
+
+        public List<Transform> GetAwaySpawnPoints()
+        {
+            return awayList;
+        }
+
+        public List<Transform> GetKickOffAwaySpawnPoints()
+        {
+            return kickOffAwayList;
+        }
     }
 
 }

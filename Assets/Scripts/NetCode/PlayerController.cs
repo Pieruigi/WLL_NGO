@@ -7,6 +7,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.Events;
@@ -170,6 +171,13 @@ namespace WLL_NGO.Netcode
         public Vector3 Position
         {
             get { return rb.position; }
+            set { rb.position = value; }
+        }
+
+        public Quaternion Rotation
+        {
+            get { return rb.rotation; }
+            set{ rb.rotation = value; }
         }
 
         public Vector3 Velocity
@@ -1629,7 +1637,9 @@ namespace WLL_NGO.Netcode
         {
             if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
             {
-                goalkeeperAI.BounceTheBallBack();
+                bool save = false;
+                if(save)
+                    goalkeeperAI.BounceTheBallBack();
                 
             }
             else
@@ -1758,6 +1768,12 @@ namespace WLL_NGO.Netcode
         public bool IsTeammate(PlayerController otherPlayer)
         {
             return TeamController.GetPlayerTeam(this) == TeamController.GetPlayerTeam(otherPlayer);
+        }
+
+
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            GetComponent<NetworkTransform>().Teleport(position, rotation, Vector3.one);
         }
 
         public int GetState()
