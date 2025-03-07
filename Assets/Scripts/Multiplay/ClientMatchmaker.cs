@@ -54,13 +54,13 @@ namespace WLL_NGO.Multiplay
             switch (gameMode)
             {
                 case GameMode.Powered:
-                    ticketName = Constants.PoweredQueueName;
+                    ticketName = Constants.PoweredMatchQueueName;
                     break;
-                case GameMode.GoldenGoal:
-                    ticketName = Constants.GoldenGoalQueueName;
+                case GameMode.Fast:
+                    ticketName = Constants.FastMatchQueueName;
                     break;
                 case GameMode.Classic:
-                    ticketName = Constants.ClassicQueueName;
+                    ticketName = Constants.ClassicMatchQueueName;
                     break;
             }
             CreateTicket(ticketName);

@@ -13,13 +13,13 @@ namespace WLL_NGO
     /// </summary>
     public class Launcher : MonoBehaviour
     {
-       
+
         //public bool IsServer { get; private set; } = false;
-        
+
 
         private void Start()
         {
-            if(Utility.IsDedicatedServer())
+            if (Utility.IsDedicatedServer())
             {
                 // Server
                 SceneManager.LoadScene(Constants.ServerMainScene);
@@ -29,6 +29,10 @@ namespace WLL_NGO
                 // Client
                 SceneManager.LoadScene(Constants.ClientMainScene);
             }
+            
+
+
+    
         }
 
        

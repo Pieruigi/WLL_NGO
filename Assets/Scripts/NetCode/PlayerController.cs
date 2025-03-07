@@ -1647,7 +1647,7 @@ namespace WLL_NGO.Netcode
         {
             if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
             {
-                bool save = false;
+                bool save = UnityEngine.Random.Range(0,3) > 0;
                 if (save)
                     goalkeeperAI.BounceTheBallBack();
 

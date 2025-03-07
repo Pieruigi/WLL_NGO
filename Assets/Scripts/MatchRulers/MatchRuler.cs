@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Lumin;
 using WLL_NGO.Netcode;
 
@@ -13,6 +14,10 @@ namespace WLL_NGO
     {
 
         NetworkVariable<float> timer = new NetworkVariable<float>(0);
+        public float Timer
+        {
+            get { return timer.Value; }
+        }
 
 
         bool completed = false;
@@ -59,6 +64,8 @@ namespace WLL_NGO
         {
             // TODO: you can chech here if the DoubleScore super power is active
             scorer.Score += 1;
+
+           
         }
 
         bool IsMatchCompleted()
