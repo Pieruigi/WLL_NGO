@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,12 +8,35 @@ namespace WLL_NGO.AI
 {
     public class FieldBlock : MonoBehaviour
     {
+        //[SerializeField]
+        bool defenceBlock, middleBlock, attackBlock, leftSideBlock, centerBlock, rightSideBlock;
+
+        public bool CenterBlock => centerBlock;
+        
+        public bool HomeLeftSideBlock => leftSideBlock;
+
+        public bool HomeRightSideBlock => rightSideBlock;
+
+        public bool AwayLeftSideBlock => rightSideBlock;
+        
+        public bool AwayRightSideBlock => leftSideBlock;
+
+        public bool HomeDefenceBlock => defenceBlock;
+
+        public bool MiddleFieldBlock => middleBlock;
+
+        public bool HomeAttackBlock => attackBlock;
+
+        public bool AwayDefenceBlock => attackBlock;
+
+        public bool AwayAttackBlock => defenceBlock;
+
         public static UnityAction<FieldBlock, PlayerAI> OnPlayerEnter;
         public static UnityAction<FieldBlock, PlayerAI> OnPlayerExit;
 
         private void OnTriggerEnter(Collider other)
         {
-            if(other.CompareTag(Tags.Player))
+            if (other.CompareTag(Tags.Player))
                 OnPlayerEnter?.Invoke(this, other.GetComponent<PlayerAI>());
         }
 
@@ -20,6 +44,36 @@ namespace WLL_NGO.AI
         {
             if (other.CompareTag(Tags.Player))
                 OnPlayerExit?.Invoke(this, other.GetComponent<PlayerAI>());
+        }
+
+        public void SetDefenceBlock()
+        {
+            defenceBlock = true;
+        }
+
+        public void SetMiddleBlock()
+        {
+            middleBlock = true;
+        }
+
+        public void SetAttackBlock()
+        {
+            attackBlock = true;
+        }
+
+        public void SetLeftSideBlock()
+        {
+            leftSideBlock = true;
+        }
+
+        public void SetCenterBlock()
+        {
+            centerBlock = true;
+        }
+
+        public void SetRightSideBlock()
+        {
+            rightSideBlock = true;
         }
     }
 

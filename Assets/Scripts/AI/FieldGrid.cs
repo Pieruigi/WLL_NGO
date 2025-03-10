@@ -1,7 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.Collections;
 using UnityEngine;
 
 namespace WLL_NGO.AI
@@ -24,10 +26,24 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         int colCount = 9;
+        
 
         [SerializeField]
         Collider centerBlock;
+        
+        [SerializeField]
+        int defenceColumnCount;
 
+        [SerializeField]
+        int middleColumnStart, middleColumnCount;
+        
+        [SerializeField]
+        int sideRowCount, centerRowCount;
+ 
+ 
+        int attackColumnCount;
+
+        
         Dictionary<PlayerAI, PlayerData> playerDictionary = new Dictionary<PlayerAI, PlayerData>();
 
         protected override void Awake()
@@ -36,9 +52,14 @@ namespace WLL_NGO.AI
             // Check rows * cols
             if (rowCount * colCount != blocks.Count)
                 Debug.LogError("TeamFieldGrid - rows * cols != blocks.Count");
-            
-            
 
+            attackColumnCount = defenceColumnCount;
+            
+            InitDefenceBlocks();
+            InitMiddleBlocks();
+            InitAttackBlocks();
+            InitSideBlocks();
+            InitCenterBlocks();
         }
 
         
@@ -85,6 +106,75 @@ namespace WLL_NGO.AI
             Debug.Log($"PlayerData - player:{player}, current:{playerDictionary[player].currentBlock}, prev:{playerDictionary[player].previousBlock}");
         }
 
+        void InitDefenceBlocks()
+        {
+            var defenceColumnStart = 0;
+            for (int i = 0; i < rowCount; i++) // Rows
+            {
+                int start = defenceColumnStart + colCount * i;
+                int stop = start + defenceColumnCount;
+                for (int j = start; j < stop; j++)
+                    blocks[j].SetDefenceBlock();
+             
+            }
+        }
+
+        void InitMiddleBlocks()
+        {
+
+            for (int i = 0; i < rowCount; i++) // Rows
+            {
+                int start = middleColumnStart + colCount * i;
+                int stop = start + middleColumnCount;
+                for (int j = start; j < stop; j++)
+                    blocks[j].SetMiddleBlock();
+              
+            }
+        }
+
+        void InitAttackBlocks()
+        {
+            var attackColumnStart = colCount - attackColumnCount;
+            for (int i = 0; i < rowCount; i++) // Rows
+            {
+                int start = attackColumnStart + colCount * i;
+                int stop = start + attackColumnCount;
+                for (int j = start; j < stop; j++)
+                    blocks[j].SetAttackBlock();
+            }
+        }
+
+        void InitSideBlocks()
+        {
+
+            for (int i = 0; i < sideRowCount; i++) // Rows
+            {
+                int start = colCount * i;
+                int stop = start + colCount;
+                for (int j = start; j < stop; j++)
+                {
+                    blocks[j].SetLeftSideBlock();
+                    blocks[(rowCount - 1 - i) * colCount + j % colCount].SetRightSideBlock(); // Other side
+                }
+            }
+
+        }
+
+        void InitCenterBlocks()
+        {
+            int offset = (rowCount - centerRowCount) / 2 * colCount;
+
+            for (int i = 0; i < centerRowCount; i++) // Rows
+            {
+                int start = offset + colCount * i;
+                int stop = start + colCount;
+                for (int j = start; j < stop; j++)
+                    blocks[j].SetCenterBlock();
+            }
+
+         
+        }
+
         public Collider Move(PlayerAI player, int forward, int right)
         {
             bool home = player.TeamAI == TeamAI.HomeTeamAI;
@@ -92,10 +182,7 @@ namespace WLL_NGO.AI
             return null;
         }
 
-        //public Collider GetCollider(Vector3 position)
-        //{
-
-        //}
+  
 
         public Vector3 GetRandomPositionInsideBlock(int blockId)
         {
@@ -105,62 +192,133 @@ namespace WLL_NGO.AI
             return pos;
         }
 
-        public int ForwardBlocksLeft(PlayerAI player)
+        public List<FieldBlock> GetLeftDefenceBlockAll(TeamAI team)
         {
-            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
-            int row = currId / colCount;
-            int col = currId % colCount;
-
-            bool home = player.TeamAI == TeamAI.HomeTeamAI;
-            if (home)
-                return colCount - 1 - col;
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeDefenceBlock && b.HomeLeftSideBlock);
             else
-                return col;
-            
+                return blocks.FindAll(b => b.AwayDefenceBlock && b.AwayLeftSideBlock);
         }
 
-        public int BackwardBlocksLeft(PlayerAI player)
+        public List<FieldBlock> GetLeftMiddleFieldBlockAll(TeamAI team)
         {
-            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
-            int row = currId / colCount;
-            int col = currId % colCount;
-
-            bool home = player.TeamAI == TeamAI.HomeTeamAI;
-            if (!home)
-                return colCount - 1 - col;
+            if (team.Home)
+                return blocks.FindAll(b => b.MiddleFieldBlock && b.HomeLeftSideBlock);
             else
-                return col;
+                return blocks.FindAll(b => b.MiddleFieldBlock && b.AwayLeftSideBlock);
+        }
 
+        public List<FieldBlock> GetLeftAttackBlockAll(TeamAI team)
+        {
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeAttackBlock && b.HomeLeftSideBlock);
+            else
+                return blocks.FindAll(b => b.AwayAttackBlock && b.AwayLeftSideBlock);
         }
 
 
-        public int RightBlocksLeft(PlayerAI player)
+        public List<FieldBlock> GetCenterDefenceBlockAll(TeamAI team)
         {
-            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
-            int row = currId / colCount;
-            int col = currId % colCount;
-
-            bool home = player.TeamAI == TeamAI.HomeTeamAI;
-            if (home)
-                return rowCount - 1 - row;
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeDefenceBlock && b.CenterBlock);
             else
-                return row;
-
+                return blocks.FindAll(b => b.AwayDefenceBlock && b.CenterBlock);
         }
 
-        public int LeftBlocksLeft(PlayerAI player)
+        public List<FieldBlock> GetCenterMiddleFieldBlockAll()
         {
-            int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
-            int row = currId / colCount;
-            int col = currId % colCount;
-
-            bool home = player.TeamAI == TeamAI.HomeTeamAI;
-            if (!home)
-                return rowCount - 1 - row;
-            else
-                return row;
-
+            return blocks.FindAll(b => b.MiddleFieldBlock && b.CenterBlock);
         }
+
+        public List<FieldBlock> GetCenterAttackBlockAll(TeamAI team)
+        {
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeAttackBlock && b.CenterBlock);
+            else
+                return blocks.FindAll(b => b.AwayAttackBlock && b.CenterBlock);
+        }
+
+        public List<FieldBlock> GetRightDefenceBlockAll(TeamAI team)
+        {
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeDefenceBlock && b.HomeRightSideBlock);
+            else
+                return blocks.FindAll(b => b.AwayDefenceBlock && b.AwayRightSideBlock);
+        }
+
+        public List<FieldBlock> GetRightMiddleFieldBlockAll(TeamAI team)
+        {
+            if (team.Home)
+                return blocks.FindAll(b => b.MiddleFieldBlock && b.HomeRightSideBlock);
+            else
+                return blocks.FindAll(b => b.MiddleFieldBlock && b.AwayRightSideBlock);
+        }
+
+        public List<FieldBlock> GetRightAttackBlockAll(TeamAI team)
+        {
+            if (team.Home)
+                return blocks.FindAll(b => b.HomeAttackBlock && b.HomeRightSideBlock);
+            else
+                return blocks.FindAll(b => b.AwayAttackBlock && b.AwayRightSideBlock);
+        }
+
+
+        // public int ForwardBlocksLeft(PlayerAI player)
+        // {
+        //     int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+        //     int row = currId / colCount;
+        //     int col = currId % colCount;
+
+        //     bool home = player.TeamAI == TeamAI.HomeTeamAI;
+        //     if (home)
+        //         return colCount - 1 - col;
+        //     else
+        //         return col;
+
+        // }
+
+        // public int BackwardBlocksLeft(PlayerAI player)
+        // {
+        //     int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+        //     int row = currId / colCount;
+        //     int col = currId % colCount;
+
+        //     bool home = player.TeamAI == TeamAI.HomeTeamAI;
+        //     if (!home)
+        //         return colCount - 1 - col;
+        //     else
+        //         return col;
+
+        // }
+
+
+        // public int RightBlocksLeft(PlayerAI player)
+        // {
+        //     int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+        //     int row = currId / colCount;
+        //     int col = currId % colCount;
+
+        //     bool home = player.TeamAI == TeamAI.HomeTeamAI;
+        //     if (home)
+        //         return rowCount - 1 - row;
+        //     else
+        //         return row;
+
+        // }
+
+        // public int LeftBlocksLeft(PlayerAI player)
+        // {
+        //     int currId = blocks.IndexOf(playerDictionary[player].currentBlock);
+        //     int row = currId / colCount;
+        //     int col = currId % colCount;
+
+        //     bool home = player.TeamAI == TeamAI.HomeTeamAI;
+        //     if (!home)
+        //         return rowCount - 1 - row;
+        //     else
+        //         return row;
+
+        // }
     }
 
 }

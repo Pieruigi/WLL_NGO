@@ -19,6 +19,10 @@ namespace WLL_NGO.AI
         public static TeamAI AwayTeamAI { get; private set; }
 
         [SerializeField] bool home;
+        public bool Home
+        {
+            get{ return home; }
+        }
         
         [SerializeField] List<PlayerAI> players;
         public IList<PlayerAI> Players
