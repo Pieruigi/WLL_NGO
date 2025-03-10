@@ -177,13 +177,13 @@ namespace WLL_NGO.AI
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T">The type of action ( must be of type ActionAI )</typeparam>
-        /// <param name="owner">The logic entity that is creating the current action ( for example a team or a specific player in the field )</param>
+        /// <typeparam name="T">Action type ( must be of type ActionAI )</typeparam>
+        /// <param name="owner">Who's creating the current action ( for example a team or a specific player in the field )</param>
         /// <param name="previousAction">The parent action</param>
-        /// <param name="restartOnNoChildren">True if you want to player the Activate() method again once all the children have completed</param>
+        /// <param name="restartOnNoChildren">True if you want to call the Activate() method once again when all childrens have completed</param>
         /// <param name="updateFunction">Does the action run in Update, LateUpdate or FixedUpdate?</param>
         /// <param name="parameters">Initialization parameters</param>
-        /// <param name="conditionFunction">A delegate function returning a bool to check action condition ( on false the action is interrupted )</param>
+        /// <param name="conditionFunction">A delegate function to check on each update the action conditions to decide whether the action must be interrupted or not.</param>
         /// <returns>The action just created</returns>
         public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.Update, object[] parameters = null, Func<bool> conditionFunction = null) where T : ActionAI
         {

@@ -1647,7 +1647,7 @@ namespace WLL_NGO.Netcode
         {
             if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
             {
-                bool save = UnityEngine.Random.Range(0,3) > 0;
+                bool save = false;// UnityEngine.Random.Range(0,3) > 0;
                 if (save)
                     goalkeeperAI.BounceTheBallBack();
 
@@ -1781,9 +1781,14 @@ namespace WLL_NGO.Netcode
         }
 
 
-        public void Teleport(Vector3 position, Quaternion rotation)
+      
+        public void ResetToKickOff(Transform t)
         {
-            GetComponent<NetworkTransform>().Teleport(position, rotation, Vector3.one);
+            rb.isKinematic = true;
+            Velocity = Vector3.zero;
+            Position = t.position;
+            Rotation = t.rotation;
+            rb.isKinematic = false;
         }
 
         public int GetState()

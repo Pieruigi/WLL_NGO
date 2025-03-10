@@ -159,7 +159,7 @@ namespace WLL_NGO.AI
         public bool HasBall()
         {
 #if TEST_AI
-            return hasBall;
+            return players.Exists(p=>p.HasBall);
 #else 
             return false;
 #endif

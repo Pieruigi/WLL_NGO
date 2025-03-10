@@ -748,7 +748,14 @@ namespace WLL_NGO.Netcode
             return true;
         }
 
-
+        public void ResetToKickOff()
+        {
+            rb.isKinematic = true;
+            Position = BallSpawner.Instance.GetKickOffBallPosition();
+            Velocity = Vector3.zero;
+            Velocity = Vector3.zero;
+            rb.isKinematic = false;
+        }
 
         #endregion
 

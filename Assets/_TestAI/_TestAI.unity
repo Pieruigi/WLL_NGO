@@ -318,8 +318,8 @@ MonoBehaviour:
   ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 173766175}
-  hasBall: 1
+  netController: {fileID: 0}
+  hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
 --- !u!4 &51784147
@@ -6503,7 +6503,7 @@ MonoBehaviour:
   ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 667974768}
+  netController: {fileID: 0}
   hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
