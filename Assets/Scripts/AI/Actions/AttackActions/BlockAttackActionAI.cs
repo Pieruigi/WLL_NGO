@@ -20,7 +20,7 @@ namespace WLL_NGO.AI
 
         int maxAttackingPlayers = 2; // Depending on formation and strategy
 
-        Dictionary<PlayerAI, FieldBlock> targets = new Dictionary<PlayerAI, FieldBlock>();
+        Dictionary<PlayerAI, List<PlayerActionAI>> actions = new Dictionary<PlayerAI, List<PlayerActionAI>>();
 
 
         protected override void Activate()
@@ -31,7 +31,7 @@ namespace WLL_NGO.AI
 
             // Init dictionary
             foreach (var player in TeamAI.Players)
-                targets.Add(player, null);
+                actions.Add(player, new List<PlayerActionAI>());
 
             maxAttackingPlayers = TeamAI.Formation == 0 ? 1 : 2;
             // If the team is loosing and the game is almost finished then we can move all the player in attack
@@ -67,7 +67,7 @@ namespace WLL_NGO.AI
 
             // First of all we must check if the team is unbalanced (someone should keep a defensive position)
             // Give me the last defending players
-            List<PlayerAI> lastDefendingPlayers = GetTheLastDefendingPlayers();
+            List<PlayerAI> lastDefendingPlayers = GetTheLastDefendingPlayers(ballBlock);
             int count = TeamAI.Players[0].HasBall ? TeamAI.Players.Count - maxAttackingPlayers : TeamAI.Players.Count - maxAttackingPlayers - 1;
 
             Debug.Log($"TEST - We need {count} players behind, we have {lastDefendingPlayers.Count}");
@@ -78,7 +78,7 @@ namespace WLL_NGO.AI
                 switch (TeamAI.Formation)
                 {
                     case 0:
-                        BackToSideBlock();
+                        BackToSideBlock(count-lastDefendingPlayers.Count, ballBlock);
                         break;
                     case 1:
                         //BackToCenterBlock();
@@ -126,11 +126,10 @@ namespace WLL_NGO.AI
         }
 
 
-        List<PlayerAI> GetTheLastDefendingPlayers()
+        List<PlayerAI> GetTheLastDefendingPlayers(FieldBlock ballBlock)
         {
-            float x = 0;
             List<PlayerAI> lastPlayers = new List<PlayerAI>();
-            FieldBlock lastBlock = null;
+            //FieldBlock lastBlock = null;
 
             for (int i = 0; i < TeamAI.Players.Count; i++)
             {
@@ -141,42 +140,34 @@ namespace WLL_NGO.AI
 
                 var block = FieldGrid.Instance.GetTheClosestBlock(player.Position);
 
-                if (block.IsAttack(TeamAI.Home)) // Only defence and middle field are allowed
-                    continue;
-
-                if (lastBlock == null)
+                if (!block.IsAttack(TeamAI.Home) && (block.IsBehind(ballBlock, TeamAI.Home) || block.IsInLine(ballBlock, TeamAI.Home)))
                 {
-                    lastBlock = block;
                     lastPlayers.Add(player);
                 }
-                else
+                else // Ball is in attack
                 {
-                    if ((lastBlock.IsDefence(TeamAI.Home) && block.IsDefence(TeamAI.Home)) || (lastBlock.IsMiddleField() && block.IsMiddleField()))
+                    if (block.IsBehind(ballBlock, TeamAI.Home))
                     {
-                        // Add this player to the others
                         lastPlayers.Add(player);
                     }
-                    else // The last block is different
-                    {
-                        // If this block is a defensive one then the old one is a middle field for sure, so we must reset
-                        if (block.IsDefence(TeamAI.Home))
-                        {
-                            lastPlayers.Clear();
-                            lastPlayers.Add(player);
-                            lastBlock = block;
-                        }
-
-                    }
                 }
+
             }
 
             return lastPlayers;
         }
 
-        void BackToSideBlock()
+        void BackToSideBlock(int neededPlayers, FieldBlock ballBlock)
         {
+            var goingBack = actions.Where(p => p.Value.Exists(a => a.GetType() == typeof(ReachDestinationActionAI) &&
+                                                                (!ballBlock.IsAttack(TeamAI.Home) && !FieldGrid.Instance.GetTheClosestBlock((a.Parameters as ReachDestinationActionParams).Destination).IsAhead(ballBlock, TeamAI.Home) ||
+                                                                 ballBlock.IsAttack(TeamAI.Home) && FieldGrid.Instance.GetTheClosestBlock((a.Parameters as ReachDestinationActionParams).Destination).IsBehind(ballBlock, TeamAI.Home))));
+            
             
         }
+
+        
+
 
     }
 

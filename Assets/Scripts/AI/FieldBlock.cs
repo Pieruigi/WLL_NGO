@@ -90,6 +90,22 @@ namespace WLL_NGO.AI
         {
             return home ? HomeAttackBlock : AwayAttackBlock;
         }
+
+        public bool IsBehind(FieldBlock other, bool home)
+        {
+            return (IsDefence(home) && !other.IsDefence(home)) || (IsMiddleField() && other.IsAttack(home));
+        }
+
+        public bool IsAhead(FieldBlock other, bool home)
+        {
+            return (IsAttack(home) && !other.IsAttack(home)) || (IsMiddleField() && other.IsDefence(home));
+        }
+
+        public bool IsInLine(FieldBlock other, bool home)
+        {
+            return (IsDefence(home) && other.IsDefence(home)) || (IsMiddleField() && other.IsMiddleField()) || (IsAttack(home) && other.IsAttack(home));
+        }
+
     }
 
 }

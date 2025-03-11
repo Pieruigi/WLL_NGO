@@ -39,6 +39,12 @@ namespace WLL_NGO.AI
         bool active = false;
         bool restartOnNoChildren = false;
 
+        ActionParams parameters;
+        public ActionParams Parameters
+        {
+            get{ return parameters; }
+        }
+
         Func<bool> ConditionFunction;
 
         protected float DeltaTime
@@ -263,6 +269,7 @@ namespace WLL_NGO.AI
 
         public virtual void Initialize(ActionParams parameters = default)
         {
+            this.parameters = parameters;
             initialized = true;
         }
 
