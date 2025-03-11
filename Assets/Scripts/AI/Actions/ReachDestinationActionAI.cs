@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace WLL_NGO.AI
@@ -13,6 +15,7 @@ namespace WLL_NGO.AI
         bool reached = false;
 
         float tollerance = .5f;
+                
         
         protected override void Activate()
         {
@@ -29,30 +32,60 @@ namespace WLL_NGO.AI
                 return;
 
 #if TEST_AI
-            //timer -= Time.deltaTime;
-            // Reach destination
-            Vector3 dir = destination - PlayerAI.transform.position;
-            dir.y = 0;
-            if(dir.magnitude < tollerance)
-                reached = true;
-            else
-                PlayerAI.transform.position += dir.normalized*PlayerAI.Speed*DeltaTime;
+            // Trying to simulate the joystick behaviour as much as possible
+            var dir = Vector3.ProjectOnPlane(destination - PlayerAI.transform.position, Vector3.up);
+            if (dir.magnitude > 0.01f)
+            {
+                // Rotate 
+                Quaternion targetRotation = Quaternion.LookRotation(dir.normalized);
+                PlayerAI.transform.rotation = Quaternion.RotateTowards(PlayerAI.transform.rotation, targetRotation, PlayerAI.RotationSpeed * Time.deltaTime);
+
+                // Move along fwd
+                PlayerAI.transform.position += PlayerAI.transform.forward * Time.deltaTime * PlayerAI.Speed;
+
+            }
+
+#else
+            // Using input handler
 #endif
         }
 
         public override bool IsCompleted(out bool succeeded)
         {
-            succeeded = true;
-            return reached;
+            var dir = Vector3.ProjectOnPlane(destination - PlayerAI.transform.position, Vector3.up);
+            if (dir.magnitude < tollerance)
+            {
+                succeeded = true;
+                return true;
+            }
+            else
+            {
+                succeeded = false;
+                return false;
+            }
+            
         }
 
+        /// <summary>
+        /// float: destination
+        /// float: tollerance
+        /// </summary>
+        /// <param name="parameters"></param>
         public override void Initialize(object[] parameters = null)
         {
             base.Initialize(parameters);
             if (parameters == null)
+            {
+                OnActionCompleted?.Invoke(this, false);
                 return;
+            }
+                
+            // Destination
             destination = (Vector3)parameters[0];
             destination.y = 0;
+            // Tollerance
+            tollerance = .75f;
+
         }
 
     }

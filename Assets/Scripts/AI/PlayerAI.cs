@@ -90,6 +90,16 @@ namespace WLL_NGO.AI
             }
         }
 
+        public float RotationSpeed
+        {
+            get
+            {
+#if TEST_AI
+                return 480f;
+#endif
+            }
+        }
+
         private void Awake()
         {
 #if !TEST_AI
