@@ -20,16 +20,17 @@ namespace WLL_NGO
 
     public enum StunDetail : byte { Front, Back }
 
-    public enum ButtonState: byte { None, Pressed, Held, Released }
+    public enum ButtonState : byte { None, Pressed, Held, Released }
 
     public enum MatchState : byte { NotReady, StartingMatch, Playing, KickOff, Goal, Replay, End }
 
-    public enum  ShotTiming : byte { Bad, Normal, Good, Perfect }
-    
+    public enum ShotTiming : byte { Bad, Normal, Good, Perfect }
+
     public enum DiveType : byte { Left, Center, Right }
 
     public enum DiveDetail : byte { Low, Middle, High }
 
     public enum PlayerRole : byte { GK, DF, MD, AT }
+        
 
 }

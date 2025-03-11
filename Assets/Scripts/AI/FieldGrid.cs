@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace WLL_NGO.AI
 {
-    public class FieldGrid: Singleton<FieldGrid>
+    public class FieldGrid : Singleton<FieldGrid>
     {
 
         class PlayerData
@@ -26,24 +26,24 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         int colCount = 9;
-        
+
 
         [SerializeField]
         Collider centerBlock;
-        
+
         [SerializeField]
         int defenceColumnCount;
 
         [SerializeField]
         int middleColumnStart, middleColumnCount;
-        
+
         [SerializeField]
         int sideRowCount, centerRowCount;
- 
- 
+
+
         int attackColumnCount;
 
-        
+
         Dictionary<PlayerAI, PlayerData> playerDictionary = new Dictionary<PlayerAI, PlayerData>();
 
         protected override void Awake()
@@ -54,7 +54,7 @@ namespace WLL_NGO.AI
                 Debug.LogError("TeamFieldGrid - rows * cols != blocks.Count");
 
             attackColumnCount = defenceColumnCount;
-            
+
             InitDefenceBlocks();
             InitMiddleBlocks();
             InitAttackBlocks();
@@ -62,7 +62,7 @@ namespace WLL_NGO.AI
             InitCenterBlocks();
         }
 
-        
+
 
         private void OnEnable()
         {
@@ -70,7 +70,7 @@ namespace WLL_NGO.AI
             FieldBlock.OnPlayerExit += HandleOnPlayerExit;
         }
 
-        
+
 
         private void OnDisable()
         {
@@ -98,7 +98,7 @@ namespace WLL_NGO.AI
 
         private void HandleOnPlayerEnter(FieldBlock block, PlayerAI player)
         {
-            if(!playerDictionary.ContainsKey(player))
+            if (!playerDictionary.ContainsKey(player))
                 playerDictionary.Add(player, new PlayerData());
 
             playerDictionary[player].previousBlock = playerDictionary[player].currentBlock;
@@ -115,7 +115,7 @@ namespace WLL_NGO.AI
                 int stop = start + defenceColumnCount;
                 for (int j = start; j < stop; j++)
                     blocks[j].SetDefenceBlock();
-             
+
             }
         }
 
@@ -128,7 +128,7 @@ namespace WLL_NGO.AI
                 int stop = start + middleColumnCount;
                 for (int j = start; j < stop; j++)
                     blocks[j].SetMiddleBlock();
-              
+
             }
         }
 
@@ -172,7 +172,7 @@ namespace WLL_NGO.AI
                     blocks[j].SetCenterBlock();
             }
 
-         
+
         }
 
         public Collider Move(PlayerAI player, int forward, int right)
@@ -182,7 +182,7 @@ namespace WLL_NGO.AI
             return null;
         }
 
-  
+
 
         public Vector3 GetRandomPositionInsideBlock(int blockId)
         {
@@ -262,6 +262,22 @@ namespace WLL_NGO.AI
                 return blocks.FindAll(b => b.AwayAttackBlock && b.AwayRightSideBlock);
         }
 
+        public FieldBlock GetTheClosestBlock(Vector3 position)
+        {
+            float minDist = 0;
+            FieldBlock closest = null;
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                float dist = Vector3.Distance(blocks[i].transform.position, position);
+                if (!closest || minDist > dist)
+                {
+                    closest = blocks[i];
+                    minDist = dist;
+                }
+            }
+
+            return closest;
+        }
 
         // public int ForwardBlocksLeft(PlayerAI player)
         // {

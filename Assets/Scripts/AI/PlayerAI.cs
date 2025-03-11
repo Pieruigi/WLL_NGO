@@ -1,4 +1,4 @@
-#define TEST_AI
+//#define TEST_AI
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,14 +15,23 @@ namespace WLL_NGO.AI
 #if TEST_AI
         [SerializeField]
         private PlayerRole role;
-
-#else
-        PlayerController controller;
-#endif
         public PlayerRole Role
         {
             get { return role; }
         }
+
+#else
+        PlayerController controller;
+        public PlayerController Controller
+        {
+            get { return controller; }
+        }
+        public PlayerRole Role
+        {
+            get { return controller.Role; }
+        }
+#endif
+
 
 #if TEST_AI
         [SerializeField]
@@ -100,6 +109,11 @@ namespace WLL_NGO.AI
             }
         }
 
+
+        float ReactionTime { get; set; } = 0.5f;
+
+        DateTime LastReactionTime;
+                
         private void Awake()
         {
 #if !TEST_AI
@@ -116,15 +130,26 @@ namespace WLL_NGO.AI
                 TestBallController.Instance.transform.position = transform.position + transform.forward * 1f + Vector3.up * .5f;
             }
 #endif
+            
 
             if (doubleGuard)
             {
                 doubleGuardElapsed += Time.deltaTime;
-                if(doubleGuardElapsed > doubleGuardTime || !targetPlayer.hasBall)
+                if (doubleGuardElapsed > doubleGuardTime || !targetPlayer.hasBall)
                     StopDoubleGuard();
             }
 
 
+        }
+
+        public bool CanReact()
+        {
+            return (DateTime.Now - LastReactionTime).TotalSeconds > ReactionTime;
+        }
+
+        public void SetLastReactionTimeToNow()
+        {
+            LastReactionTime = DateTime.Now;
         }
 
         public void StartDoubleGuard(PlayerAI player)
@@ -133,7 +158,7 @@ namespace WLL_NGO.AI
             savedTarget = null; // You should release this target because is no longer in your zone
             targetPlayer = player;
             doubleGuard = true;
-            
+
         }
 
         void StopDoubleGuard()

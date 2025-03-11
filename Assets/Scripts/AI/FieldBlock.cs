@@ -12,13 +12,13 @@ namespace WLL_NGO.AI
         bool defenceBlock, middleBlock, attackBlock, leftSideBlock, centerBlock, rightSideBlock;
 
         public bool CenterBlock => centerBlock;
-        
+
         public bool HomeLeftSideBlock => leftSideBlock;
 
         public bool HomeRightSideBlock => rightSideBlock;
 
         public bool AwayLeftSideBlock => rightSideBlock;
-        
+
         public bool AwayRightSideBlock => leftSideBlock;
 
         public bool HomeDefenceBlock => defenceBlock;
@@ -74,6 +74,21 @@ namespace WLL_NGO.AI
         public void SetRightSideBlock()
         {
             rightSideBlock = true;
+        }
+
+        public bool IsDefence(bool home)
+        {
+            return home ? HomeDefenceBlock : AwayDefenceBlock;
+        }
+
+        public bool IsMiddleField()
+        {
+            return MiddleFieldBlock;
+        }
+
+        public bool IsAttack(bool home)
+        {
+            return home ? HomeAttackBlock : AwayAttackBlock;
         }
     }
 

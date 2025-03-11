@@ -87,7 +87,11 @@ namespace WLL_NGO.AI
         /// 0: 2-1
         /// 1: 1-2
         /// </summary>
-        int formationId = 0;
+        int formation = 0;
+        public int Formation
+        {
+            get{ return formation; }
+        }
 
         private void Awake()
         {
@@ -104,10 +108,10 @@ namespace WLL_NGO.AI
             {
                 player.TeamAI = this;
             }
-            
+
 #endif
-            
-            
+
+
         }
 
         
