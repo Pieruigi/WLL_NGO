@@ -39,20 +39,20 @@ namespace WLL_NGO.AI
             return;
 
             // Set an action for each player in the team
-            foreach (var player in TeamAI.Players)
-            {
+            // foreach (var player in TeamAI.Players)
+            // {
 
-                if (player != TeamAI.Players[1]) // Testing purpose 
-                    continue;
+            //     if (player != TeamAI.Players[1]) // Testing purpose 
+            //         continue;
 
-                Debug.Log("Creating player action MoveToDirection()");
-                dfTargetId = 0;
-                dfAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, null, () => { return CheckConditions(player); });
+            //     Debug.Log("Creating player action MoveToDirection()");
+            //     dfTargetId = 0;
+            //     dfAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, null, () => { return CheckConditions(player); });
 
-                dfAction.OnActionCompleted += HandleOnActionCompleted;
-                dfAction.OnActionInterrupted += HandleOnActionInterrupted;
-                dfAction.Initialize(new object[] { FieldGrid.Instance.GetRandomPositionInsideBlock(dfBlocks[dfTargetId]) });
-            }
+            //     dfAction.OnActionCompleted += HandleOnActionCompleted;
+            //     dfAction.OnActionInterrupted += HandleOnActionInterrupted;
+            //     dfAction.Initialize(new object[] { FieldGrid.Instance.GetRandomPositionInsideBlock(dfBlocks[dfTargetId]) });
+            // }
         }
 
         protected override void Loop()
@@ -108,14 +108,14 @@ namespace WLL_NGO.AI
         private void HandleOnActionCompleted(ActionAI action, bool succeeded)
         {
 
-            dfTargetId++;
-            if (dfTargetId >= dfBlocks.Length)
-                dfTargetId = 0;
-            PlayerAI player = ((PlayerActionAI)action).PlayerAI;
-            dfAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, null, () => { return CheckConditions(player); });
-            dfAction.OnActionCompleted += HandleOnActionCompleted;
-            dfAction.OnActionInterrupted += HandleOnActionInterrupted;
-            dfAction.Initialize(new object[] { FieldGrid.Instance.GetRandomPositionInsideBlock(dfBlocks[dfTargetId]) });
+            // dfTargetId++;
+            // if (dfTargetId >= dfBlocks.Length)
+            //     dfTargetId = 0;
+            // PlayerAI player = ((PlayerActionAI)action).PlayerAI;
+            // dfAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, null, () => { return CheckConditions(player); });
+            // dfAction.OnActionCompleted += HandleOnActionCompleted;
+            // dfAction.OnActionInterrupted += HandleOnActionInterrupted;
+            // dfAction.Initialize(new object[] { FieldGrid.Instance.GetRandomPositionInsideBlock(dfBlocks[dfTargetId]) });
         }
 
         bool CheckConditions(PlayerAI player)

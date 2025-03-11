@@ -15,8 +15,7 @@ namespace WLL_NGO.AI
         bool reached = false;
 
         float tollerance = .5f;
-                
-        
+
         protected override void Activate()
         {
             timer = 5;
@@ -63,7 +62,7 @@ namespace WLL_NGO.AI
                 succeeded = false;
                 return false;
             }
-            
+
         }
 
         /// <summary>
@@ -71,23 +70,48 @@ namespace WLL_NGO.AI
         /// float: tollerance
         /// </summary>
         /// <param name="parameters"></param>
-        public override void Initialize(object[] parameters = null)
+        public override void Initialize(ActionParams parameters = default)
         {
             base.Initialize(parameters);
-            if (parameters == null)
-            {
-                OnActionCompleted?.Invoke(this, false);
-                return;
-            }
-                
+            // if (parameters == null)
+            // {
+            //     OnActionCompleted?.Invoke(this, false);
+            //     return;
+            // }
+            // Cast params
+            ReachDestinationActionParams p = (ReachDestinationActionParams)parameters;
+
             // Destination
-            destination = (Vector3)parameters[0];
+            destination = (Vector3)p.Destination;
             destination.y = 0;
             // Tollerance
-            tollerance = .75f;
+            tollerance = p.Tollerance;
 
         }
 
+        // public override void Initialize(object[] parameters = null)
+        // {
+        //     base.Initialize(parameters);
+        //     if (parameters == null)
+        //     {
+        //         OnActionCompleted?.Invoke(this, false);
+        //         return;
+        //     }
+
+        //     // Destination
+        //     destination = (Vector3)parameters[0];
+        //     destination.y = 0;
+        //     // Tollerance
+        //     tollerance = .75f;
+
+        // }
+
+    }
+
+    public class ReachDestinationActionParams : ActionParams
+    {
+        public Vector3 Destination;
+        public float Tollerance = .75f;
     }
 
 }

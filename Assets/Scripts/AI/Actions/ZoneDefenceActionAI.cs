@@ -126,20 +126,20 @@ namespace WLL_NGO.AI
                     if (!moveActions[player])
                     {
                         
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new object[] { pos });
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = pos });
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
-                    moveActions[player].Initialize(new object[] { pos });
+                    moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = pos });
                 }
                 else // We don't have any target yet 
                 {
                     
                     if (!moveActions[player])
                     {
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new object[] { trigger.DefaultPosition }); ;
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = trigger.DefaultPosition }); ;
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
-                    moveActions[player].Initialize(new object[] { trigger.DefaultPosition });
+                    moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = trigger.DefaultPosition });
                 }
             }
         }

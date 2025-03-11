@@ -56,7 +56,7 @@ namespace WLL_NGO.AI
 
                 }
                 Vector3 pos = TeamAI.BallController.Position;
-                moveActions[closest].Initialize(new object[] { pos });
+                moveActions[closest].Initialize(new ReachDestinationActionParams { Destination = pos });
             }
         }
     }

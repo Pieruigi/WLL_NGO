@@ -9,13 +9,11 @@ namespace WLL_NGO.AI
 
         Vector3 direction;
 
-        public override void Initialize(object[] parameters = null)
+        public override void Initialize(ActionParams parameters = default)
         {
             base.Initialize(parameters);
-            if(parameters != null)
-            {
-                this.direction = (Vector3)parameters[0];
-            }
+            
+            this.direction = (parameters as ReachDestinationActionParams).Destination;
             
         }
 
@@ -25,7 +23,7 @@ namespace WLL_NGO.AI
 
 #if TEST_AI
             PlayerAI.transform.position += direction * PlayerAI.Speed * DeltaTime;
-            
+
 #endif
         }
 
@@ -34,5 +32,7 @@ namespace WLL_NGO.AI
             // We should reset the command here
         }
     }
+    
+
 
 }

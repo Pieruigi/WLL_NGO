@@ -10,7 +10,13 @@ namespace WLL_NGO.AI
         public PlayerAI PlayerAI { get { return playerAI; } }
 
 
-        public override void Initialize(object[] parameters = null)
+        // public override void Initialize(object[] parameters = null)
+        // {
+        //     base.Initialize(parameters);
+        //     playerAI = Owner.GetComponent<PlayerAI>();
+        // }
+
+        public override void Initialize(ActionParams parameters = default)
         {
             base.Initialize(parameters);
             playerAI = Owner.GetComponent<PlayerAI>();

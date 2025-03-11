@@ -10,7 +10,7 @@ namespace WLL_NGO.AI
         private TeamAI teamAI;
         public TeamAI TeamAI { get { return teamAI; } }
 
-        public override void Initialize(object[] parameters = null)
+        public override void Initialize(ActionParams parameters = default)
         {
             base.Initialize(parameters);
             teamAI = Owner.GetComponent<TeamAI>();

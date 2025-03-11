@@ -16,7 +16,7 @@ namespace WLL_NGO.AI
     /// Working for both team and player ai.
     /// It's a chain of running actions.
     /// </summary>
-    public abstract class ActionAI: MonoBehaviour
+    public abstract class ActionAI : MonoBehaviour
     {
         public UnityAction<ActionAI, bool> OnActionCompleted;
         public UnityAction<ActionAI> OnActionInterrupted;
@@ -38,20 +38,20 @@ namespace WLL_NGO.AI
         bool completed = false;
         bool active = false;
         bool restartOnNoChildren = false;
-      
+
         Func<bool> ConditionFunction;
 
         protected float DeltaTime
         {
             get { return UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime; }
         }
-        
+
         protected virtual void Update()
         {
             if (updateFunction != ActionUpdateFunction.Update || interrupted || !initialized || completed)
                 return;
 
-            if(ConditionFunction != null && !ConditionFunction.Invoke(/*conditionParameters*/))
+            if (ConditionFunction != null && !ConditionFunction.Invoke(/*conditionParameters*/))
             {
                 interrupted = true;
                 //interruptedCallback?.Invoke(this);
@@ -63,7 +63,7 @@ namespace WLL_NGO.AI
             if (interrupted)
                 return;
 
-            
+
             if (!active)
             {
                 active = true;
@@ -73,7 +73,7 @@ namespace WLL_NGO.AI
             Loop();
 
             bool succeeded;
-            if(IsCompleted(out succeeded))
+            if (IsCompleted(out succeeded))
             {
                 completed = true;
                 OnActionCompleted?.Invoke(this, succeeded);
@@ -126,7 +126,7 @@ namespace WLL_NGO.AI
                 //interruptedCallback?.Invoke(this);
                 OnActionInterrupted?.Invoke(this);
                 CheckForDestroy();
-                
+
             }
 
             if (interrupted)
@@ -163,17 +163,17 @@ namespace WLL_NGO.AI
                 if (active)
                 {
                     DestroyAction();
-                   
+
                 }
-                
+
             }
-                
+
         }
 
-        
 
-        protected virtual void Loop(){}
-        
+
+        protected virtual void Loop() { }
+
         /// <summary>
         /// 
         /// </summary>
@@ -185,7 +185,41 @@ namespace WLL_NGO.AI
         /// <param name="parameters">Initialization parameters</param>
         /// <param name="conditionFunction">A delegate function to check on each update the action conditions to decide whether the action must be interrupted or not.</param>
         /// <returns>The action just created</returns>
-        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.Update, object[] parameters = null, Func<bool> conditionFunction = null) where T : ActionAI
+        // public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.Update, object[] parameters = null, Func<bool> conditionFunction = null) where T : ActionAI
+        // {
+        //     GameObject actionObject = new GameObject($"{owner.gameObject.name}_{typeof(T).Name}");
+        //     //ActionAI action = actionObject.AddComponent<T>();
+        //     ActionAI action = actionObject.AddComponent<T>();
+        //     action.Owner = owner;
+        //     action.PreviousAction = previousAction;
+        //     action.UpdateFunction = updateFunction;
+        //     action.restartOnNoChildren = restartOnNoChildren;
+        //     //action.interruptedCallback = interruptedCallback;
+        //     if (previousAction != null)
+        //     {
+        //         action.PreviousAction = previousAction;
+        //         previousAction.NextActionList.Add(action);
+        //         action.transform.parent = previousAction.transform;
+        //         action.OnActionCompleted += previousAction.HandleOnChildActionCompleted;
+        //         action.OnActionInterrupted += previousAction.HandleOnChildActionInterrupted;
+        //     }
+        //     action.Initialize(parameters);
+        //     action.ConditionFunction = conditionFunction;
+        //     return action;
+        // }
+
+/// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T">Action type ( must be of type ActionAI )</typeparam>
+        /// <param name="owner">Who's creating the current action ( for example a team or a specific player in the field )</param>
+        /// <param name="previousAction">The parent action</param>
+        /// <param name="restartOnNoChildren">True if you want to call the Activate() method once again when all childrens have completed</param>
+        /// <param name="updateFunction">Does the action run in Update, LateUpdate or FixedUpdate?</param>
+        /// <param name="parameters">Initialization parameters</param>
+        /// <param name="conditionFunction">A delegate function to check on each update the action conditions to decide whether the action must be interrupted or not.</param>
+        /// <returns>The action just created</returns>
+        public static ActionAI CreateAction<T>(MonoBehaviour owner, ActionAI previousAction, bool restartOnNoChildren = false, ActionUpdateFunction updateFunction = ActionUpdateFunction.Update, ActionParams parameters = default, Func<bool> conditionFunction = null) where T : ActionAI
         {
             GameObject actionObject = new GameObject($"{owner.gameObject.name}_{typeof(T).Name}");
             //ActionAI action = actionObject.AddComponent<T>();
@@ -210,19 +244,24 @@ namespace WLL_NGO.AI
 
         protected virtual void Activate() { }
 
-        
 
-        protected virtual void HandleOnChildActionInterrupted(ActionAI childAction){}
 
-        protected virtual void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded){}
+        protected virtual void HandleOnChildActionInterrupted(ActionAI childAction) { }
+
+        protected virtual void HandleOnChildActionCompleted(ActionAI childAction, bool succeeded) { }
 
         public virtual bool IsCompleted(out bool succeeded)
         {
             succeeded = false;
             return false;
         }
-        
-        public virtual void Initialize(object[] parameters = null) 
+
+        // public virtual void Initialize(object[] parameters = null)
+        // {
+        //     initialized = true;
+        // }
+
+        public virtual void Initialize(ActionParams parameters = default)
         {
             initialized = true;
         }
@@ -254,6 +293,13 @@ namespace WLL_NGO.AI
         {
             ConditionFunction = function;
         }
+    }
+
+
+
+    public abstract class ActionParams
+    {
+        
     }
 
 }
