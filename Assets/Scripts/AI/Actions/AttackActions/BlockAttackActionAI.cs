@@ -51,6 +51,7 @@ namespace WLL_NGO.AI
 
         protected override void Loop()
         {
+            bool useLerp = false;
             // Compute base positions
             FormationHelper helper = TeamAI.Home ? FormationHelper.HomeFormationHelper : FormationHelper.AwayFormationHelper;
 #if TEST_AI
@@ -65,21 +66,33 @@ namespace WLL_NGO.AI
                 for (int i = 0; i < basePositions.Length; i++)
                 {
                     Vector3 offset = Vector3.zero;
-                    foreach (var trigger in helper.CurrentTriggers)
+                    if (useLerp)
                     {
-                        Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
+                        foreach (var trigger in helper.CurrentTriggers)
+                        {
+                            Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
 
-                        offset += trigger.Positions[i].position - startPos;
+                            offset += trigger.Positions[i].position - startPos;
+
+                        }
+
+                        offset /= helper.CurrentTriggers.Count;
+                    }
+                    else
+                    {
+                        var trigger = helper.CurrentTriggers.Last();
+                        Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
+                        offset = trigger.Positions[i].position - startPos;
                     }
 
-                    offset /= helper.CurrentTriggers.Count;
+                    //offset /= helper.CurrentTriggers.Count;
                     Debug.Log($"TEST - Offset for player {TeamAI.Players[i].gameObject.name}:{offset}");
                     Debug.Log($"TEST - BallPosition :{ballPosition}");
 
                     basePositions[i] = ballPosition + offset;
 
                     
-                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 5 * Time.deltaTime);    
+                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 2.5f * Time.deltaTime);    
 
                 }
 
