@@ -106,6 +106,29 @@ namespace WLL_NGO.AI
             return (IsDefence(home) && other.IsDefence(home)) || (IsMiddleField() && other.IsMiddleField()) || (IsAttack(home) && other.IsAttack(home));
         }
 
+        public bool IsLeftSide(bool home)
+        {
+            return home ? HomeLeftSideBlock : AwayLeftSideBlock;
+        }
+
+        public bool IsCenter()
+        {
+            return CenterBlock;
+        }
+
+        public bool IsRightSide(bool home)
+        {
+            return home ? HomeRightSideBlock : AwayRightSideBlock;
+        }
+
+        public Vector3 GetRandomPosition()
+        {
+            Vector3 pos = transform.position;
+            pos.y = 0;
+            return pos;
+        }
+
+
     }
 
 }

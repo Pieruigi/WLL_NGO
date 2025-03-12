@@ -1,0 +1,90 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Services.Matchmaker.Models;
+using Unity.VisualScripting;
+using UnityEngine;
+
+namespace WLL_NGO.AI
+{
+    public class FormationHelperTrigger : MonoBehaviour
+    {
+      
+        [SerializeField]
+        int ballOwnerIndex = -1;
+
+        [SerializeField]
+        Transform positionGroup;
+
+        List<Transform> positions = new List<Transform>();
+
+        FormationHelper rootHelper;
+
+        void Awake()
+        {
+            rootHelper = transform.root.GetComponent<FormationHelper>();
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            for (int i = 0; i < positionGroup.childCount; i++)
+                positions.Add(positionGroup.GetChild(i));
+
+
+        }
+
+
+        void OnTriggerStay(Collider other)
+        {
+            PlayerAI player = other.GetComponent<PlayerAI>();
+
+            if (!player)
+                return;
+           
+            if (player.TeamAI.Home != rootHelper.Home)
+                return;
+
+            // Check index
+            if (ballOwnerIndex >= 0)
+            {
+                int index = player.TeamAI.Players.ToList().FindIndex(p => p == player);
+                if (index != ballOwnerIndex)
+                    return;
+                // Is the right player
+                if (player.HasBall)
+                    rootHelper.AddTrigger(this);
+                else
+                    rootHelper.RemoveTrigger(this);
+            }
+           
+
+            
+
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+
+            PlayerAI player = other.GetComponent<PlayerAI>();
+
+            if (!player)
+                return;
+
+            if (player.TeamAI.Home != rootHelper.Home)
+                return;
+
+            if (ballOwnerIndex >= 0)
+            {
+                int index = player.TeamAI.Players.ToList().FindIndex(p => p == player);
+                if (index != ballOwnerIndex)
+                    return;
+                // Right player
+                rootHelper.RemoveTrigger(this);
+            }
+            
+
+        }
+    }
+    
+}

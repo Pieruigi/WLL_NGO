@@ -20,7 +20,6 @@ namespace WLL_NGO.AI
         {
             timer = 5;
             loop = true;
-            Debug.Log($"REACH - Setting loop:{loop}");
         }
 
 

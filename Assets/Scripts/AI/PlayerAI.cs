@@ -2,6 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Services.Matchmaker.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.AI.Test;
 using WLL_NGO.Netcode;
@@ -31,7 +34,7 @@ namespace WLL_NGO.AI
             get { return controller.Role; }
         }
 #endif
-
+  
 
 #if TEST_AI
         [SerializeField]
@@ -120,6 +123,7 @@ namespace WLL_NGO.AI
             playerController = GetComponent<PlayerController>();
             role = playerController.PlayerRole;
 #endif
+
         }
 
         private void Update()

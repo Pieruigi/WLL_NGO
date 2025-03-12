@@ -186,11 +186,10 @@ namespace WLL_NGO.AI
 
         public Vector3 GetRandomPositionInsideBlock(int blockId)
         {
-            Vector3 pos = blocks[blockId].transform.position;
-            pos.y = 0;
-            Debug.Log($"Block {blocks[blockId].name}, pos:{pos}");
-            return pos;
+            return blocks[blockId].GetRandomPosition();
         }
+
+        
 
         public List<FieldBlock> GetLeftDefenceBlockAll(TeamAI team)
         {
