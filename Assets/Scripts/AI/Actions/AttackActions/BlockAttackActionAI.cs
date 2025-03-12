@@ -49,55 +49,132 @@ namespace WLL_NGO.AI
             // right = -left;
         }
 
+//         protected void __Loop()
+//         {
+//             bool useLerp = false;
+//             // Compute base positions
+//             FormationHelper helper = TeamAI.Home ? FormationHelper.HomeFormationHelper : FormationHelper.AwayFormationHelper;
+// #if TEST_AI
+//             Vector3 ballPosition = TestBallController.Instance.Position;
+// #else
+//             Vector3 ballPosition = BallController.Instance.Position;
+// #endif
+//             Vector3[] basePositions = new Vector3[TeamAI.Players.Count];
+
+//             bool hasBall = TeamAI.Players.ToList().Exists(p => p.HasBall);
+//             var triggers = helper.CurrentTriggers.ToList().FindAll(t => (t.BallOwnerIndex >= 0 && hasBall) || (t.BallOwnerIndex < 0 && !hasBall));
+
+//             if (triggers.Count > 0)
+//             {
+//                 for (int i = 0; i < basePositions.Length; i++)
+//                 {
+//                     Vector3 offset = Vector3.zero;
+//                     if (useLerp)
+//                     {
+//                         foreach (var trigger in triggers)
+//                         {
+//                             Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
+
+//                             offset += trigger.Positions[i].position - startPos;
+
+//                         }
+
+//                         offset /= triggers.Count;
+//                     }
+//                     else
+//                     {
+//                         var trigger = triggers.Last();
+//                         Vector3 dir = ballPosition - trigger.Pivot.position;
+//                         basePositions[i] = trigger.Positions[i].position + dir;
+//                     }
+
+//                     //offset /= helper.CurrentTriggers.Count;
+//                     Debug.Log($"TEST - Offset for player {TeamAI.Players[i].gameObject.name}:{offset}");
+//                     Debug.Log($"TEST - BallPosition :{ballPosition}");
+
+//                     //basePositions[i] = ballPosition + offset;
+
+
+//                     targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 2.5f * Time.deltaTime);
+
+//                 }
+
+//                 // Move each player
+//                 for (int i = 0; i < basePositions.Length; i++)
+//                 {
+//                     PlayerAI player = TeamAI.Players[i];
+//                     if (player.Role == PlayerRole.GK || player.HasBall)// && !player.HasBall) // Only bot when player owns the ball
+//                         continue;
+
+
+//                     // Create action
+//                     var moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
+//                     moveAction.OnActionCompleted += HandleOnActionCompleted;
+//                     moveAction.OnActionInterrupted += HandleOnActionInterrupted;
+//                     //player.transform.position = basePositions[i];
+//                     Debug.Log($"TEST - Setting position for player {player.gameObject.name}:{basePositions[i]}");
+//                 }
+//             }
+//         }
+
         protected override void Loop()
         {
+            // This action is only available if a team player is bringing the ball.
+            int ballOwnerIndex = TeamAI.Players.ToList().FindIndex(p => p.HasBall);
+            if (ballOwnerIndex < 0)
+            {
+                Debug.LogWarning("BlockAttackActionAI is running but no team player keeping the ball has been found");
+                return;
+            }
+                
+
             bool useLerp = false;
             // Compute base positions
             FormationHelper helper = TeamAI.Home ? FormationHelper.HomeFormationHelper : FormationHelper.AwayFormationHelper;
 #if TEST_AI
-                    Vector3 ballPosition = TestBallController.Instance.Position;
+            Vector3 ballPosition = TestBallController.Instance.Position;
 #else
-                    Vector3 ballPosition = BallController.Instance.Position;
+            Vector3 ballPosition = BallController.Instance.Position;
 #endif
             Vector3[] basePositions = new Vector3[TeamAI.Players.Count];
 
-            if (helper.CurrentTriggers.Count > 0)
+            // Filter triggers
+            var triggers = helper.CurrentTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);
+
+            if (triggers.Count > 0)
             {
                 for (int i = 0; i < basePositions.Length; i++)
                 {
                     Vector3 offset = Vector3.zero;
                     if (useLerp)
                     {
-                        foreach (var trigger in helper.CurrentTriggers)
+                        foreach (var trigger in triggers)
                         {
-                            Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
+                            Vector3 startPos = /*trigger.BallOwnerIndex < 0 ? ballPosition : */trigger.Positions[trigger.BallOwnerIndex].position;
 
                             offset += trigger.Positions[i].position - startPos;
 
                         }
 
-                        offset /= helper.CurrentTriggers.Count;
+                        offset /= triggers.Count;
                     }
                     else
                     {
-                        var trigger = helper.CurrentTriggers.Last();
-                        Vector3 startPos = trigger.BallOwnerIndex < 0 ? ballPosition : trigger.Positions[trigger.BallOwnerIndex].position;
+                        var trigger = triggers.Last();
+                        Vector3 startPos = /*trigger.BallOwnerIndex < 0 ? ballPosition : */trigger.Positions[trigger.BallOwnerIndex].position;
                         offset = trigger.Positions[i].position - startPos;
                     }
 
-                    //offset /= helper.CurrentTriggers.Count;
-                    Debug.Log($"TEST - Offset for player {TeamAI.Players[i].gameObject.name}:{offset}");
-                    Debug.Log($"TEST - BallPosition :{ballPosition}");
-
+                  
                     basePositions[i] = ballPosition + offset;
 
-                    
-                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 2.5f * Time.deltaTime);    
+
+                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 2.5f * Time.deltaTime);
 
                 }
 
 
-                
+
 
                 // Move each player
                 for (int i = 0; i < basePositions.Length; i++)
@@ -112,11 +189,11 @@ namespace WLL_NGO.AI
                     moveAction.OnActionCompleted += HandleOnActionCompleted;
                     moveAction.OnActionInterrupted += HandleOnActionInterrupted;
                     //player.transform.position = basePositions[i];
-                    Debug.Log($"TEST - Setting position for player {player.gameObject.name}:{basePositions[i]}");
+                  
                 }
             }
 
-            
+
         }
 
         
