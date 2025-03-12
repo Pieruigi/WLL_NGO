@@ -6,9 +6,12 @@ namespace WLL_NGO.AI
 {
     public class FormationHelper : MonoBehaviour
     {
+        public static FormationHelper HomeFormationHelper { get; private set; }
+        public static FormationHelper AwayFormationHelper { get; private set; }
+
         List<FormationHelperTrigger> currentTriggers = new List<FormationHelperTrigger>();
 
-        IList<FormationHelperTrigger> CurrentTriggers
+        public IList<FormationHelperTrigger> CurrentTriggers
         {
             get{ return currentTriggers.AsReadOnly(); }
         }
@@ -27,6 +30,11 @@ namespace WLL_NGO.AI
 
         void Awake()
         {
+            if (home)
+                HomeFormationHelper = this;
+            else
+                AwayFormationHelper = this;
+
             SetActualFormation(actualFormation);
         }
 

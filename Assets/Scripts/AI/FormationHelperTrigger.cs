@@ -12,11 +12,19 @@ namespace WLL_NGO.AI
       
         [SerializeField]
         int ballOwnerIndex = -1;
+        public int BallOwnerIndex
+        {
+            get{ return ballOwnerIndex; }
+        }
 
         [SerializeField]
         Transform positionGroup;
 
         List<Transform> positions = new List<Transform>();
+        public IList<Transform> Positions
+        {
+            get{ return positions.AsReadOnly(); }
+        }
 
         FormationHelper rootHelper;
 

@@ -14,7 +14,7 @@ namespace WLL_NGO.AI
         Vector3 destination = Vector3.zero;
         bool reached = false;
 
-        float tollerance = .5f;
+        float tollerance = 1f;
 
         protected override void Activate()
         {
