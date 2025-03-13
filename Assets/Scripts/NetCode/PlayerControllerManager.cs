@@ -8,6 +8,7 @@ namespace WLL_NGO.Netcode
 {
     public class PlayerControllerManager : SingletonNetwork<PlayerControllerManager>
     {
+       
         [SerializeField] NetworkPrefabsList playerPrefabList;
 
         List<PlayerController> playerControllers = new List<PlayerController>();

@@ -2,9 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.AI.Test;
 using WLL_NGO.Netcode;
@@ -24,7 +22,7 @@ namespace WLL_NGO.AI
             get{ return home; }
         }
         
-        [SerializeField] List<PlayerAI> players;
+        [SerializeField] List<PlayerAI> players = new List<PlayerAI>();
         public IList<PlayerAI> Players
         {
             get { return players.AsReadOnly(); }
@@ -136,11 +134,18 @@ namespace WLL_NGO.AI
         private void OnEnable()
         {
             BallController.OnBallSpawned += HandleOnBallSpawned;
+            PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
         }
 
         private void OnDisable()
         {
             BallController.OnBallSpawned -= HandleOnBallSpawned;
+            PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
+        }
+
+        private void HandleOnPlayerControllerSpawned(PlayerController playerController)
+        {
+            Debug.Log($"New player controller spawned, player:{playerController.gameObject.name}, ishost:{playerController.IsHost}");
         }
 
         private void HandleOnBallSpawned()

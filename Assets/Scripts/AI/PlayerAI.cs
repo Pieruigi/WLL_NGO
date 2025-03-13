@@ -34,7 +34,7 @@ namespace WLL_NGO.AI
             get { return controller.Role; }
         }
 #endif
-  
+
 
 #if TEST_AI
         [SerializeField]
@@ -42,6 +42,8 @@ namespace WLL_NGO.AI
 #endif
 
 #if TEST_AI
+        public Vector3 Position { get { return transform.position; } }
+#else
         public Vector3 Position { get { return transform.position; } }
 #endif
 
@@ -52,7 +54,7 @@ namespace WLL_NGO.AI
 #if TEST_AI
                 return hasBall;
 #else
-                return playerController.HasBall;
+                return controller.HasBall;
 #endif
 
             }
@@ -98,6 +100,8 @@ namespace WLL_NGO.AI
             {
 #if TEST_AI
                 return 1.5f;
+#else
+                return controller.MaxSpeed;
 #endif
             }
         }
@@ -108,6 +112,8 @@ namespace WLL_NGO.AI
             {
 #if TEST_AI
                 return 480f;
+#else
+                return controller.RotationSpeed;
 #endif
             }
         }
@@ -120,8 +126,8 @@ namespace WLL_NGO.AI
         private void Awake()
         {
 #if !TEST_AI
-            playerController = GetComponent<PlayerController>();
-            role = playerController.PlayerRole;
+            controller = GetComponent<PlayerController>();
+            //role = playerController.PlayerRole;
 #endif
 
         }
@@ -139,7 +145,7 @@ namespace WLL_NGO.AI
             if (doubleGuard)
             {
                 doubleGuardElapsed += Time.deltaTime;
-                if (doubleGuardElapsed > doubleGuardTime || !targetPlayer.hasBall)
+                if (doubleGuardElapsed > doubleGuardTime || !targetPlayer.HasBall)
                     StopDoubleGuard();
             }
 

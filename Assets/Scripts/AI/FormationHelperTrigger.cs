@@ -5,6 +5,7 @@ using Unity.Services.Matchmaker.Models;
 using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.AI.Test;
+using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
@@ -89,7 +90,7 @@ namespace WLL_NGO.AI
 #if TEST_AI
                 TestBallController ballCtrl = other.GetComponent<TestBallController>();
 #else
-            BallController ballCtrl = other.GetComponent<BallController>();
+                BallController ballCtrl = other.GetComponent<BallController>();
 #endif
 
                 if (ballCtrl)

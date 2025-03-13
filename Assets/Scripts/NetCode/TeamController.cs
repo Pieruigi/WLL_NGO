@@ -100,11 +100,15 @@ namespace WLL_NGO.Netcode
 
         }
 
-            
+
         public bool IsBot()
         {
-            List<PlayerInfo> list = PlayerInfoManager.Instance.GetPlayerInfoAll(home);
-            return list[0].Bot;
+            // List<PlayerInfo> list = PlayerInfoManager.Instance.GetPlayerInfoAll(home);
+            // return list[0].Bot;
+            if (home)
+                return false;
+
+            return PlayerInfoManager.Instance.BotPlayerInfoExists();
 
         }
 

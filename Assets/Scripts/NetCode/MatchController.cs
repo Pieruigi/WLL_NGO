@@ -38,7 +38,7 @@ namespace WLL_NGO.Netcode
         }
 
         
-        int playerPerTeam = 5;
+        int playerPerTeam = 4;
         public int PlayerPerTeam
         {
             get { return playerPerTeam; }
@@ -122,27 +122,15 @@ namespace WLL_NGO.Netcode
 
                             for (int i = 0; i < TeamController.HomeTeam.GetPlayers().Count; i++)
                             {
-                                // TeamController.HomeTeam.GetPlayers()[i].SetKinematic(true);
-                                // TeamController.HomeTeam.GetPlayers()[i].Velocity = Vector3.zero;
-                                // TeamController.HomeTeam.GetPlayers()[i].Position = homeSP[i].position;
-                                // TeamController.HomeTeam.GetPlayers()[i].Rotation = homeSP[i].rotation;
-                                // TeamController.HomeTeam.GetPlayers()[i].SetKinematic(false);
+                               
                                 TeamController.HomeTeam.GetPlayers()[i].ResetToKickOff(homeSP[i]);
-                                // TeamController.AwayTeam.GetPlayers()[i].SetKinematic(true);
-                                // TeamController.AwayTeam.GetPlayers()[i].Velocity = Vector3.zero;
-                                // TeamController.AwayTeam.GetPlayers()[i].Position = awaySP[i].position;
-                                // TeamController.AwayTeam.GetPlayers()[i].Rotation = awaySP[i].rotation;
-                                // TeamController.AwayTeam.GetPlayers()[i].SetKinematic(false);
                                 TeamController.AwayTeam.GetPlayers()[i].ResetToKickOff(awaySP[i]);
                                 
                             }
 
                             // Reset the ball
                             BallController.Instance.ResetToKickOff();
-                            // BallController.Instance.Position = BallSpawner.Instance.GetKickOffBallPosition();
-                            // BallController.Instance.Velocity = Vector3.zero;
-                            // BallController.Instance.Velocity = Vector3.zero;
-
+                            
                             lastScorer = null;
                         }
 

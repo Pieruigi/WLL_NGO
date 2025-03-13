@@ -30,12 +30,17 @@ namespace WLL_NGO.AI
 
         void Awake()
         {
-            if (home)
-                HomeFormationHelper = this;
-            else
-                AwayFormationHelper = this;
+            // if (name.ToLower().StartsWith("home"))
+            //     home = true;
+            // else if (name.ToLower().StartsWith("away"))
+            //     home = false;
 
-            SetActualFormation(actualFormation);
+            if (home)
+                    HomeFormationHelper = this;
+                else
+                    AwayFormationHelper = this;
+
+            //SetActualFormation(actualFormation);
         }
 
         // Start is called before the first frame update
@@ -51,11 +56,13 @@ namespace WLL_NGO.AI
         }
 
 
-
         public void SetActualFormation(int actualFormation)
         {
+            if (formations == null || formations.Count == 0)
+                return;
+
             foreach (var formation in formations)
-                formation.SetActive(false);
+                    formation.SetActive(false);
 
             currentTriggers.Clear();
 

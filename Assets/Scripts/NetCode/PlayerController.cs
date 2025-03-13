@@ -154,9 +154,17 @@ namespace WLL_NGO.Netcode
 
         [SerializeField]
         float maxSpeed = 5f;
+        public float MaxSpeed
+        {
+            get{ return maxSpeed; }
+        }
 
         [SerializeField]
         float rotationSpeed = 480;
+        public float RotationSpeed
+        {
+            get{ return rotationSpeed; }
+        }
 
 
         [SerializeField]

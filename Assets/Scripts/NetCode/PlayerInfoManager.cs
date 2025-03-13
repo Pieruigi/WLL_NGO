@@ -78,6 +78,7 @@ namespace WLL_NGO.Netcode
                 // Every time the server modifies the player list all the players are notified
                 if (changeEvent.Value.ClientId == NetworkManager.LocalClientId)
                 {
+                    
                     Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
                     PlayerInfo player = players[changeEvent.Index];
                     // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
@@ -86,29 +87,11 @@ namespace WLL_NGO.Netcode
                         if (!player.Initialized)
                         {
                             InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
-                            if (IsHost) // Create single player bot
-                            {
-                                if (!PlayerInfoManager.Instance.BotPlayerInfoExists())
-                                {
-                                    // Create bot
-                                    PlayerInfoManager.Instance.AddBot();
-                                }
-                            }
+                          
                         }
                             
                     }
-                    else // Is bot
-                    {
-                        Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAA is bot");
-                        // Initialize
-                        if (!player.Initialized)
-                        {
-                            player.Initialize("bot-json-data");
-                            // Set ready
-                            player.Ready = true;
-                        }
-                        
-                    }
+                    
                     
                 };
             }
@@ -116,6 +99,40 @@ namespace WLL_NGO.Netcode
             if (IsServer)
             {
                 
+            }
+
+            if (IsHost) // We only manage bot player here
+            {
+                if (changeEvent.Value.ClientId == NetworkManager.LocalClientId)
+                {
+                    // The local client id means both human and both player
+                    PlayerInfo player = players[changeEvent.Index];
+                    if (player.Bot)
+                    {
+                        if (!player.Initialized)
+                        {
+                            PlayerInfoManager.Instance.InitializeBot("bot-josn-data");
+                        }
+                        else
+                        {
+                            if (!player.Ready)
+                            {
+                                PlayerInfoManager.Instance.SetBotReady();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!PlayerInfoManager.Instance.BotPlayerInfoExists()) // Bot not created yet
+                        {
+                            // Create bot
+                            PlayerInfoManager.Instance.AddBot();
+                        }
+                    }
+                    
+                 
+
+                }
             }
 
             
@@ -130,7 +147,40 @@ namespace WLL_NGO.Netcode
             Debug.Log("Scene has been loaded");
         }
 
+        void InitializeBot(string data)
+        {
+            for (int i = 0; i < players.Count; i++)
+            {
+                if (players[i].Bot)
+                {
+                    var p = players[i];
+                    p.Initialize(data);
+                    players[i] = p;
 
+                    Debug.Log($"Bot initialized {p}");
+                    OnPlayerInitialized?.Invoke(players[i]);
+
+                    return;
+                }
+            }
+        }
+
+        void SetBotReady()
+        {
+            for (int i = 0; i < players.Count; i++)
+            {
+                if (players[i].Bot)
+                {
+                    var p = players[i];
+                    p.Ready = true;
+                    players[i] = p;
+
+                    Debug.Log($"Bot is ready");
+                  
+                    return;
+                }
+            }
+        }
 
         /// <summary>
         /// Executed on the server to initialize the local client
@@ -142,7 +192,7 @@ namespace WLL_NGO.Netcode
         {
             for (int i = 0; i < players.Count; i++)
             {
-                if (players[i].ClientId == clientId)
+                if (players[i].ClientId == clientId && !players[i].Bot)
                 {
                     var p = players[i];
                     p.Initialize(data);
@@ -161,7 +211,7 @@ namespace WLL_NGO.Netcode
         {
             for (int i = 0; i < players.Count; i++)
             {
-                if (players[i].ClientId == clientId)
+                if (players[i].ClientId == clientId && !players[i].Bot)
                 {
                     var p = players[i];
                     p.Ready = true;
@@ -297,12 +347,22 @@ namespace WLL_NGO.Netcode
             return default;
         }
 
-        public List<PlayerInfo> GetPlayerInfoAll(bool home)
+        // public List<PlayerInfo> GetPlayerInfoAll(bool home)
+        // {
+        //     List<PlayerInfo> ret = new List<PlayerInfo>();
+        //     foreach (var player in players)
+        //     {
+        //         if (player.Home == home) ret.Add(player);
+        //     }
+        //     return ret;
+        // }
+
+        public List<PlayerInfo> GetPlayerInfoAll()
         {
             List<PlayerInfo> ret = new List<PlayerInfo>();
             foreach (var player in players)
             {
-                if (player.Home == home) ret.Add(player);
+                ret.Add(player);
             }
             return ret;
         }
