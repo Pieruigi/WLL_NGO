@@ -146,6 +146,14 @@ namespace WLL_NGO.AI
         private void HandleOnPlayerControllerSpawned(PlayerController playerController)
         {
             Debug.Log($"New player controller spawned, player:{playerController.gameObject.name}, ishost:{playerController.IsHost}");
+            // Team check
+            if (home != playerController.PlayerInfo.Home)
+                return;
+
+            // Add the new player
+            PlayerAI player = playerController.GetComponent<PlayerAI>();
+            player.TeamAI = this;
+            AddPlayer(player);
         }
 
         private void HandleOnBallSpawned()
@@ -167,6 +175,12 @@ namespace WLL_NGO.AI
                 
             }
            
+        }
+
+        void AddPlayer(PlayerAI player)
+        {
+            if(!players.Contains(player))
+                players.Add(player);
         }
 
         public bool HasBall()

@@ -113,7 +113,7 @@ namespace WLL_NGO
 
         void OnTriggerEnter(Collider other)
         {
-            if (NetworkManager.Singleton.IsClient) return;
+            if (!NetworkManager.Singleton.IsServer) return;
 
             Debug.Log($"TEST - Net trigger, is not client");
 

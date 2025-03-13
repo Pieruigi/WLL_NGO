@@ -11,7 +11,7 @@ namespace WLL_NGO.AI
 
         protected override void Activate()
         {
-           
+            return;
             TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
             if (TeamAI.HasBall())
                 CreateAction<AttackActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return TeamAI.HasBall(); });

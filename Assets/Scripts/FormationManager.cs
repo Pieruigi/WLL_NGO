@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.Netcode;
 
@@ -14,7 +15,7 @@ namespace WLL_NGO.AI
 
         FormationHelper homeHelper, awayHelper;
 
-
+        
         // Start is called before the first frame update
         void Start()
         {
@@ -37,19 +38,16 @@ namespace WLL_NGO.AI
 
             // Create a new formation helper
             FormationHelper helper = home ? FormationHelper.HomeFormationHelper : FormationHelper.AwayFormationHelper;
-            
+
             //TODO: you should get the formation from json
-            
 
             // Get prefab from list
             List<GameObject> prefabs = formationPrefabs.FindAll(f => f.name.EndsWith(formationType));
             GameObject prefab = prefabs[UnityEngine.Random.Range(0, prefabs.Count)];
-            // Create formation
-            GameObject fo = Instantiate(prefab, helper.transform);
-            fo.transform.localPosition = Vector3.zero;
-            fo.transform.localEulerAngles = Vector3.up * (home ? 0f : 180f);
 
-            //helper.SetActualFormation();
+            // Initialize helper
+            helper.Initialize(prefab);
+
         }
         
 

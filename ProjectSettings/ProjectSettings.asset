@@ -801,7 +801,7 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     Server: __NO_MM;_USE_LOBBY_SCENE
-    Standalone: NO_MM;_USE_LOBBY_SCENE;_TEST_AI
+    Standalone: _NO_MM;_USE_LOBBY_SCENE;_TEST_AI
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

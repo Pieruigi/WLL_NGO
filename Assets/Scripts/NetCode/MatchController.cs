@@ -8,6 +8,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Events;
+using WLL_NGO.AI;
 
 namespace WLL_NGO.Netcode
 {
@@ -113,19 +114,22 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)MatchState.KickOff:
                     // Check the team who's going to kick off (only after a goal)
-                    if (!IsClient) // Last scorer is not null only on server
+                    if (IsServer) // Last scorer is not null only on server
                     {
                         if (lastScorer != null)
                         {
-                            List<Transform> homeSP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoints() : PlayerSpawnPointManager.Instance.GetKickOffHomeSpawnPoints();
-                            List<Transform> awaySP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetKickOffAwaySpawnPoints() : PlayerSpawnPointManager.Instance.GetAwaySpawnPoints();
+                            // List<Transform> homeSP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoints() : PlayerSpawnPointManager.Instance.GetKickOffHomeSpawnPoints();
+                            // List<Transform> awaySP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetKickOffAwaySpawnPoints() : PlayerSpawnPointManager.Instance.GetAwaySpawnPoints();
+
+                            IList<Transform> homeSP = lastScorer == TeamController.HomeTeam ? FormationHelper.HomeFormationHelper.GetKickOffSpawnPoints() : FormationHelper.HomeFormationHelper.GetKickOffKickerSpawnPoints();
+                            IList<Transform> awaySP = lastScorer == TeamController.HomeTeam ? FormationHelper.AwayFormationHelper.GetKickOffKickerSpawnPoints() : FormationHelper.AwayFormationHelper.GetKickOffSpawnPoints();
 
                             for (int i = 0; i < TeamController.HomeTeam.GetPlayers().Count; i++)
                             {
-                               
+
                                 TeamController.HomeTeam.GetPlayers()[i].ResetToKickOff(homeSP[i]);
                                 TeamController.AwayTeam.GetPlayers()[i].ResetToKickOff(awaySP[i]);
-                                
+
                             }
 
                             // Reset the ball

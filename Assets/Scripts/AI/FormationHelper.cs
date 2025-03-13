@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
@@ -13,7 +14,7 @@ namespace WLL_NGO.AI
 
         public IList<FormationHelperTrigger> CurrentTriggers
         {
-            get{ return currentTriggers.AsReadOnly(); }
+            get { return currentTriggers.AsReadOnly(); }
         }
 
         [SerializeField]
@@ -28,6 +29,8 @@ namespace WLL_NGO.AI
 
         int actualFormation = 1;
 
+        List<Transform> kickOffTransforms = new List<Transform>(), kickOffKickerTransforms = new List<Transform>();
+
         void Awake()
         {
             // if (name.ToLower().StartsWith("home"))
@@ -36,9 +39,9 @@ namespace WLL_NGO.AI
             //     home = false;
 
             if (home)
-                    HomeFormationHelper = this;
-                else
-                    AwayFormationHelper = this;
+                HomeFormationHelper = this;
+            else
+                AwayFormationHelper = this;
 
             //SetActualFormation(actualFormation);
         }
@@ -55,20 +58,51 @@ namespace WLL_NGO.AI
 
         }
 
-
-        public void SetActualFormation(int actualFormation)
+        public void Initialize(GameObject prefab)
         {
-            if (formations == null || formations.Count == 0)
-                return;
+            // Remove any other formation if exists
+            if (transform.childCount > 0)
+            {
+                Destroy(transform.GetChild(0));
+            }
 
-            foreach (var formation in formations)
-                    formation.SetActive(false);
-
+            // Clear trigger 
             currentTriggers.Clear();
+            kickOffTransforms.Clear();
+            kickOffKickerTransforms.Clear();
 
-            this.actualFormation = actualFormation;
-            formations[actualFormation].SetActive(true);
+            // Create formation
+            GameObject fo = Instantiate(prefab, transform);
+            fo.transform.localPosition = Vector3.zero;
+            fo.transform.localEulerAngles = Vector3.up * (home ? 0f : 180f);
+
+            // Get kick off transforms
+
+            Transform kok = fo.transform.Find("KickOff").Find("Kicker");
+            Transform ko = fo.transform.Find("KickOff").Find("NotKicker");
+            for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
+            {
+                kickOffTransforms.Add(ko.GetChild(i));
+                kickOffKickerTransforms.Add(kok.GetChild(i));
+            }
+
+
         }
+
+
+        // public void SetActualFormation(int actualFormation)
+        // {
+        //     if (formations == null || formations.Count == 0)
+        //         return;
+
+        //     foreach (var formation in formations)
+        //         formation.SetActive(false);
+
+        //     currentTriggers.Clear();
+
+        //     this.actualFormation = actualFormation;
+        //     formations[actualFormation].SetActive(true);
+        // }
 
         public void AddTrigger(FormationHelperTrigger trigger)
         {
@@ -82,6 +116,16 @@ namespace WLL_NGO.AI
         public void RemoveTrigger(FormationHelperTrigger trigger)
         {
             currentTriggers.Remove(trigger);
+        }
+
+        public IList<Transform> GetKickOffSpawnPoints()
+        {
+            return kickOffTransforms;
+        }
+
+        public IList<Transform> GetKickOffKickerSpawnPoints()
+        {
+            return kickOffKickerTransforms;
         }
     }
     
