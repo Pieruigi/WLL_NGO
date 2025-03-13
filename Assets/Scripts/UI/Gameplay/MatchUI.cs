@@ -25,7 +25,7 @@ namespace WLL_NGO.UI
         // Start is called before the first frame update
         void Start()
         {
-            localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo(false).Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+            localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
             remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
    
         }

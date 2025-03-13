@@ -79,18 +79,46 @@ namespace WLL_NGO.Netcode
                 if (changeEvent.Value.ClientId == NetworkManager.LocalClientId)
                 {
                     Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
-                    PlayerInfo localPlayer = players[changeEvent.Index];
+                    PlayerInfo player = players[changeEvent.Index];
                     // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
-                    if (!localPlayer.Initialized)
-                        InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
-                }
-                ;
+                    if (!player.Bot) // Human player
+                    {
+                        if (!player.Initialized)
+                        {
+                            InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
+                            if (IsHost) // Create single player bot
+                            {
+                                if (!PlayerInfoManager.Instance.BotPlayerInfoExists())
+                                {
+                                    // Create bot
+                                    PlayerInfoManager.Instance.AddBot();
+                                }
+                            }
+                        }
+                            
+                    }
+                    else // Is bot
+                    {
+                        Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAA is bot");
+                        // Initialize
+                        if (!player.Initialized)
+                        {
+                            player.Initialize("bot-json-data");
+                            // Set ready
+                            player.Ready = true;
+                        }
+                        
+                    }
+                    
+                };
             }
 
             if (IsServer)
             {
-
+                
             }
+
+            
 
             Debug.Log($"Player list has changed");
             foreach (var player in players)
@@ -219,13 +247,44 @@ namespace WLL_NGO.Netcode
             return true;
         }
 
-        public PlayerInfo GetLocalPlayerInfo(bool bot)
+        public PlayerInfo GetBotPlayerInfo()
         {
             foreach (var player in players)
             {
-                if (player.ClientId == NetworkManager.LocalClientId && bot) return player;
+                if (player.ClientId == NetworkManager.LocalClientId && player.Bot) return player;
             }
             return default;
+        }
+
+        public bool BotPlayerInfoExists()
+        {
+            foreach (var player in players)
+            {
+                if (player.ClientId == NetworkManager.LocalClientId && player.Bot)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public PlayerInfo GetLocalPlayerInfo()
+        {
+            foreach (var player in players)
+            {
+                if (player.ClientId == NetworkManager.LocalClientId && !player.Bot) return player;
+            }
+            return default;
+        }
+
+        public bool LocalPlayerInfoExists()
+        {
+            foreach (var player in players)
+            {
+                if (player.ClientId == NetworkManager.LocalClientId && !player.Bot)
+                    return true;
+            }
+
+            return false;
         }
 
         public PlayerInfo GetPlayerInfoById(string playerInfoId)
