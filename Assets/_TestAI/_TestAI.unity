@@ -315,10 +315,10 @@ MonoBehaviour:
   maxDefensiveDistance: 4
   defenceZoneTriggers: []
   pressingTriggers: []
-  ball: {fileID: 1373425456}
+  ball: {fileID: 0}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 173766175}
+  netController: {fileID: 0}
   hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
@@ -4636,7 +4636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 3
+  role: 0
   hasBall: 0
 --- !u!136 &619650641
 CapsuleCollider:
@@ -5179,7 +5179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 1
+  role: 0
   hasBall: 0
 --- !u!136 &691588919
 CapsuleCollider:
@@ -6517,10 +6517,10 @@ MonoBehaviour:
   - {fileID: 949506858}
   - {fileID: 1462687027}
   - {fileID: 172216607}
-  ball: {fileID: 1373425456}
+  ball: {fileID: 0}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 667974768}
+  netController: {fileID: 0}
   hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
@@ -13044,7 +13044,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 2
+  role: 0
   hasBall: 0
 --- !u!136 &1930528751
 CapsuleCollider:

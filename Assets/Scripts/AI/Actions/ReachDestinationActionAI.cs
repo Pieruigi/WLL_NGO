@@ -42,9 +42,18 @@ namespace WLL_NGO.AI
                 PlayerAI.transform.position += PlayerAI.transform.forward * Time.deltaTime * PlayerAI.Speed;
 
             }
-
 #else
             // Using input handler
+            var inputHandler = PlayerAI.Controller.GetInputHandler();
+            var dir = Vector3.ProjectOnPlane(destination - PlayerAI.transform.position, Vector3.up);
+            if (dir.magnitude > 0.01f)
+            {
+                inputHandler.SetJoystick(new Vector2(dir.x, dir.z).normalized);
+            }
+            else
+            {
+                inputHandler.SetJoystick(Vector2.zero);
+            }
 #endif
         }
 
@@ -110,7 +119,7 @@ namespace WLL_NGO.AI
     public class ReachDestinationActionParams : ActionParams
     {
         public Vector3 Destination;
-        public float Tollerance = .75f;
+        public float Tollerance = 2f;
     }
 
 }

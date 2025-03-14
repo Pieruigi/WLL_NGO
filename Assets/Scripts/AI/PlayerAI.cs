@@ -123,14 +123,23 @@ namespace WLL_NGO.AI
 
         DateTime LastReactionTime;
 
+
         public bool IsOwner
         {
-            get{ return controller.IsOwner; }
+#if TEST_AI
+            get { return true; }
+#else
+            get { return controller.IsOwner; }
+#endif
         }
 
         public bool IsSelected
         {
-            get{ return controller.IsSelected(); }
+#if TEST_AI
+            get{ return false; }
+#else
+            get { return controller.IsSelected(); }
+#endif
         } 
 
         private void Awake()

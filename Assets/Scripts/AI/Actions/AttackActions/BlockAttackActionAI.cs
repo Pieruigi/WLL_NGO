@@ -22,6 +22,8 @@ namespace WLL_NGO.AI
 
         Vector3[] targetPositions;
 
+        List<PlayerActionAI> actions = new List<PlayerActionAI>();
+
 
         protected override void Activate()
         {
@@ -54,7 +56,7 @@ namespace WLL_NGO.AI
                 Debug.LogWarning("BlockAttackActionAI is running but no team player keeping the ball has been found");
                 return;
             }
-
+            Debug.Log("TEST - BallOwnerIndex:" + ballOwnerIndex);
 
             bool useLerp = false;
             // Compute base positions
@@ -67,6 +69,7 @@ namespace WLL_NGO.AI
             Vector3[] basePositions = new Vector3[TeamAI.Players.Count];
 
             // Filter triggers
+            Debug.Log("TEST - Current trigger count:" + helper.CurrentTriggers.Count);
             var triggers = helper.CurrentTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);
 
             if (triggers.Count > 0)
@@ -111,11 +114,25 @@ namespace WLL_NGO.AI
                     if (player.Role == PlayerRole.GK || player.HasBall)// && !player.HasBall) // Only bot when player owns the ball
                         continue;
 
+                    // Check if an action already exists for this player
+                    var moveAction = actions.Find(a => a.PlayerAI == player);
 
+                    if (!moveAction)
+                    {
+                        moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
+                        moveAction.OnActionCompleted += HandleOnActionCompleted;
+                        moveAction.OnActionInterrupted += HandleOnActionInterrupted;
+                        actions.Add(moveAction);
+                    }
+                    else
+                    {
+                        moveAction.Initialize(new ReachDestinationActionParams() { Destination = targetPositions[i] });
+                    }
+                    
                     // Create action
-                    var moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
-                    moveAction.OnActionCompleted += HandleOnActionCompleted;
-                    moveAction.OnActionInterrupted += HandleOnActionInterrupted;
+                    // moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
+                    // moveAction.OnActionCompleted += HandleOnActionCompleted;
+                    // moveAction.OnActionInterrupted += HandleOnActionInterrupted;
                     //player.transform.position = basePositions[i];
 
                 }
@@ -130,12 +147,12 @@ namespace WLL_NGO.AI
 
         private void HandleOnActionInterrupted(ActionAI action)
         {
-            //playerActions.Remove(action as PlayerActionAI);
+            actions.Remove(action as PlayerActionAI);
         }
 
         private void HandleOnActionCompleted(ActionAI action, bool succeeded)
         {
-            //playerActions.Remove(action as PlayerActionAI);
+            actions.Remove(action as PlayerActionAI);
         }
 
         bool CheckConditions(PlayerAI player)
