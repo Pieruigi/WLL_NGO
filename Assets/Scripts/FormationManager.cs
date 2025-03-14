@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal.Internal;
 using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
@@ -22,7 +23,6 @@ namespace WLL_NGO.AI
             if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // We don't need formation helper on client
                 return;
 
-            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             // Create 
             var players = PlayerInfoManager.Instance.GetPlayerInfoAll();
             foreach (var player in players)

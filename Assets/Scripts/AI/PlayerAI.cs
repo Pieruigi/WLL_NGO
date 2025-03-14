@@ -122,7 +122,17 @@ namespace WLL_NGO.AI
         float ReactionTime { get; set; } = 0.5f;
 
         DateTime LastReactionTime;
-                
+
+        public bool IsOwner
+        {
+            get{ return controller.IsOwner; }
+        }
+
+        public bool IsSelected
+        {
+            get{ return controller.IsSelected(); }
+        } 
+
         private void Awake()
         {
 #if !TEST_AI
@@ -140,7 +150,13 @@ namespace WLL_NGO.AI
                 TestBallController.Instance.transform.position = transform.position + transform.forward * 1f + Vector3.up * .5f;
             }
 #endif
-            
+            if (!IsSelected)
+            {
+                if (Input.GetKey(KeyCode.P))
+                    controller.GetInputHandler().SetJoystick(new Vector2(1f, 0f));
+                else
+                    controller.GetInputHandler().SetJoystick(Vector3.zero);
+            }
 
             if (doubleGuard)
             {

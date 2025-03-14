@@ -336,17 +336,19 @@ namespace WLL_NGO.Netcode
             if (!IsSpawned)
                 return;
 
+
+
             if (IsOwner) // Is client or host
             {
                 if (Selected)
                     CheckHumanInput();
-                else if (IsHost)
+                else
                     CheckNotHumanInput(); // AI for singleplayer
             }
-            else // Client is the owner of the player, so we are on the dedicated server here
+            else // Client is the owner, so we are on the dedicated server here
             {
                 if (!Selected)
-                    CheckNotHumanInput();
+                    CheckNotHumanInput(); // AI for multiplayer
             }
 
 
@@ -1633,8 +1635,8 @@ namespace WLL_NGO.Netcode
             if (inputHandler == null || !IsOwner || !Selected) 
                 return;
 
-            if (Selected)
-                input = inputHandler.GetInput();
+            //if (Selected)
+            input = inputHandler.GetInput();
             //else
             //    input = new InputData() { joystick = Vector2.zero, button1 = false, button2 = false, button3 = false };
             //Debug.Log($"Client input:{input}");
