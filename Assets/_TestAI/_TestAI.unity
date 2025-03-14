@@ -315,10 +315,10 @@ MonoBehaviour:
   maxDefensiveDistance: 4
   defenceZoneTriggers: []
   pressingTriggers: []
-  ball: {fileID: 0}
+  ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 0}
+  netController: {fileID: 173766175}
   hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
@@ -4617,7 +4617,7 @@ Transform:
   m_GameObject: {fileID: 619650638}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.02, y: 0, z: -0.4}
+  m_LocalPosition: {x: -4.76, y: 0, z: -5.41}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4636,7 +4636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 0
+  role: 3
   hasBall: 0
 --- !u!136 &619650641
 CapsuleCollider:
@@ -5160,7 +5160,7 @@ Transform:
   m_GameObject: {fileID: 691588916}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.69, y: 0, z: 4.86}
+  m_LocalPosition: {x: -7.87, y: 0, z: -0.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5179,7 +5179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 0
+  role: 1
   hasBall: 0
 --- !u!136 &691588919
 CapsuleCollider:
@@ -6510,17 +6510,17 @@ MonoBehaviour:
   waitingTime: 1000
   maxDefensiveDistance: 4
   defenceZoneTriggers:
-  - {fileID: 1384244175}
-  - {fileID: 586300124}
-  - {fileID: 102757442}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   pressingTriggers:
   - {fileID: 949506858}
   - {fileID: 1462687027}
   - {fileID: 172216607}
-  ball: {fileID: 0}
+  ball: {fileID: 1373425456}
   homeScore: 0
   awayScore: 0
-  netController: {fileID: 0}
+  netController: {fileID: 667974768}
   hasBall: 0
   rootAction: {fileID: 0}
   iaDisabled: 0
@@ -12371,7 +12371,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1827283428
 Transform:
   m_ObjectHideFlags: 0
@@ -12779,7 +12779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1876271877
 Transform:
   m_ObjectHideFlags: 0
@@ -13025,7 +13025,7 @@ Transform:
   m_GameObject: {fileID: 1930528748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.53, y: 0, z: -5.26}
+  m_LocalPosition: {x: -5.14, y: 0, z: 5.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13044,7 +13044,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7622faf7e898fb9439cad91bee073881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  role: 0
+  role: 2
   hasBall: 0
 --- !u!136 &1930528751
 CapsuleCollider:

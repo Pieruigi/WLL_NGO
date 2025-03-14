@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.PlayerLoop;
 
 namespace WLL_NGO.AI
 {
@@ -15,7 +16,11 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         PlayerAI caretaker;
-        public PlayerAI Caretaker { get { return caretaker; } }
+        public PlayerAI Caretaker
+        {
+            get { return caretaker; }
+            
+        }
 
         [SerializeField]
         Transform idlePoint;
@@ -36,14 +41,18 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         bool resizeEnabled = false;
-        
+
         [SerializeField]
         bool moveOnResize = false;
 
         bool activated = false;
 
+        TeamAI teamAI;
+
         private void Awake()
         {
+            teamAI = transform.root.GetComponent<FormationHelper>().Home ? TeamAI.HomeTeamAI : TeamAI.AwayTeamAI;
+
             defaultOffset = transform.parent.position.x;
             zoneTriggerList.Add(this);
             Activate(false);
@@ -68,7 +77,7 @@ namespace WLL_NGO.AI
                 }
             }
 
-            
+
         }
 
         private void OnDestroy()
@@ -92,7 +101,7 @@ namespace WLL_NGO.AI
                 // We only report opponents
                 OnOpponentPlayerEnter?.Invoke(this, player);
             }
-            
+
         }
 
 
@@ -109,7 +118,7 @@ namespace WLL_NGO.AI
             {
                 OnOpponentPlayerExit?.Invoke(this, player);
             }
-            
+
         }
 
         public static IList<ZoneTrigger> GetZoneTriggerAll()
@@ -119,7 +128,7 @@ namespace WLL_NGO.AI
 
         public static IList<ZoneTrigger> GetZoneTriggers(PlayerAI player)
         {
-            return zoneTriggerList.Where(z=>z.caretaker == player).ToList();
+            return zoneTriggerList.Where(z => z.caretaker == player).ToList();
         }
 
         public bool IsPlayerZone(PlayerAI player)
@@ -137,6 +146,10 @@ namespace WLL_NGO.AI
             }
         }
 
+        public void Init(int index)
+        {
+            caretaker = teamAI.Players[index + 1];
+        }
 
     }
 

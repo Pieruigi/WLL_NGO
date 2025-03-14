@@ -100,7 +100,7 @@ namespace WLL_NGO.AI
                     basePositions[i] = ballPosition + offset;
 
 
-                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 2.5f * Time.deltaTime);
+                    targetPositions[i] = Vector3.MoveTowards(targetPositions[i], basePositions[i], 5f * Time.deltaTime);
 
                 }
 

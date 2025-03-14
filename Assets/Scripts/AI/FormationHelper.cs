@@ -31,6 +31,9 @@ namespace WLL_NGO.AI
 
         List<Transform> kickOffTransforms = new List<Transform>(), kickOffKickerTransforms = new List<Transform>();
 
+        List<ZoneTrigger> waitingZones = new List<ZoneTrigger>();
+        List<ZoneTrigger> pressingZones = new List<ZoneTrigger>();
+
         void Awake()
         {
             // if (name.ToLower().StartsWith("home"))
@@ -70,6 +73,8 @@ namespace WLL_NGO.AI
             currentTriggers.Clear();
             kickOffTransforms.Clear();
             kickOffKickerTransforms.Clear();
+            waitingZones.Clear();
+            pressingZones.Clear();
 
             // Create formation
             GameObject fo = Instantiate(prefab, transform);
@@ -77,7 +82,6 @@ namespace WLL_NGO.AI
             fo.transform.localEulerAngles = Vector3.up * (home ? 0f : 180f);
 
             // Get kick off transforms
-
             Transform kok = fo.transform.Find("KickOff").Find("Kicker");
             Transform ko = fo.transform.Find("KickOff").Find("NotKicker");
             for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
@@ -86,6 +90,19 @@ namespace WLL_NGO.AI
                 kickOffKickerTransforms.Add(kok.GetChild(i));
             }
 
+            // Get defensive zone
+            ZoneTrigger[] wz = fo.transform.Find("WaitingZone").GetComponentsInChildren<ZoneTrigger>();
+            ZoneTrigger[] pz = fo.transform.Find("PressingZone").GetComponentsInChildren<ZoneTrigger>();
+            for (int i = 0; i < MatchController.Instance.PlayerPerTeam-1; i++)
+            {
+                wz[i].Init(i);
+                pz[i].Init(i);
+                waitingZones.Add(wz[i]);
+                pressingZones.Add(pz[i]);
+            }
+                
+            
+            // Get pressing zone
 
         }
 
