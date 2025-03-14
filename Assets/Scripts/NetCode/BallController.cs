@@ -555,8 +555,7 @@ namespace WLL_NGO.Netcode
 
         public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick)
         {
-            Debug.Log($"Shoot at tick {tick}, currentTick:{NetworkTimer.Instance.CurrentTick}");
-          
+           
             //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
 
             // You can not shoot the ball it's controlled by another player
@@ -648,9 +647,6 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         PlayerController EvaluateTackleWinner(PlayerController playerA, PlayerController playerB)
         {
-            Debug.Log($"Tackle evaluation - {playerA} VS {playerB}");
-
-
             if (playerA.Role == PlayerRole.GK)
                 return playerA;
 

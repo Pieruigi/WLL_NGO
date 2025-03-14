@@ -117,14 +117,12 @@ namespace WLL_NGO.AI
 
         void HandleOnBallSpawned()
         {
-            Debug.Log($"TEST - Ball spawned:{BallController.Instance}");
             //ball = BallController.Instance;
         }
 
         private void HandleOnOwnerChanged(PlayerController oldOwner, PlayerController newOwner)
         {
-            Debug.Log($"Owner changed:{oldOwner}, {newOwner}");
-
+        
             if (player.Role != PlayerRole.GK)
                 return;
 
@@ -312,7 +310,6 @@ namespace WLL_NGO.AI
             // How much time it will take for the ball to reach the net line ( computing velocity along the X axis )
             Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
             Vector3 ballDir = netCenter - BallController.Instance.Position;
-            Debug.Log($"GK - ball vel:{BallController.Instance.GetVelocityWithoutEffect()}");
             Vector3 xVel = Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.right);
             Vector3 xDir = Vector3.ProjectOnPlane(ballDir, Vector3.right);
             float time = xDir.magnitude / xVel.magnitude;

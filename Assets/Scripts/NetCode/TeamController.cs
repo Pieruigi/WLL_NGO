@@ -59,19 +59,21 @@ namespace WLL_NGO.Netcode
 
         }
 
-      
+
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             selectedPlayerRef.OnValueChanged += HandleOnSelectedPlayerRefValueChanged;
+
+            OnTeamControllerSpawned?.Invoke(this);
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-
+            OnTeamControllerDespawned?.Invoke(this);
         }
 
         private void HandleOnSelectedPlayerRefValueChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
@@ -89,11 +91,16 @@ namespace WLL_NGO.Netcode
             if (newNetObj == preNetObject)
                 return; // Nothing changed
 
+            // We reset the input of the previous player since the ai will take care of it
+            if (preNetObject)
+                preNetObject.GetComponent<PlayerController>().GetInputHandler().ResetInput();
+
             // Something changed
             if (newNetObj)
                 selectedPlayer = newNetObj.GetComponent<PlayerController>();
             else
                 selectedPlayer = null;
+                
 
             OnSelectedPlayerChanged?.Invoke(this, preNetObject ? preNetObject.GetComponent<PlayerController>() : null, selectedPlayer);
 

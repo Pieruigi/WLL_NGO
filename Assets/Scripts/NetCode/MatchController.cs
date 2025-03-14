@@ -100,7 +100,6 @@ namespace WLL_NGO.Netcode
         /// <param name="newValue"></param>
         private void HandleOnMatchStateChanged(byte previousValue, byte newValue)
         {
-            Debug.Log($"TEST - Changing state state from {previousValue} to {newValue}");
             switch (newValue)
             {
                 case (byte)MatchState.StartingMatch:
@@ -230,7 +229,6 @@ namespace WLL_NGO.Netcode
         {
             if (!IsServer) return;
 
-            Debug.Log($"Server - Setting new match state: {newMatchState}");
             matchState.Value = (byte)newMatchState;
         }
 

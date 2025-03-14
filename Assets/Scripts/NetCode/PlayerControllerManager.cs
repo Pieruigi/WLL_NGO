@@ -14,7 +14,7 @@ namespace WLL_NGO.Netcode
         List<PlayerController> playerControllers = new List<PlayerController>();
         public ICollection<PlayerController> PlayerControllers
         {
-            get { Debug.Log($"Returning players, count:{playerControllers.Count}"); return playerControllers.AsReadOnly(); }
+            get { return playerControllers.AsReadOnly(); }
         }
         
         public override void OnNetworkSpawn()
@@ -41,8 +41,6 @@ namespace WLL_NGO.Netcode
         /// <param name="player"></param>
         void HandleOnPlayerInitialized(PlayerInfo playerInfo)
         {
-            Debug.Log($"Player initialized, spawn controllers, player info:{playerInfo}");
-
             // Spawn the team using the team roster
             for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
             {
@@ -66,7 +64,7 @@ namespace WLL_NGO.Netcode
         public void AddPlayerController(PlayerController playerController)
         {
             playerControllers.Add(playerController);
-            Debug.Log($"Added new player controller, player count:{playerControllers.Count}");
+           
         }
 
         public List<PlayerController> GetLocalPlayerControllers(bool bot)

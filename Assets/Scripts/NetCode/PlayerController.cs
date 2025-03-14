@@ -383,9 +383,7 @@ namespace WLL_NGO.Netcode
                 NetworkObject no = GetComponent<NetworkObject>();
                 no.ChangeOwnership(PlayerInfo.ClientId);
 
-                //Debug.Log($"Spawned player controller, playerInfo:{playerInfo.Value}");
-                Debug.Log($"Spawned player controller, playerInfoId:{playerInfoId.Value}");
-
+           
                 // Set handling trigger callbacks
                 ballHandlingTrigger.OnBallEnter += HandleOnBallEnter;
                 ballHandlingTrigger.OnBallExit += HandleOnBallExit;
@@ -1567,8 +1565,7 @@ namespace WLL_NGO.Netcode
         {
             if(oldState == newState) return;
 
-            Debug.Log($"GK - changing state:{newState.state}, {newState.subState}, old:{oldState.state}");
-
+           
             switch (newState.state)
             {
                 case (byte)PlayerState.Normal:
@@ -1582,9 +1579,7 @@ namespace WLL_NGO.Netcode
                         
                         // Get the action cooldown
                         playerStateCooldown = GetTackleCooldown(newState.subState);
-                        Debug.Log($"GK - cooldown:{playerStateCooldown}");
-
-
+           
                         // Start animation on server
                         animator.SetInteger(typeAnimParam, newState.subState);
                         animator.SetTrigger(tackleAnimTrigger);
@@ -1954,7 +1949,6 @@ namespace WLL_NGO.Netcode
 
         public void SetInputHandler(IInputHandler inputHandler)
         {
-            Debug.Log($"PlayerController setting input handler:{inputHandler}");
             this.inputHandler = inputHandler;
         }
 

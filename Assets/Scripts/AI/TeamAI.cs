@@ -91,6 +91,8 @@ namespace WLL_NGO.AI
             get{ return formation; }
         }
 
+        public TeamController TeamController { get; private set; }
+
         private void Awake()
         {
             if (home)
@@ -135,17 +137,26 @@ namespace WLL_NGO.AI
         {
             BallController.OnBallSpawned += HandleOnBallSpawned;
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
+            TeamController.OnTeamControllerSpawned += HandleOnTeamControllerSpawned;
         }
 
         private void OnDisable()
         {
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
+            TeamController.OnTeamControllerSpawned -= HandleOnTeamControllerSpawned;
+        }
+
+        private void HandleOnTeamControllerSpawned(TeamController teamController)
+        {
+            if (home != teamController.Home)
+                return;
+
+            TeamController = teamController;
         }
 
         private void HandleOnPlayerControllerSpawned(PlayerController playerController)
         {
-            Debug.Log($"New player controller spawned, player:{playerController.gameObject.name}, ishost:{playerController.IsHost}");
             // Team check
             if (home != playerController.PlayerInfo.Home)
                 return;
@@ -188,7 +199,7 @@ namespace WLL_NGO.AI
 #if TEST_AI
             return players.Exists(p=>p.HasBall);
 #else 
-            return false;
+            return players.Exists(p=>p.HasBall);
 #endif
         }
 

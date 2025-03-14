@@ -79,7 +79,6 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         public static PlayerInfo CreateHumanPlayer(ulong clientId, bool home)
         {
-            Debug.Log($"Creating player info, isHome:{home}");
             return new PlayerInfo()
             {
                 clientId = clientId,
@@ -115,7 +114,6 @@ namespace WLL_NGO.Netcode
        
         public void Initialize(string json)
         {
-            Debug.Log($"Initializing player (clientId:{clientId}): {json}");
             data = json;
             initialized = true;
         }
@@ -144,7 +142,7 @@ namespace WLL_NGO.Netcode
                 reader.ReadValueSafe(out data);
                 reader.ReadValueSafe(out bool r); // We do this to trigger the OnReadyChanged event
                 Ready = r; 
-                Debug.Log("TEST - reading player info");
+               
             }
             else
             {
@@ -156,7 +154,7 @@ namespace WLL_NGO.Netcode
                 writer.WriteValueSafe(initialized);
                 writer.WriteValueSafe(data);
                 writer.WriteValueSafe(ready);
-                Debug.Log("TEST - writing player info");
+               
             }
             
         }

@@ -79,7 +79,6 @@ namespace WLL_NGO.Netcode
                 if (changeEvent.Value.ClientId == NetworkManager.LocalClientId)
                 {
                     
-                    Debug.Log($"Local PlayerInfo has been created or updated by the server for local client (id:{NetworkManager.LocalClientId})");
                     PlayerInfo player = players[changeEvent.Index];
                     // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
                     if (!player.Bot) // Human player
@@ -135,9 +134,6 @@ namespace WLL_NGO.Netcode
                 }
             }
 
-            
-
-            Debug.Log($"Player list has changed");
             foreach (var player in players)
                 Debug.Log(player);
         }
@@ -157,7 +153,6 @@ namespace WLL_NGO.Netcode
                     p.Initialize(data);
                     players[i] = p;
 
-                    Debug.Log($"Bot initialized {p}");
                     OnPlayerInitialized?.Invoke(players[i]);
 
                     return;
@@ -174,9 +169,7 @@ namespace WLL_NGO.Netcode
                     var p = players[i];
                     p.Ready = true;
                     players[i] = p;
-
-                    Debug.Log($"Bot is ready");
-                  
+ 
                     return;
                 }
             }
@@ -198,7 +191,6 @@ namespace WLL_NGO.Netcode
                     p.Initialize(data);
                     players[i] = p;
 
-                    Debug.Log($"Player initialized {p}");
                     OnPlayerInitialized?.Invoke(players[i]);
 
                     return;

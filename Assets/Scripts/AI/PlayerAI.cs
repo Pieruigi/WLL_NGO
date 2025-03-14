@@ -150,13 +150,13 @@ namespace WLL_NGO.AI
                 TestBallController.Instance.transform.position = transform.position + transform.forward * 1f + Vector3.up * .5f;
             }
 #endif
-            if (!IsSelected)
-            {
-                if (Input.GetKey(KeyCode.P))
-                    controller.GetInputHandler().SetJoystick(new Vector2(1f, 0f));
-                else
-                    controller.GetInputHandler().SetJoystick(Vector3.zero);
-            }
+            // if (!IsSelected)
+            // {
+            //     if (Input.GetKey(KeyCode.P))
+            //         controller.GetInputHandler().SetJoystick(new Vector2(1f, 0f));
+            //     else
+            //         controller.GetInputHandler().SetJoystick(Vector3.zero);
+            // }
 
             if (doubleGuard)
             {

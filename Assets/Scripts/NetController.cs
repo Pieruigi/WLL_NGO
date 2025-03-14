@@ -52,9 +52,6 @@ namespace WLL_NGO
 
             width = GetComponent<BoxCollider>().size.z;// trigger.transform.lossyScale.z;
             height = GetComponent<BoxCollider>().size.y;// trigger.transform.lossyScale.y;
-            Debug.Log($"Width:{width}");
-            Debug.Log($"Height:{height}");
-                
         }
 
         // Start is called before the first frame update
