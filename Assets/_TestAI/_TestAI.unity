@@ -6546,7 +6546,7 @@ MonoBehaviour:
   - {fileID: 691588918}
   - {fileID: 1930528750}
   - {fileID: 619650640}
-  waitingLine: 13
+  waitingLine: 16
   waitingTime: 1000
   maxDefensiveDistance: 4
   defenceZoneTriggers:
@@ -6869,8 +6869,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 3
-  hasBall: 0
-  selected: 0
+  hasBall: 1
+  selected: 1
 --- !u!136 &979949425
 CapsuleCollider:
   m_ObjectHideFlags: 0
