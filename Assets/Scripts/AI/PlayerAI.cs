@@ -133,10 +133,14 @@ namespace WLL_NGO.AI
 #endif
         }
 
+#if TEST_AI
+        [SerializeField]
+        bool selected = false;
+#endif
         public bool IsSelected
         {
 #if TEST_AI
-            get{ return false; }
+            get { return selected; }
 #else
             get { return controller.IsSelected(); }
 #endif

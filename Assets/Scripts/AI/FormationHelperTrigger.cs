@@ -98,6 +98,18 @@ namespace WLL_NGO.AI
             }
             else
             {
+                // Check the ball
+                
+#if TEST_AI
+                TestBallController ball = other.GetComponent<TestBallController>();
+#else
+                BallController ball = other.GetComponent<BallController>();
+#endif
+                if (ball)
+                    rootHelper.AddBallTrigger(this);
+                
+
+                // Chck player
                 PlayerAI player = other.GetComponent<PlayerAI>();
 
                 if (!player)
@@ -111,6 +123,8 @@ namespace WLL_NGO.AI
                     return;
 
                 rootHelper.AddTrigger(this);
+
+
             }
 
         }
@@ -130,6 +144,16 @@ namespace WLL_NGO.AI
             }
             else
             {
+                // Check the ball
+#if TEST_AI
+                TestBallController ball = other.GetComponent<TestBallController>();
+#else
+                BallController ball = other.GetComponent<BallController>();
+#endif
+                if (ball)
+                    rootHelper.RemoveBallTrigger(this);
+
+
                 PlayerAI player = other.GetComponent<PlayerAI>();
 
                 if (!player)

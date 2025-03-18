@@ -194,11 +194,20 @@ namespace WLL_NGO.AI
                 players.Add(player);
         }
 
+        public void DestroyRootAction()
+        {
+            if (rootAction)
+            {
+                Destroy(rootAction.gameObject);
+                rootAction = null;
+            }
+        }
+
         public bool HasBall()
         {
 #if TEST_AI
             return players.Exists(p => p.HasBall);
-            
+
 #else
             if(players.Exists(p => p.HasBall) || players.Exists(p => p.IsReceivingPassage()))
                 return true;

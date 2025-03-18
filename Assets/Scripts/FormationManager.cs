@@ -16,19 +16,26 @@ namespace WLL_NGO.AI
 
         FormationHelper homeHelper, awayHelper;
 
-        
+
         // Start is called before the first frame update
         void Start()
         {
-            if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // We don't need formation helper on client
+#if TEST_AI
+            InitFormationHelper(true, "12");
+            InitFormationHelper(false, "12");
+#else
+      if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // We don't need formation helper on client
                 return;
 
             // Create 
             var players = PlayerInfoManager.Instance.GetPlayerInfoAll();
             foreach (var player in players)
             {
-                InitFormationHelper(player.Home,"112");
+                InitFormationHelper(player.Home,"12");
             }
+#endif
+
+
         }
 
 

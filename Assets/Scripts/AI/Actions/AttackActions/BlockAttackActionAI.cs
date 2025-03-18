@@ -50,12 +50,17 @@ namespace WLL_NGO.AI
         void ComputeBasePositions()
         {
             // This action is only available if a team player is bringing the ball.
-            int ballOwnerIndex = TeamAI.Players.ToList().FindIndex(p => p.HasBall);
-            if (ballOwnerIndex < 0)
+            int ballOwnerIndex = TeamAI.Players.ToList().FindIndex(p => p.HasBall || p.IsSelected);
+
+            if(ballOwnerIndex < 0)
             {
-                Debug.LogWarning("BlockAttackActionAI is running but no team player keeping the ball has been found");
                 return;
             }
+
+            // if (ballOwnerIndex < 0)
+            // {
+            //     return;
+            // }
             Debug.Log("TEST - BallOwnerIndex:" + ballOwnerIndex);
 
             bool useLerp = false;
@@ -70,7 +75,11 @@ namespace WLL_NGO.AI
 
             // Filter triggers
             Debug.Log("TEST - Current trigger count:" + helper.CurrentTriggers.Count);
-            var triggers = helper.CurrentTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);
+            List<FormationHelperTrigger> triggers;
+            if(TeamAI.Players[ballOwnerIndex].HasBall)
+                triggers = helper.CurrentTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);
+            else
+                triggers = helper.CurrentBallTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);
 
             if (triggers.Count > 0)
             {
@@ -92,7 +101,7 @@ namespace WLL_NGO.AI
                     else
                     {
                         var trigger = triggers.Last();
-                        Vector3 startPos = /*trigger.BallOwnerIndex < 0 ? ballPosition : */trigger.Positions[trigger.BallOwnerIndex].position;
+                        Vector3 startPos = trigger.Positions[trigger.BallOwnerIndex].position;
                         offset = trigger.Positions[i].position - startPos;
                     }
 
@@ -111,7 +120,7 @@ namespace WLL_NGO.AI
                 for (int i = 0; i < basePositions.Length; i++)
                 {
                     PlayerAI player = TeamAI.Players[i];
-                    if (player.Role == PlayerRole.GK || player.HasBall)// && !player.HasBall) // Only bot when player owns the ball
+                    if (player.Role == PlayerRole.GK || player.HasBall || player.IsSelected)// && !player.HasBall) // Only bot when player owns the ball
                         continue;
 
                     // Check if an action already exists for this player
@@ -128,7 +137,7 @@ namespace WLL_NGO.AI
                     {
                         moveAction.Initialize(new ReachDestinationActionParams() { Destination = targetPositions[i] });
                     }
-                    
+
                     // Create action
                     // moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
                     // moveAction.OnActionCompleted += HandleOnActionCompleted;
@@ -157,7 +166,7 @@ namespace WLL_NGO.AI
 
         bool CheckConditions(PlayerAI player)
         {
-            // For example an action may be considered interrupted if the player got stunned ( or even if they are facing an opponent and they need to
+            // For example an action may be considered interrupted if the player is stunned ( or even if they are facing an opponent and they need to
             // switch direction )
             return true;
         }
