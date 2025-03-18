@@ -9,19 +9,19 @@ using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
-    
+
 
     public class TeamAI : MonoBehaviour
     {
-        public static TeamAI HomeTeamAI {  get; private set; }
+        public static TeamAI HomeTeamAI { get; private set; }
         public static TeamAI AwayTeamAI { get; private set; }
 
         [SerializeField] bool home;
         public bool Home
         {
-            get{ return home; }
+            get { return home; }
         }
-        
+
         [SerializeField] List<PlayerAI> players = new List<PlayerAI>();
         public IList<PlayerAI> Players
         {
@@ -30,7 +30,7 @@ namespace WLL_NGO.AI
         [SerializeField] float waitingLine;
         public float WaitingLine
         {
-            get { return waitingLine; } 
+            get { return waitingLine; }
         }
 
         [SerializeField] float waitingTime;
@@ -48,10 +48,10 @@ namespace WLL_NGO.AI
         //public int FormationId { get { return formationId; } }
 
         [SerializeField] List<ZoneTrigger> defenceZoneTriggers;
-        public List<ZoneTrigger> DefenceZoneTriggers { get { return defenceZoneTriggers; } }
+        public List<ZoneTrigger> WaitingZoneTriggers { get { return defenceZoneTriggers; } }
 
         [SerializeField] List<ZoneTrigger> pressingTriggers;
-        public List<ZoneTrigger> PressingTriggers { get { return pressingTriggers; } }
+        public List<ZoneTrigger> PressingZoneTriggers { get { return pressingTriggers; } }
 
 #if TEST_AI
         [SerializeField]TestBallController ball;
@@ -66,7 +66,7 @@ namespace WLL_NGO.AI
         BallController ball;
         public BallController BallController { get { return ball; } }
         [SerializeField] NetController netController;
-        public NetController NetController { get { return netController;} }
+        public NetController NetController { get { return netController; } }
 #endif
 
 #if TEST_AI
@@ -88,7 +88,7 @@ namespace WLL_NGO.AI
         int formation = 0;
         public int Formation
         {
-            get{ return formation; }
+            get { return formation; }
         }
 
         public TeamController TeamController { get; private set; }
@@ -114,7 +114,7 @@ namespace WLL_NGO.AI
 
         }
 
-        
+
 
         private void FixedUpdate()
         {
@@ -123,8 +123,8 @@ namespace WLL_NGO.AI
                 return;
 #endif
             timeElapsed -= Time.fixedDeltaTime;
-            
-            if(timeElapsed < 0)
+
+            if (timeElapsed < 0)
             {
                 timeElapsed = updateTime;
                 DoUpdate();
@@ -172,36 +172,58 @@ namespace WLL_NGO.AI
 
             ball = BallController.Instance;
 
-    }
+        }
 #endif
 
         void DoUpdate()
         {
             if (iaDisabled) return;
 
-            if(!rootAction)
+            if (!rootAction)
             {
                 // Create the root action
                 rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null, restartOnNoChildren: true);
-                
+
             }
-           
+
         }
 
         void AddPlayer(PlayerAI player)
         {
-            if(!players.Contains(player))
+            if (!players.Contains(player))
                 players.Add(player);
         }
 
         public bool HasBall()
         {
 #if TEST_AI
-            return players.Exists(p=>p.HasBall);
-#else 
-            return players.Exists(p=>p.HasBall);
+            return players.Exists(p => p.HasBall);
+            
+#else
+            if(players.Exists(p => p.HasBall) || players.Exists(p => p.IsReceivingPassage()))
+                return true;
 #endif
         }
+
+        public bool IsAttacking()
+        {
+            if(HasBall())
+                return true;
+
+            TeamAI opponent = home ? AwayTeamAI : HomeTeamAI;
+            if(opponent.HasBall())
+                return false;
+#if TEST_AI
+            return (TestBallController.Instance.Position.x > 0 && home) || (TestBallController.Instance.Position.x < 0 && !home);
+#else
+            return (BallController.Instance.Position.x > 0 && home) || (BallController.Instance.Position.x < 0 && !home);
+#endif
+        }
+
+        public bool IsDefending()
+        {
+            return !IsAttacking();
+        }        
 
         //public PlayerAI GetZoneDefender(ZoneTrigger zone)
         //{
@@ -223,7 +245,15 @@ namespace WLL_NGO.AI
             return maxDefensiveDistance;
         }
 
-       
-    }
+        public void SetDefenceZoneTriggerList(List<ZoneTrigger> zoneTriggers)
+        {
+            defenceZoneTriggers = zoneTriggers;
 
+        }
+
+        public void SetPressingZoneTriggerList(List<ZoneTrigger> zoneTriggers)
+        {
+            pressingTriggers = zoneTriggers;
+        }
+    }
 }

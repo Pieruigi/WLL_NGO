@@ -1813,6 +1813,11 @@ namespace WLL_NGO.Netcode
             this.role = role;
         }
 
+        public bool IsReceivingPassage()
+        {
+            return playerStateInfo.Value.state == (byte)PlayerState.Receiver;
+        }
+
         //public void DisableBallHandlingTrigger()
         //{
         //    ballHandlingTrigger.SetEnable(false);

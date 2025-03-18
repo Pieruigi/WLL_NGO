@@ -13,6 +13,7 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         Dictionary<PlayerAI, ActionAI> moveActions = new Dictionary<PlayerAI, ActionAI>();
+        
 
         protected override void Activate()
         {
@@ -20,7 +21,7 @@ namespace WLL_NGO.AI
             ZoneTrigger.OnOpponentPlayerEnter += HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit += HandleOnOpponentPlayerExit;
             // Activate triggers
-            foreach (ZoneTrigger zt in TeamAI.PressingTriggers)
+            foreach (ZoneTrigger zt in TeamAI.PressingZoneTriggers)
                 zt.Activate(true);
 
             // Clear player target and dictionary
@@ -39,7 +40,7 @@ namespace WLL_NGO.AI
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
 
             // Deactivate triggers
-            foreach (ZoneTrigger zt in TeamAI.PressingTriggers)
+            foreach (ZoneTrigger zt in TeamAI.PressingZoneTriggers)
                 zt.Activate(false);
 
             foreach (var player in TeamAI.Players)
@@ -69,7 +70,7 @@ namespace WLL_NGO.AI
             else
             {
                 // Double guard only if the target is entering the zone of a teammate
-                foreach (var t in TeamAI.PressingTriggers)
+                foreach (var t in TeamAI.PressingZoneTriggers)
                 {
                     if (t == trigger)
                         continue;
@@ -112,7 +113,7 @@ namespace WLL_NGO.AI
                 if (player.Role == PlayerRole.GK)
                     continue;
 
-                ZoneTrigger trigger = TeamAI.PressingTriggers.Find(t => t.Caretaker == player);
+                ZoneTrigger trigger = TeamAI.PressingZoneTriggers.Find(t => t.Caretaker == player);
 
                 // We always want to target an opponent player on pressing
                 if (!player.TargetPlayer)

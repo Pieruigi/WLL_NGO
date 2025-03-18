@@ -32,8 +32,9 @@ namespace WLL_NGO.AI
         List<Transform> kickOffTransforms = new List<Transform>(), kickOffKickerTransforms = new List<Transform>();
 
         List<ZoneTrigger> waitingZones = new List<ZoneTrigger>();
+       
         List<ZoneTrigger> pressingZones = new List<ZoneTrigger>();
-
+       
         void Awake()
         {
             // if (name.ToLower().StartsWith("home"))
@@ -93,16 +94,19 @@ namespace WLL_NGO.AI
             // Get defensive zone
             ZoneTrigger[] wz = fo.transform.Find("WaitingZone").GetComponentsInChildren<ZoneTrigger>();
             ZoneTrigger[] pz = fo.transform.Find("PressingZone").GetComponentsInChildren<ZoneTrigger>();
-            for (int i = 0; i < MatchController.Instance.PlayerPerTeam-1; i++)
+            for (int i = 0; i < MatchController.Instance.PlayerPerTeam - 1; i++)
             {
                 wz[i].Init(i);
                 pz[i].Init(i);
                 waitingZones.Add(wz[i]);
                 pressingZones.Add(pz[i]);
             }
-                
+            // Setting team ai triggers
+            var team = home ? TeamAI.HomeTeamAI : TeamAI.AwayTeamAI;
+            team.SetDefenceZoneTriggerList(waitingZones);
+            team.SetPressingZoneTriggerList(pressingZones);
             
-            // Get pressing zone
+            
 
         }
 

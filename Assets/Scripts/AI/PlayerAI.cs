@@ -99,7 +99,7 @@ namespace WLL_NGO.AI
             get
             {
 #if TEST_AI
-                return 1.5f;
+                return 2.5f;
 #else
                 return controller.MaxSpeed;
 #endif

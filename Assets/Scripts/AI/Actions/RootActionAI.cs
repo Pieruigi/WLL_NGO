@@ -29,14 +29,18 @@ namespace WLL_NGO.AI
                 return;
 
             //Debug.Log("TEST - TeamAI has ball:" + TeamAI.HasBall());
-            TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
-            if (TeamAI.HasBall())
-                actionAI = CreateAction<AttackActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return TeamAI.HasBall(); });
-            else if(oppTeam.HasBall())
-                actionAI = CreateAction<DefenceActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return oppTeam.HasBall(); });
+            //TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
+            if (TeamAI.IsAttacking())
+                actionAI = CreateAction<AttackActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return TeamAI.IsAttacking(); });
             else
-                actionAI = CreateAction<LooseBallActionAI>(Owner, this, restartOnNoChildren: false, conditionFunction: () => { return !oppTeam.HasBall() && !TeamAI.HasBall(); });
+                actionAI = CreateAction<DefenceActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return TeamAI.IsDefending(); });
+            // else if (oppTeam.HasBall())
+            //     actionAI = CreateAction<DefenceActionAI>(Owner, this, restartOnNoChildren: true, conditionFunction: () => { return oppTeam.HasBall(); });
+            // else
+            //     actionAI = CreateAction<LooseBallActionAI>(Owner, this, restartOnNoChildren: false, conditionFunction: () => { return !oppTeam.HasBall() && !TeamAI.HasBall(); });
         }
+
+        
 
     }
 

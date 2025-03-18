@@ -14,7 +14,7 @@ namespace WLL_NGO.AI
         Vector3 destination = Vector3.zero;
         bool reached = false;
 
-        float tollerance = 2f;
+        float tollerance = .75f;
 
         protected override void Activate()
         {
@@ -46,12 +46,13 @@ namespace WLL_NGO.AI
             // Using input handler
             var inputHandler = PlayerAI.Controller.GetInputHandler();
             var dir = Vector3.ProjectOnPlane(destination - PlayerAI.transform.position, Vector3.up);
-            if (dir.magnitude > 0.01f)
+            if (dir.magnitude > tollerance)
             {
                 inputHandler.SetJoystick(new Vector2(dir.x, dir.z).normalized);
             }
             else
             {
+                //if(dir.magnitude < tollerance * .5f)
                 inputHandler.SetJoystick(Vector2.zero);
             }
 #endif

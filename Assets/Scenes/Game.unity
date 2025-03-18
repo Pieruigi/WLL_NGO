@@ -1950,12 +1950,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   home: 0
   players: []
-  waitingLine: 10
+  waitingLine: 13
   waitingTime: 1000
   maxDefensiveDistance: 4
   defenceZoneTriggers: []
   pressingTriggers: []
-  netController: {fileID: 0}
+  netController: {fileID: 738137974}
   rootAction: {fileID: 0}
   iaDisabled: 0
 --- !u!4 &892747939
@@ -4606,15 +4606,9 @@ MonoBehaviour:
   waitingLine: 13
   waitingTime: 1000
   maxDefensiveDistance: 4
-  defenceZoneTriggers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  pressingTriggers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  netController: {fileID: 0}
+  defenceZoneTriggers: []
+  pressingTriggers: []
+  netController: {fileID: 667974766}
   rootAction: {fileID: 0}
   iaDisabled: 0
 --- !u!4 &2007861885
