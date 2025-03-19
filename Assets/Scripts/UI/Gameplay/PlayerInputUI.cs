@@ -13,15 +13,19 @@ namespace WLL_NGO.UI
         CanvasGroup canvasGroup;
 
         [SerializeField]
-        Button button1, button2;
+        GameButton button1, button2;
 
         TeamController teamController;
+
+        [SerializeField]
+        Joystick joystick;
 
 
         // Start is called before the first frame update
         void Start()
         {
-            canvasGroup.alpha = 0;            
+            canvasGroup.alpha = 0;
+            Show();    
         }
 
         // Update is called once per frame
@@ -64,14 +68,21 @@ namespace WLL_NGO.UI
             switch (MatchController.Instance.MatchState)
             {
                 case MatchState.Playing:
-                    ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
-                    ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
-                    ih.SetButton2(Input.GetKey(KeyCode.Keypad2));
+                    //ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
+                    ih.SetJoystick(joystick.Direction);
+                    //ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
+                    ih.SetButton1(button1.GetButton());
+                    //ih.SetButton2(Input.GetKey(KeyCode.Keypad2));
+                    ih.SetButton2(button2.GetButton());
                     ih.SetButton3(false);
                     break;
                 case MatchState.KickOff:
                     ih.SetJoystick(Vector2.zero);
-                    ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
+                    //ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
+                    if(teamController.SelectedPlayer && teamController.SelectedPlayer.HasBall)
+                        ih.SetButton1(button1.GetButton());
+                    else
+                        ih.SetButton1(false);
                     ih.SetButton2(false);
                     ih.SetButton3(false);
                     break;

@@ -53,7 +53,10 @@ namespace WLL_NGO
                 ServerMatchmaker.OnMatchmakerPayload?.Invoke(new Unity.Services.Matchmaker.Models.MatchmakingResults() { });
 #else
                 // Start the matchmaker handler
+#if UNITY_SERVER || UNITY_EDITOR || UNITY_STANDALONE || UNITY_STANDALONE_WIN
                 ServerMatchmaker.Instance.StartUp();
+#endif
+
 #endif
             }
 

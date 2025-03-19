@@ -60,6 +60,11 @@ namespace WLL_NGO.AI
             }
         }
 
+        public bool IsReceivingPassage
+        {
+            get {return controller.IsReceivingPassage(); }    
+        }
+
         PlayerAI targetPlayer = null;
         public PlayerAI TargetPlayer
         {

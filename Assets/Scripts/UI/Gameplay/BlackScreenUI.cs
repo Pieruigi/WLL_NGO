@@ -12,7 +12,7 @@ namespace WLL_NGO.UI
 
         void Awake()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponentInChildren<CanvasGroup>();
             canvasGroup.alpha = 1;
         }
 
@@ -51,11 +51,13 @@ namespace WLL_NGO.UI
         void Show()
         {
             canvasGroup.alpha = 1;
+            canvasGroup.blocksRaycasts = true;
         }
 
         void Hide()
         {
             canvasGroup.alpha = 0;
+            canvasGroup.blocksRaycasts = false;
         }
     }
     

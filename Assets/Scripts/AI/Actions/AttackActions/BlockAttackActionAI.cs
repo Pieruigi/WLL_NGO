@@ -57,12 +57,7 @@ namespace WLL_NGO.AI
                 return;
             }
 
-            // if (ballOwnerIndex < 0)
-            // {
-            //     return;
-            // }
-            Debug.Log("TEST - BallOwnerIndex:" + ballOwnerIndex);
-
+            
             bool useLerp = false;
             // Compute base positions
             FormationHelper helper = TeamAI.Home ? FormationHelper.HomeFormationHelper : FormationHelper.AwayFormationHelper;
@@ -74,7 +69,6 @@ namespace WLL_NGO.AI
             Vector3[] basePositions = new Vector3[TeamAI.Players.Count];
 
             // Filter triggers
-            Debug.Log("TEST - Current trigger count:" + helper.CurrentTriggers.Count);
             List<FormationHelperTrigger> triggers;
             if(TeamAI.Players[ballOwnerIndex].HasBall)
                 triggers = helper.CurrentTriggers.ToList().FindAll(t => t.BallOwnerIndex == ballOwnerIndex);

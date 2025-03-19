@@ -21,6 +21,7 @@ namespace WLL_NGO.Netcode
             Time.fixedDeltaTime = 1f / Constants.ServerTickRate;
             //NetworkManager.Singleton.NetworkConfig.TickRate = Constants.ServerTickRate;
             Application.targetFrameRate = Constants.ServerTickRate;
+            
 
             //Physics.simulationMode = SimulationMode.Script;
         }

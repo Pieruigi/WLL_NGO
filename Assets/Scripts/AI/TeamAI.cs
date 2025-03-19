@@ -115,6 +115,18 @@ namespace WLL_NGO.AI
         }
 
 
+        void Start()
+        {
+            // Set net controller
+            if (home)
+            {
+                netController = NetController.HomeNetController;
+            }
+            else
+            {
+                netController = NetController.AwayNetController;
+            }
+        }
 
         private void FixedUpdate()
         {
@@ -138,6 +150,7 @@ namespace WLL_NGO.AI
             BallController.OnBallSpawned += HandleOnBallSpawned;
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
             TeamController.OnTeamControllerSpawned += HandleOnTeamControllerSpawned;
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
         }
 
         private void OnDisable()
@@ -145,6 +158,21 @@ namespace WLL_NGO.AI
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
             TeamController.OnTeamControllerSpawned -= HandleOnTeamControllerSpawned;
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
+        }
+
+        private void HandleOnMatchStateChanged(int oldState, int newState)
+        {
+            switch (newState)
+            {
+                case (int)MatchState.End:
+                case (int)MatchState.Goal:
+                    DestroyRootAction();
+                    break;
+                case (int)MatchState.Playing:
+                    CreateRootAction();
+                    break;
+            }
         }
 
         private void HandleOnTeamControllerSpawned(TeamController teamController)
@@ -177,14 +205,14 @@ namespace WLL_NGO.AI
 
         void DoUpdate()
         {
-            if (iaDisabled) return;
+            // if (iaDisabled) return;
 
-            if (!rootAction)
-            {
-                // Create the root action
-                rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null, restartOnNoChildren: true);
+            // if (!rootAction)
+            // {
+            //     // Create the root action
+            //     rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null, restartOnNoChildren: true);
 
-            }
+            // }
 
         }
 
@@ -193,6 +221,15 @@ namespace WLL_NGO.AI
             if (!players.Contains(player))
                 players.Add(player);
         }
+
+        void CreateRootAction()
+        {
+            if(!rootAction)
+            {
+                rootAction = ActionAI.CreateAction<RootActionAI>(owner: this, previousAction: null, restartOnNoChildren: true);
+            }
+        }
+
 
         public void DestroyRootAction()
         {
@@ -209,8 +246,7 @@ namespace WLL_NGO.AI
             return players.Exists(p => p.HasBall);
 
 #else
-            if(players.Exists(p => p.HasBall) || players.Exists(p => p.IsReceivingPassage()))
-                return true;
+            return (players.Exists(p => p.HasBall) || players.Exists(p => p.IsReceivingPassage));
 #endif
         }
 

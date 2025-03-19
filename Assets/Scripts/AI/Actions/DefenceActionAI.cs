@@ -31,8 +31,6 @@ namespace WLL_NGO.AI
             Vector3 ballDir = ball.Position - team.NetController.transform.position;
             ballDir.y = 0;
 
-            Debug.Log("WaitingCondition, ball distance:" + (ballDir.magnitude));
-
             return (ballDir.magnitude > team.WaitingLine && team.WaitingTime > 0);
 
         }

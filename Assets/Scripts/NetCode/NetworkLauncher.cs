@@ -37,12 +37,12 @@ namespace WLL_NGO.Netcode
                 ClientMatchmaker.OnTicketAssigned += HandleOnTicketAssigned;
 #endif
             }
-
-
-            if (dedicatedServer)
+#if UNITY_SERVER || UNITY_EDITOR || UNITY_STANDALONE || UNITY_STANDALONE_WIN
+            else
             {
                 ServerMatchmaker.OnMatchmakerPayload += HandleOnMatchmakerPayload; // Wait for payload to set the connection ip and port
             }
+#endif
         }
 
 
