@@ -6,6 +6,10 @@ public class FPSDisplay : MonoBehaviour
     public TextMeshProUGUI fpsText; // Assegna un oggetto UI di tipo TextMeshProUGUI
     private float deltaTime = 0.0f;
 
+    void Start()
+    {
+        //Application.targetFrameRate = -1;
+    }
     void Update()
     {
         deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;

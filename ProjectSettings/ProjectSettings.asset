@@ -800,7 +800,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: _NO_MM;_TEST_AI
+    Android: _NO_MM;TEST_AI
     Server: __NO_MM;_USE_LOBBY_SCENE
     Standalone: NO_MM;_USE_LOBBY_SCENE;TEST_AI
   additionalCompilerArguments: {}

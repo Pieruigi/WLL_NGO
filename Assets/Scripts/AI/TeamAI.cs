@@ -117,15 +117,9 @@ namespace WLL_NGO.AI
 
         void Start()
         {
-            // Set net controller
-            if (home)
-            {
-                netController = NetController.HomeNetController;
-            }
-            else
-            {
-                netController = NetController.AwayNetController;
-            }
+#if TEST_AI
+            CreateRootAction();
+#endif
         }
 
         private void FixedUpdate()
