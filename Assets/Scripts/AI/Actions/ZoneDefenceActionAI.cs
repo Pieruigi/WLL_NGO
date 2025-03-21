@@ -63,7 +63,6 @@ namespace WLL_NGO.AI
         private void HandleOnOpponentPlayerExit(ZoneTrigger trigger, PlayerAI player)
         {
             // We must check the waiting line too
-            Debug.Log($"Player exit:{player}");
             if (!player.HasBall)
             {
                 trigger.Caretaker.TargetPlayer = null;

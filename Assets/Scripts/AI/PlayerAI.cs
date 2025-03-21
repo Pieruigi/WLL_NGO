@@ -75,7 +75,6 @@ namespace WLL_NGO.AI
             { 
                 if (doubleGuard)
                 {
-                    Debug.Log($"AI - savedTarget:{value}");
                     savedTarget = value;
                     return;
                 }
