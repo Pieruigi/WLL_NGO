@@ -138,8 +138,8 @@ Material:
     - _Surface: 1
     - _WorkflowMode: 1
     - _ZWrite: 0
-    - _alpha_lines: 1
-    - _power_color: 0.52
+    - _alpha_lines: 0.08
+    - _power_color: 0.45
     m_Colors:
     - _BaseColor: {r: 0.512994, g: 0.8301887, b: 0.68770385, a: 1}
     - _Color: {r: 0.512994, g: 0.8301887, b: 0.68770385, a: 1}

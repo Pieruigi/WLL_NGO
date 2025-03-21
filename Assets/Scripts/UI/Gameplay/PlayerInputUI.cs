@@ -70,11 +70,21 @@ namespace WLL_NGO.UI
                 case MatchState.Playing:
                     //ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
                     ih.SetJoystick(joystick.Direction);
+                    
                     //ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
                     ih.SetButton1(button1.GetButton());
                     //ih.SetButton2(Input.GetKey(KeyCode.Keypad2));
                     ih.SetButton2(button2.GetButton());
                     ih.SetButton3(false);
+
+#if UNITY_EDITOR
+                    if(joystick.Direction == Vector2.zero)
+                        ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
+                    if(!button1.GetButton())
+                        ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
+                    if(!button2.GetButton())
+                        ih.SetButton2(Input.GetKey(KeyCode.Keypad2));
+#endif
                     break;
                 case MatchState.KickOff:
                     ih.SetJoystick(Vector2.zero);

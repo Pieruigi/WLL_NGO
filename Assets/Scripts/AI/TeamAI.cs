@@ -118,8 +118,13 @@ namespace WLL_NGO.AI
         void Start()
         {
 #if TEST_AI
+            netController = FindObjectsOfType<TestNetController>().ToList().Find(n=>n.Home == home)            
+
             CreateRootAction();
+#else
+            netController = home ? NetController.HomeNetController : NetController.AwayNetController;
 #endif
+
         }
 
         private void FixedUpdate()

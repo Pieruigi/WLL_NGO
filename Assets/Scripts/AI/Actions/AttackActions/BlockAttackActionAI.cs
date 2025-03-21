@@ -117,12 +117,15 @@ namespace WLL_NGO.AI
                     if (player.Role == PlayerRole.GK || player.HasBall || player.IsSelected)// && !player.HasBall) // Only bot when player owns the ball
                         continue;
 
+                    if (Vector3.Distance(player.Position, targetPositions[i]) < ReachDestinationActionParams.TolleranceDefault)
+                        continue;
+
                     // Check if an action already exists for this player
-                    var moveAction = actions.Find(a => a.PlayerAI == player);
+                        var moveAction = actions.Find(a => a.PlayerAI == player);
 
                     if (!moveAction)
                     {
-                        moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] });
+                        moveAction = (PlayerActionAI)ActionAI.CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = targetPositions[i] }, ()=> { return !player.IsSelected; });
                         moveAction.OnActionCompleted += HandleOnActionCompleted;
                         moveAction.OnActionInterrupted += HandleOnActionInterrupted;
                         actions.Add(moveAction);
@@ -144,9 +147,9 @@ namespace WLL_NGO.AI
 
         }
 
-        
 
-        
+
+
 
         private void HandleOnActionInterrupted(ActionAI action)
         {
