@@ -27,12 +27,12 @@ namespace WLL_NGO
 
         int goalLimit;
         float timeLimit;
-        
+
 
         // Update is called once per frame
         protected virtual void Update()
         {
-            if (IsClient) return; // Server only
+            if (!IsServer) return; // Server only
 
             if (completed) return; // Completed
 
@@ -65,10 +65,10 @@ namespace WLL_NGO
             // TODO: you can chech here if the DoubleScore super power is active
             scorer.Score += 1;
 
-           
+
         }
 
-        bool IsMatchCompleted()
+        protected virtual bool IsMatchCompleted()
         {
             if (useTimeLimit && timer.Value > timeLimit)
             {
@@ -81,7 +81,7 @@ namespace WLL_NGO
             return false;
         }
 
-        void InitGameMode(GameMode gameMode)
+        protected virtual void InitGameMode(GameMode gameMode)
         {
             switch (gameMode)
             {
@@ -101,7 +101,18 @@ namespace WLL_NGO
                     useGoalLimit = false;
                     timeLimit = 150;
                     break;
-                
+
+            }
+        }
+
+        public static void CreateMatchRuler(GameMode gameMode)
+        {
+            switch (gameMode)
+            {
+                case GameMode.Fast:
+                case GameMode.Classic:
+
+                    break;
             }
         }
     }
