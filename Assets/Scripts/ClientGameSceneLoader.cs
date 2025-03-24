@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.Services.Matchmaker.Models;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -20,18 +22,43 @@ namespace WLL_NGO
             {
                 Destroy(gameObject);
             }
-            else
-            {
-                // Load and stream data
-                Initialize();
-            }
+            // else
+            // {
+            //     // Load and stream data
+            //     Initialize();
+            // }
         }
 
-        async void Initialize()
+        void OnEnable()
+        {
+            PlayerInfo.OnInitializedChanged += HandleOnPlayerInitialized;    
+        }
+
+        void OnDisable()
+        {
+            PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitialized;    
+        }
+
+        private void HandleOnPlayerInitialized(PlayerInfo player)
+        {
+            MoveToReady(player);
+        }
+
+        async void MoveToReady(PlayerInfo player)
         {
             await Task.Delay(3000); // Just for test
 
-            PlayerInfoManager.Instance.SetPlayerReadyServerRpc(NetworkManager.Singleton.LocalClientId);
+            if (player.IsLocal)
+            {
+                if (!player.Bot)
+                    player.SetReadyServerRpc(true);
+                else
+                    player.SetReady(true);
+            }
+
+            
+
+
         }
     }
 

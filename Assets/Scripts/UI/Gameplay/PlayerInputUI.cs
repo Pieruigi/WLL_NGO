@@ -48,7 +48,7 @@ namespace WLL_NGO.UI
 
         private void HandleOnPlayerReadyChanged(PlayerInfo playerInfo)
         {
-            if (!playerInfo.IsLocal && !playerInfo.Bot)
+            if (!playerInfo.IsLocal || playerInfo.Bot)
                 return;
             teamController = playerInfo.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
         }

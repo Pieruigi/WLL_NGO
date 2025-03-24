@@ -47,17 +47,7 @@ namespace WLL_NGO.Netcode
         public bool Initialized
         {
             get { return initialized.Value; }
-            // set
-            // {
-            //     var old = initialized;
-            //     initialized = value;
-            //     if (old != initialized)
-            //     {
-            //         Debug.Log($"TEST - AAAAAAAAAAAAAAA init:{initialized}, old:{old}");
-            //         OnInitializedChanged?.Invoke(this);
-            //     }
-                    
-            // }
+           
         }
 
         [SerializeField]NetworkVariable<FixedString32Bytes> data = new NetworkVariable<FixedString32Bytes>();
@@ -76,13 +66,7 @@ namespace WLL_NGO.Netcode
         public bool Ready
         {
             get { return ready.Value; }
-            set
-            {
-                var old = ready.Value;
-                ready.Value = value;
-                if(old != ready.Value)
-                    OnReadyChanged?.Invoke(this);
-            }
+       
         }
 
 
@@ -92,41 +76,7 @@ namespace WLL_NGO.Netcode
             get { return clientId.Value == NetworkManager.Singleton.LocalClientId; }
         }
 
-        /// <summary>
-        /// Called by the server to create human player info.
-        /// </summary>
-        /// <param name="clientId"></param>
-        /// <returns></returns>
-        // public static PlayerInfo CreateHumanPlayer(ulong clientId, bool home)
-        // {
-        //     return new PlayerInfo()
-        //     {
-        //         clientId = clientId,
-        //         bot = false,
-        //         id = $"h_{clientId}",
-        //         initialized = false,
-        //         home = home,
-        //         data = ""
-        //     };
-        // }
-
-        /// <summary>
-        /// Called by the server to create bot player info.
-        /// </summary>
-        /// <returns></returns>
-        // public static PlayerInfo CreateBotPlayer()
-        // {
-        //     return new PlayerInfo()
-        //     {
-        //         clientId = 0,
-        //         bot = true,
-        //         id = "",
-        //         initialized = false,
-        //         home = false,
-        //         data = ""
-        //     };
-        // }
-
+   
         /// <summary>
         /// Executed on the server to init data ( for example the teamroster )
         /// </summary>
@@ -135,7 +85,8 @@ namespace WLL_NGO.Netcode
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            initialized.OnValueChanged = (o,n) => { OnInitializedChanged?.Invoke(this); };
+            initialized.OnValueChanged = (o,n) => { Debug.Log($"Player initialized:{this}"); OnInitializedChanged?.Invoke(this); };
+            ready.OnValueChanged = (o, n) => { Debug.Log($"Player ready:{this}"); OnReadyChanged?.Invoke(this); };
             PlayerInfoManager.Instance.AddPlayer(this);
         }
 
@@ -149,6 +100,18 @@ namespace WLL_NGO.Netcode
         {
             data.Value = json;
             initialized.Value = true;
+        }
+
+        /// <summary>
+        /// Executed on the server to initialize the local client
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="data"></param>
+        [ServerRpc(RequireOwnership = false)]
+        public void InizialiteServerRpc(string data)
+        {
+            Initialize(data);
+            
         }
 
         public void CreateHumanPlayer(ulong clientId, bool home)
@@ -171,57 +134,23 @@ namespace WLL_NGO.Netcode
             data.Value = "";
         }
 
+        public void SetReady(bool value)
+        {
+            ready.Value = value;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SetReadyServerRpc(bool value)
+        {
+            ready.Value = value;
+        }
 
         public override string ToString()
         {
-            return $"[Player id:{id}, clientId:{clientId}, bot:{bot}, home:{home}, initialized:{initialized}, data:{data}, ready:{ready}]";
+            return $"[Player id:{id.Value}, clientId:{clientId.Value}, bot:{bot.Value}, home:{home.Value}, initialized:{initialized.Value}, data:{data.Value}, ready:{ready.Value}]";
         }
 
-        #region data serialization
-        // public bool Equals(PlayerInfo other)
-        // {
-        //     return id == other.id && clientId == other.clientId && bot == other.bot;
-        // }
-
-        // public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        // {
-        //     Debug.Log($"TEST - AAAAAAAAAAAAAAAAA:{data}");
-
-        //     bool oldInitialized = initialized;
-
-        //     if (serializer.IsReader)
-        //     {
-        //         var reader = serializer.GetFastBufferReader();
-        //         reader.ReadValueSafe(out id);
-        //         reader.ReadValueSafe(out clientId);
-        //         reader.ReadValueSafe(out bot);
-        //         reader.ReadValueSafe(out home);
-        //         reader.ReadValueSafe(out initialized);
-          
-        //         //Initialized = i;
-        //         reader.ReadValueSafe(out data);
-        //         reader.ReadValueSafe(out bool r); // We do this to trigger the OnReadyChanged event
-        //         Ready = r;
-
-        //         if (oldInitialized != initialized)
-        //             OnInitializedChanged?.Invoke(this);
-        //     }
-        //     else
-        //     {
-        //         var writer = serializer.GetFastBufferWriter();
-        //         writer.WriteValueSafe(id);
-        //         writer.WriteValueSafe(clientId);
-        //         writer.WriteValueSafe(bot);
-        //         writer.WriteValueSafe(home);
-        //         writer.WriteValueSafe(initialized);
-        //         writer.WriteValueSafe(data);
-        //         writer.WriteValueSafe(ready);
-
-        //     }
-
-        //     Debug.Log($"TEST - BBBBBBBBBBBBBBBBBBB:{data}");
-        // }
-        #endregion
+       
 
 
     }

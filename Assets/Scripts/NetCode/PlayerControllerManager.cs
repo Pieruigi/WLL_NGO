@@ -39,6 +39,7 @@ namespace WLL_NGO.Netcode
         /// <param name="player"></param>
         void HandleOnPlayerInitialized(PlayerInfo playerInfo)
         {
+            Debug.Log("TEST - EEEEEEEEEEEEEEEEEEE: " + playerInfo);
             // Spawn the team using the team roster
             for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
             {
@@ -52,7 +53,7 @@ namespace WLL_NGO.Netcode
                 rb.rotation = spawnPoint.rotation;
                 NetworkObject no = go.GetComponent<NetworkObject>();
                 no.Spawn();
-                
+
             }
             //NetworkObject no = playerPrefabList.PrefabList[0].Prefab.GetComponent<NetworkObject>();
             //Transform spawnPoint = playerInfo.Home ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoint(0) : PlayerSpawnPointManager.Instance.GetAwaySpawnPoint(0);
