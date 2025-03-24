@@ -12,8 +12,8 @@ namespace WLL_NGO
         // Start is called before the first frame update
         void Start()
         {
-            var lp = PlayerInfoManager.Instance.GetLocalPlayerInfo();
-            Debug.Log($"TEST - Local player info:{lp}");
+            //var lp = PlayerInfoManager.Instance.GetLocalPlayerInfo();
+            //Debug.Log($"TEST - Local player info:{lp}");
 
         }
 
@@ -23,19 +23,19 @@ namespace WLL_NGO
 
         }
 
-        // void OnEnable()
-        // {
-        //     PlayerInfoManager.OnPlayerInitialized += HandleOnPlayerInitialized;
-        // }
+        void OnEnable()
+        {
+            PlayerInfo.OnInitializedChanged += HandleOnPlayerInitialized;
+        }
 
-        // void OnDisable()
-        // {
-        //     PlayerInfoManager.OnPlayerInitialized -= HandleOnPlayerInitialized;
-        // }
+        void OnDisable()
+        {
+            PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitialized;
+        }
 
         private void HandleOnPlayerInitialized(PlayerInfo player)
         {
-            Debug.Log($"TEST - Player initialized:{player.IsLocal}");
+            Debug.Log($"TEST - Camera, player:{player}");
 
             if (NetworkManager.Singleton.IsClient)
             {

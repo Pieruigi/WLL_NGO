@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -23,10 +24,16 @@ namespace WLL_NGO.Netcode
     public class PlayerInfoManager : SingletonNetwork<PlayerInfoManager>
 #endif
     {
-        public static UnityAction<PlayerInfo> OnPlayerInitialized;
+        //public static UnityAction<PlayerInfo> OnPlayerInitialized;
 
         [SerializeField]
-        NetworkList<PlayerInfo> players = new NetworkList<PlayerInfo>();
+        GameObject playerInfoPrefab;
+
+        List<PlayerInfo> players = new List<PlayerInfo>();
+
+
+
+        //[SerializeField] NetworkList<
 
         int playersNeeded = 2;
 
@@ -37,8 +44,9 @@ namespace WLL_NGO.Netcode
             base.OnNetworkSpawn();
             if (IsServer)
             {
-                NetworkLauncher.OnClientConnected += AddPlayer;
+                NetworkLauncher.OnClientConnected += CreatePlayer;
                 NetworkLauncher.OnClientDisconnected += RemovePlayer;
+                PlayerInfo.OnInitializedChanged += HandleOnPlayerInitializedChanged;
             }
             if (IsClient)
             {
@@ -47,9 +55,23 @@ namespace WLL_NGO.Netcode
 #endif
             }
             // Both client and server register to the player list changed callback
-            players.OnListChanged += HandleOnPlayerInfoListChanged;
+            //players.OnListChanged += HandleOnPlayerInfoListChanged;
         }
 
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitializedChanged;
+        }
+
+        private void HandleOnPlayerInitializedChanged(PlayerInfo player)
+        {
+            if (player.Bot && player.Initialized && !player.Ready)
+                    {
+                        SetBotReady();
+                        
+                    }
+        }
 
 #if USE_LOBBY_SCENE
         /// <summary>
@@ -110,7 +132,7 @@ namespace WLL_NGO.Netcode
                     {
                         if (!player.Initialized)
                         {
-                            PlayerInfoManager.Instance.InitializeBot("bot-josn-data");
+                            PlayerInfoManager.Instance.InitializeBot("bot-json-data");
                         }
                         else
                         {
@@ -125,7 +147,7 @@ namespace WLL_NGO.Netcode
                         if (!PlayerInfoManager.Instance.BotPlayerInfoExists()) // Bot not created yet
                         {
                             // Create bot
-                            PlayerInfoManager.Instance.AddBot();
+                            PlayerInfoManager.Instance.CreateBot();
                         }
                     }
                     
@@ -153,7 +175,7 @@ namespace WLL_NGO.Netcode
                     p.Initialize(data);
                     players[i] = p;
 
-                    OnPlayerInitialized?.Invoke(players[i]);
+                    //OnPlayerInitialized?.Invoke(players[i]);
 
                     return;
                 }
@@ -191,7 +213,7 @@ namespace WLL_NGO.Netcode
                     p.Initialize(data);
                     players[i] = p;
 
-                    OnPlayerInitialized?.Invoke(players[i]);
+                    //OnPlayerInitialized?.Invoke(players[i]);
 
                     return;
                 }
@@ -233,7 +255,7 @@ namespace WLL_NGO.Netcode
         /// Called on the server to add a new player
         /// </summary>
         /// <param name="clientId"></param>
-        public void AddPlayer(ulong clientId)
+        public void CreatePlayer(ulong clientId)
         {
             // Check whether the player must play in the home or away team
             int homeCount = 0;
@@ -248,15 +270,95 @@ namespace WLL_NGO.Netcode
                 home = true;
 
             // Player not found
-            players.Add(PlayerInfo.CreateHumanPlayer(clientId, home));
+            var p = Instantiate(playerInfoPrefab);
+            p.GetComponent<PlayerInfo>().CreateHumanPlayer(clientId, home);
+            p.GetComponent<NetworkObject>().Spawn();
+            //players.Add(PlayerInfo.CreateHumanPlayer(clientId, home));
         }
 
         /// <summary>
         /// Called by the server to add a bot ( for single player ). 
         /// </summary>
-        public void AddBot()
+        public void CreateBot()
         {
-            players.Add(PlayerInfo.CreateBotPlayer());
+            //players.Add(PlayerInfo.CreateBotPlayer());
+            var p = Instantiate(playerInfoPrefab);
+            p.GetComponent<PlayerInfo>().CreateBotPlayer();
+            p.GetComponent<NetworkObject>().Spawn();
+        }
+
+        public void AddPlayer(PlayerInfo player)
+        {
+            if (players.Contains(player))
+                return;
+            players.Add(player);
+
+
+            if (IsClient)
+            {
+                // Every time the server modifies the player list all the players are notified
+                if (player.ClientId == NetworkManager.LocalClientId)
+                {
+                    
+                    //PlayerInfo player = players[changeEvent.Index];
+                    // The local player has been added, we need to send initialization data ( ex. the teamroaster ) to the server
+                    if (!player.Bot) // Human player
+                    {
+                        if (!player.Initialized)
+                        {
+                            InizialitePlayerServerRpc(NetworkManager.LocalClientId, "json-data");
+                          
+                        }
+                            
+                    }
+                    
+                    
+                };
+            }
+
+            if (IsServer)
+            {
+                
+            }
+
+            if (IsHost) // We only manage bot player here
+            {
+                if (player.ClientId == NetworkManager.LocalClientId)
+                {
+                    // The local client id means both human and both player
+                    //PlayerInfo player = players[changeEvent.Index];
+                    if (player.Bot)
+                    {
+                        if (!player.Initialized)
+                        {
+                            InitializeBot("bot-josn-data");
+                        }
+                        else
+                        {
+                            if (!player.Ready)
+                            {
+                                SetBotReady();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!BotPlayerInfoExists()) // Bot not created yet
+                        {
+                            // Create bot
+                            CreateBot();
+                        }
+                    }
+                    
+                 
+
+                }
+            }
+        }
+
+        public void RemovePlayer(PlayerInfo player)
+        {
+            players.Remove(player);
         }
 
         public int PlayerCount()

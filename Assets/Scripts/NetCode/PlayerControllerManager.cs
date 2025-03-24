@@ -21,9 +21,7 @@ namespace WLL_NGO.Netcode
         {
             base.OnNetworkSpawn();
             if (IsServer)
-            {
-                PlayerInfoManager.OnPlayerInitialized += HandleOnPlayerInitialized;
-            }
+                PlayerInfo.OnInitializedChanged += HandleOnPlayerInitialized;
                 
         }
 
@@ -31,7 +29,7 @@ namespace WLL_NGO.Netcode
         {
             base.OnNetworkDespawn();
             if (IsServer)
-                PlayerInfoManager.OnPlayerInitialized -= HandleOnPlayerInitialized;
+                PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitialized;
         }
 
         /// <summary>

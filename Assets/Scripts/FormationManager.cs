@@ -30,11 +30,12 @@ namespace WLL_NGO.AI
           
             // Create 
             var players = PlayerInfoManager.Instance.GetPlayerInfoAll();
+            Debug.Log("TEST - Players.Count:" + players.Count);
             foreach (var player in players)
             {
                 InitFormationHelper(player.Home, "12");
             }
-            PlayerInfoManager.OnPlayerInitialized += HandleOnPlayerInitialized;
+            PlayerInfo.OnInitializedChanged += HandleOnPlayerInitialized;
 #endif
 
 
@@ -42,7 +43,7 @@ namespace WLL_NGO.AI
 
         void OnDestroy()
         {
-            PlayerInfoManager.OnPlayerInitialized -= HandleOnPlayerInitialized;
+            PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitialized;
         }
 
         private void HandleOnPlayerInitialized(PlayerInfo player)
