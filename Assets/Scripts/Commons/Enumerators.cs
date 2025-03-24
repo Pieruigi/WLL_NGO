@@ -6,6 +6,10 @@ namespace WLL_NGO
 {
     public enum GameMode { Fast, Classic, Powered }
 
+    public enum PowerUpType {ExplosiveCat, Bazooka, Pepper, Shield}
+
+    public enum SportBagType {Local, Remote, Both}
+
     /// <summary>
     /// Normal: normal state, you can move, shoot, etc
     /// ReceivingPassage: you can't move it but you can still pass or shot

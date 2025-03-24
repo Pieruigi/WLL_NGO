@@ -391,7 +391,7 @@ namespace WLL_NGO.Netcode
             
             if (positionError > reconciliationThreshold)
             {
-                Debug.Log($"Ball reconciliation - tick:{rewindState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
+                Debug.Log($"TEST - Ball reconciliation - tick:{rewindState.tick}, serverPos:{rewindState.position}, clientPos:{clientStateBuffer.Get(bufferIndex).position}");
                 ReconcileState(rewindState);
             }
 

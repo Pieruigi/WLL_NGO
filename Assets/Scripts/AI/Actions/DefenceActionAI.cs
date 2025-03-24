@@ -27,8 +27,6 @@ namespace WLL_NGO.AI
 #else
             BallController ball = BallController.Instance;
 #endif
-            Debug.Log($"Ball:{ball}");            
-            Debug.Log($"Net:{team.NetController}");            
             Vector3 ballDir = ball.Position - team.NetController.transform.position;
             ballDir.y = 0;
 

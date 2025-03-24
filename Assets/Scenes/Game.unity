@@ -852,6 +852,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -926,13 +927,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22017254, y: 0.008780034, z: -0.0019812128, w: 0.97541946}
-  m_LocalPosition: {x: -0.49, y: 18.33, z: -38.5}
+  m_LocalRotation: {x: 0.22017813, y: 0, z: 0, w: 0.9754597}
+  m_LocalPosition: {x: 0, y: 18.33, z: -38.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 25.439, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -977,6 +978,18 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 515f8f6b791d6484b8be63ec7400232c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &346232583
 GameObject:
   m_ObjectHideFlags: 0
@@ -3161,6 +3174,12 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 2102859207
       objectReference: {fileID: 0}
+    - target: {fileID: 7761208893235096840, guid: bebc4e58354eb9b4b8871a4be63ddf0a,
+        type: 3}
+      propertyPath: powerUpManagerPrefab
+      value: 
+      objectReference: {fileID: 1353601137583110324, guid: 51473e8a183007a4a9ab57007a668084,
+        type: 3}
     - target: {fileID: 8413251974574061969, guid: bebc4e58354eb9b4b8871a4be63ddf0a,
         type: 3}
       propertyPath: m_LocalPosition.x

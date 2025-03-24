@@ -19,6 +19,8 @@ namespace WLL_NGO
             get { return timer.Value; }
         }
 
+        [SerializeField]
+        GameObject powerUpManagerPrefab;
 
         bool completed = false;
 
@@ -46,17 +48,35 @@ namespace WLL_NGO
                 MatchController.Instance.SetMatchState(MatchState.End);
         }
 
-        protected virtual void OnEnable()
+        // protected virtual void OnEnable()
+        // {
+        //     var gameMode = GameMode.Classic;
+
+        //     InitGameMode(gameMode);
+
+        //     NetController.OnGoalScored += HandleOnGoalScored;
+        // }
+
+        // protected virtual void OnDisable()
+        // {
+        //     NetController.OnGoalScored -= HandleOnGoalScored;
+        // }
+
+        public override void OnNetworkSpawn()
         {
-            var gameMode = GameMode.Classic;
+            base.OnNetworkSpawn();
+
+            var gameMode = GameMode.Powered;
 
             InitGameMode(gameMode);
 
             NetController.OnGoalScored += HandleOnGoalScored;
         }
 
-        protected virtual void OnDisable()
+        public override void OnNetworkDespawn()
         {
+            base.OnNetworkDespawn();
+
             NetController.OnGoalScored -= HandleOnGoalScored;
         }
 
@@ -100,6 +120,13 @@ namespace WLL_NGO
                     useTimeLimit = true;
                     useGoalLimit = false;
                     timeLimit = 150;
+                    // Spawn power up manager
+                    if (IsServer)
+                    {
+                        GameObject go = Instantiate(powerUpManagerPrefab);
+                        go.GetComponent<PowerUpManager>().Initialize(10);
+                        go.GetComponent<NetworkObject>().Spawn();        
+                    }
                     break;
 
             }

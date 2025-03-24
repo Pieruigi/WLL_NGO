@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1353601137583110324
+--- !u!1 &3805871090086612257
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6050934229106098738}
-  - component: {fileID: 1200807384166163533}
-  - component: {fileID: 3667117614592140022}
+  - component: {fileID: 7723290999578230292}
+  - component: {fileID: 3703350645475148034}
+  - component: {fileID: 7517585987768067040}
   m_Layer: 0
-  m_Name: PowerUpManager
+  m_Name: SportBag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6050934229106098738
+--- !u!4 &7723290999578230292
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1353601137583110324}
+  m_GameObject: {fileID: 3805871090086612257}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -33,38 +33,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1200807384166163533
+--- !u!114 &3703350645475148034
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1353601137583110324}
+  m_GameObject: {fileID: 3805871090086612257}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3953181657
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 55013049
+  InScenePlacedSourceGlobalObjectIdHash: 2090083149
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &3667117614592140022
+--- !u!114 &7517585987768067040
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1353601137583110324}
+  m_GameObject: {fileID: 3805871090086612257}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2940bdd0ef19d20438a9a0ca9fd29b90, type: 3}
+  m_Script: {fileID: 11500000, guid: 9d6b630adeb2fe54c8d2e7cc135b8e1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sportBagPrefab: {fileID: 3805871090086612257, guid: a258cfde8eed40e438b51d8f082d1f3f,
+  sportBagMeshPrefab: {fileID: 5212850383423169743, guid: d8085d17bf1823640841c569bf8aa844,
     type: 3}
+  localMaterial: {fileID: 2100000, guid: c67b88bce4bbcb84ca266c66f56f80b6, type: 2}
+  remoteMaterial: {fileID: 2100000, guid: de2dbf929fac4414f816859abfdaec6d, type: 2}
+  bothMaterial: {fileID: 2100000, guid: 139758544463edc489e2c6f077eff6ac, type: 2}
+  materialIndex: 0
