@@ -19,15 +19,16 @@ namespace WLL_NGO.AI
         }
 
 
-
         bool WaitingCondition()
         {
             TeamAI team = TeamAI;
 #if TEST_AI
             TestBallController ball = team.BallController;
 #else
-            BallController ball = team.BallController;
+            BallController ball = BallController.Instance;
 #endif
+            Debug.Log($"Ball:{ball}");            
+            Debug.Log($"Net:{team.NetController}");            
             Vector3 ballDir = ball.Position - team.NetController.transform.position;
             ballDir.y = 0;
 

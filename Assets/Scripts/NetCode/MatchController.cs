@@ -31,8 +31,8 @@ namespace WLL_NGO.Netcode
         //    get { return numOfPlayers; }
         //}
 
-        [SerializeField]
-        GameObject[] matchRulerPrefabs;
+        // [SerializeField]
+        // GameObject[] matchRulerPrefabs;
 
         NetworkVariable<byte> matchState = new NetworkVariable<byte>((byte)MatchState.NotReady);
 
@@ -78,11 +78,11 @@ namespace WLL_NGO.Netcode
             base.OnNetworkSpawn();
             matchState.OnValueChanged += HandleOnMatchStateChanged;
             // If server create match ruler
-            if (IsServer)
-            {
-                GameObject mr = Instantiate(matchRulerPrefabs[(int)GameMode.Powered]);
-                mr.GetComponent<NetworkObject>().Spawn(true);
-            }
+            // if (IsServer)
+            // {
+            //     GameObject mr = Instantiate(matchRulerPrefabs[(int)GameMode.Powered]);
+            //     mr.GetComponent<NetworkObject>().Spawn(true);
+            // }
         }
 
         void OnEnable()

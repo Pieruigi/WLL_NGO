@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using UnityEngine;
 using TMPro;
 using Unity.Services.Matchmaker.Models;
@@ -20,6 +21,7 @@ public class FPSDisplay : MonoBehaviour
         float fps = 1.0f / deltaTime;
         fpsText.text = Mathf.Ceil(fps).ToString() + " FPS";
 
-        selectedPlayerField.text = TeamController.HomeTeam.SelectedPlayer.gameObject.name;
+        //selectedPlayerField.text = TeamController.HomeTeam.SelectedPlayer.gameObject.name;
     }
 }
+#endif

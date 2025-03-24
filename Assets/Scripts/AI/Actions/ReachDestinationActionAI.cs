@@ -36,7 +36,9 @@ namespace WLL_NGO.AI
 
         void OnDestroy()
         {
+#if !TEST_AI
             PlayerAI.Controller.GetInputHandler().SetJoystick(Vector3.zero);
+#endif
         }
 
 

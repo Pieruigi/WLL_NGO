@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using WLL_NGO.AI.Test;
 using WLL_NGO.Netcode;
@@ -95,6 +96,8 @@ namespace WLL_NGO.AI
 
         private void Awake()
         {
+            
+
             if (home)
                 HomeTeamAI = this;
             else
@@ -117,8 +120,11 @@ namespace WLL_NGO.AI
 
         void Start()
         {
+            if (!NetworkManager.Singleton.IsServer) return;
+           
+
 #if TEST_AI
-            netController = FindObjectsOfType<TestNetController>().ToList().Find(n=>n.Home == home)            
+            netController = FindObjectsOfType<TestNetController>().ToList().Find(n => n.Home == home);           
 
             CreateRootAction();
 #else
@@ -129,6 +135,8 @@ namespace WLL_NGO.AI
 
         private void FixedUpdate()
         {
+            if (!NetworkManager.Singleton.IsServer) return;
+
 #if !TEST_AI
             if (MatchController.Instance.MatchState != MatchState.Playing)
                 return;
@@ -146,6 +154,7 @@ namespace WLL_NGO.AI
 #if !TEST_AI
         private void OnEnable()
         {
+            
             BallController.OnBallSpawned += HandleOnBallSpawned;
             PlayerController.OnSpawned += HandleOnPlayerControllerSpawned;
             TeamController.OnTeamControllerSpawned += HandleOnTeamControllerSpawned;
@@ -154,6 +163,7 @@ namespace WLL_NGO.AI
 
         private void OnDisable()
         {
+            
             BallController.OnBallSpawned -= HandleOnBallSpawned;
             PlayerController.OnSpawned -= HandleOnPlayerControllerSpawned;
             TeamController.OnTeamControllerSpawned -= HandleOnTeamControllerSpawned;
@@ -162,6 +172,8 @@ namespace WLL_NGO.AI
 
         private void HandleOnMatchStateChanged(int oldState, int newState)
         {
+            if (!NetworkManager.Singleton.IsServer) return;
+
             switch (newState)
             {
                 case (int)MatchState.End:
@@ -176,6 +188,8 @@ namespace WLL_NGO.AI
 
         private void HandleOnTeamControllerSpawned(TeamController teamController)
         {
+            if (!NetworkManager.Singleton.IsServer) return;
+
             if (home != teamController.Home)
                 return;
 
@@ -184,6 +198,8 @@ namespace WLL_NGO.AI
 
         private void HandleOnPlayerControllerSpawned(PlayerController playerController)
         {
+            if (!NetworkManager.Singleton.IsServer) return;
+
             // Team check
             if (home != playerController.PlayerInfo.Home)
                 return;
@@ -196,7 +212,8 @@ namespace WLL_NGO.AI
 
         private void HandleOnBallSpawned()
         {
-
+            if (!NetworkManager.Singleton.IsServer) return;
+            
             ball = BallController.Instance;
 
         }
