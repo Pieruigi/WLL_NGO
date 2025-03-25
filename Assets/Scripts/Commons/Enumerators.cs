@@ -6,7 +6,7 @@ namespace WLL_NGO
 {
     public enum GameMode { Fast, Classic, Powered }
 
-    public enum PowerUpType {ExplosiveCat, Bazooka, Pepper, Shield}
+    //public enum PowerUpType {ExplosiveCat, Bazooka, Pepper, Shield}
 
     public enum SportBagType {Home, Away, Both}
 

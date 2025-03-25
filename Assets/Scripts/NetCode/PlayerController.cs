@@ -1283,9 +1283,16 @@ namespace WLL_NGO.Netcode
             if (!IsServer)
                 return;
 
+            if (TeamController.GetOpponentTeam(this).GetPlayers().Exists(p => p.HasBall))
+            {
+                SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Normal });
+                return;            
+            }
+
             PlayerController receiver = BallController.Instance.GetShootingDataReceiver();
             if (!receiver || receiver != this)
                 return;
+
             
 
             // Read the target

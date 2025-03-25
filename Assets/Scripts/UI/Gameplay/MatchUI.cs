@@ -19,6 +19,7 @@ namespace WLL_NGO.UI
         [SerializeField]
         TMP_Text remoteScoreField;
 
+        
         TeamController localTeam, remoteTeam;
 
 
@@ -27,7 +28,8 @@ namespace WLL_NGO.UI
         {
             // localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
             // remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
-   
+            
+                
         }
 
         // Update is called once per frame

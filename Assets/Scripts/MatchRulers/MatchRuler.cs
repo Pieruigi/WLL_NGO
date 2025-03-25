@@ -19,6 +19,12 @@ namespace WLL_NGO
             get { return timer.Value; }
         }
 
+        GameMode gameMode = GameMode.Fast;
+        public GameMode GameMode
+        {
+            get{ return gameMode; }
+        }
+
         [SerializeField]
         GameObject powerUpManagerPrefab;
 
@@ -103,6 +109,8 @@ namespace WLL_NGO
 
         protected virtual void InitGameMode(GameMode gameMode)
         {
+            this.gameMode = gameMode;
+
             switch (gameMode)
             {
                 case GameMode.Fast:
@@ -125,23 +133,14 @@ namespace WLL_NGO
                     {
                         GameObject go = Instantiate(powerUpManagerPrefab);
                         go.GetComponent<PowerUpManager>().Initialize(10);
-                        go.GetComponent<NetworkObject>().Spawn();        
+                        go.GetComponent<NetworkObject>().Spawn();
                     }
                     break;
 
             }
         }
 
-        public static void CreateMatchRuler(GameMode gameMode)
-        {
-            switch (gameMode)
-            {
-                case GameMode.Fast:
-                case GameMode.Classic:
-
-                    break;
-            }
-        }
+       
     }
     
 }

@@ -91,13 +91,13 @@ namespace WLL_NGO.AI
             base.Loop();
 
 
-            if (timer > 0)
-                timer -= DeltaTime;//UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
+            // if (timer > 0)
+            //     timer -= DeltaTime;//UpdateFunction == ActionUpdateFunction.FixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
 
-            if (timer > 0)
-                return;
+            // if (timer > 0)
+            //     return;
 
-            timer = loopTime;
+            // timer = loopTime;
 
             CheckTargets();
         }
@@ -113,7 +113,13 @@ namespace WLL_NGO.AI
                 if (player.Role == PlayerRole.GK)
                     continue;
 
-                
+                if (player.IsSelected)
+                {
+                    if (moveActions[player])
+                        moveActions[player].DestroyAction();
+                    continue;
+                }
+                    
 
                 ZoneTrigger trigger = TeamAI.WaitingZoneTriggers.Find(t=>t.Caretaker == player);
 
@@ -126,7 +132,7 @@ namespace WLL_NGO.AI
                     if (!moveActions[player])
                     {
                         
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = pos });
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = pos }, ()=> { return !player.IsSelected; });
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
                     moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = pos });
@@ -136,7 +142,7 @@ namespace WLL_NGO.AI
                     
                     if (!moveActions[player])
                     {
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = trigger.DefaultPosition }); ;
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = trigger.DefaultPosition }, ()=> { return !player.IsSelected; }); ;
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
                     moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = trigger.DefaultPosition });

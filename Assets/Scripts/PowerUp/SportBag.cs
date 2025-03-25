@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DG.Tweening;
+using Unity.Barracuda;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -28,11 +30,13 @@ namespace WLL_NGO.Netcode
         int materialIndex = 0;
 
         GameObject sportBagMesh;
+
+        Animator animator;
     #endif
 
         NetworkVariable<byte> type = new NetworkVariable<byte>(default);
 
-        NetworkVariable<byte> powerUpType = new NetworkVariable<byte>(default);
+        NetworkVariable<FixedString32Bytes> powerUpName = new NetworkVariable<FixedString32Bytes>(default);
 
         NetworkVariable<byte> state = new NetworkVariable<byte>((byte)SportBagState.NotReady);
 
@@ -52,7 +56,8 @@ namespace WLL_NGO.Netcode
                 else
                     sportBagMesh.transform.localRotation = Quaternion.Euler(0, 180, 0);
 
-                //TODO: check rotation for away client
+                // Get animator
+                animator = sportBagMesh.GetComponentInChildren<Animator>();
 
                 var local = PlayerInfoManager.Instance.GetLocalPlayerInfo();
                 if (type.Value == (int)SportBagType.Both)
@@ -90,11 +95,7 @@ namespace WLL_NGO.Netcode
                 case (byte)SportBagState.Ready:
                     GetComponent<Collider>().enabled = true;
                     break;
-                case (byte)SportBagState.PickedUp:
-                    GetComponent<Collider>().enabled = false;
-                    if (IsServer) Despawn();
-                    if (IsClient) DoPickedUpFx();
-                    break;
+              
             }
         }
 
@@ -111,30 +112,32 @@ namespace WLL_NGO.Netcode
 
             PlayerController player = other.GetComponent<PlayerController>();
 
-            TryPickUp(player);
+            bool succeeded = IsRightPicker(player);
+
+            if (IsServer)
+            {
+                if (succeeded) PickUp(player);
+            }
+
+#if !UNITY_SERVER
+            if (IsClient)
+            {
+                if (succeeded) PlayPickUpSucceededFx();
+                else PlayPickUpFailedFx();
+            }
+
+#endif
+        
+
             
         }
 
-        void TryPickUp(PlayerController player)
-        {
-            if (state.Value != (byte)SportBagState.Ready) return;
-
-            bool succeeded = IsRightPicker(player);
-
-            if (IsServer) // Do logic
-            {
-                if(succeeded) DoPickUp(player);
-            }
-
-            if (IsClient) // Do fx
-            {
-                if (succeeded) DoPickedUpFx();
-                else DoWrongPickerFx();
-            }
-        }
+     
 
         bool IsRightPicker(PlayerController player)
         {
+            if (player.GetState() != (int)PlayerState.Normal) return false; 
+
             if (type.Value == (byte)SportBagType.Both) return true;
 
             TeamController team = TeamController.GetPlayerTeam(player);
@@ -148,10 +151,19 @@ namespace WLL_NGO.Netcode
             return false;
         }
 
-        void DoPickUp(PlayerController player)
+        void PickUp(PlayerController player)
         {
-            var team = TeamController.GetPlayerTeam(player);
             
+            if (!IsServer) return;
+
+            state.Value = (byte)SportBagState.PickedUp;
+
+            // Get the player team
+            var team = TeamController.GetPlayerTeam(player);
+
+            // Add the power up to the team
+            PowerUpManager.Instance.Push(team, powerUpName.Value.ToString());
+
             Despawn();
         }
 
@@ -162,17 +174,18 @@ namespace WLL_NGO.Netcode
             GetComponent<NetworkObject>().Despawn();
         }
 
-        void DoPickedUpFx()
+#if !UNITY_SERVER
+
+        void PlayPickUpSucceededFx()
         {
             if (!IsClient) return;    
         }
 
-        void DoWrongPickerFx()
+        void PlayPickUpFailedFx()
         {
             if (!IsClient) return;
         }
 
-#if !UNITY_SERVER
         void SetMaterial(Material material)
         {
             var rend = sportBagMesh.GetComponentInChildren<MeshRenderer>();
@@ -182,10 +195,10 @@ namespace WLL_NGO.Netcode
         }
     #endif
 
-        public void Initialize(SportBagType type, PowerUpType powerUpType)
+        public void Initialize(SportBagType type, string powerUpName)
         {
             this.type.Value = (byte)type;
-            this.powerUpType.Value = (byte)powerUpType;
+            this.powerUpName.Value = (FixedString32Bytes)powerUpName;
 
         }
 

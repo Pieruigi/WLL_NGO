@@ -27,7 +27,7 @@ namespace WLL_NGO.AI
 
             if (actionAI)
                 return;
-
+            
             //Debug.Log("TEST - TeamAI has ball:" + TeamAI.HasBall());
             //TeamAI oppTeam = TeamAI == TeamAI.HomeTeamAI ? TeamAI.AwayTeamAI : TeamAI.HomeTeamAI;
             if (TeamAI.IsAttacking())

@@ -1,19 +1,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using WLL_NGO.AI;
 using WLL_NGO.Netcode;
+using WLL_NGO.Scriptables;
 
 namespace WLL_NGO.Netcode
 {
     public class PowerUpManager : SingletonNetwork<PowerUpManager>
     {
+        public static UnityAction<TeamController, string> OnPowerUpPushed;
+        public static UnityAction<TeamController, string> OnPowerUpPopped;
+
         public const int MaxPowerUps = 2;
 
         [SerializeField]
@@ -24,10 +32,19 @@ namespace WLL_NGO.Netcode
         TeamController lastScorer = null;
 
 
-        NetworkList<byte> homeTeamPowerUps = new NetworkList<byte>();
-        NetworkList<byte> awayTeamPowerUps = new NetworkList<byte>();
+        [SerializeField] NetworkList<FixedString32Bytes> homeTeamPowerUps = new NetworkList<FixedString32Bytes>();
+        public NetworkList<FixedString32Bytes> HomeTeamPowerUps
+        {
+            get{ return homeTeamPowerUps; }
+        }
 
-        List<PowerUpType> allowedPowerUps = new List<PowerUpType>();
+        [SerializeField] NetworkList<FixedString32Bytes> awayTeamPowerUps = new NetworkList<FixedString32Bytes>();
+        public NetworkList<FixedString32Bytes> AwayTeamPowerUps
+        {
+            get{ return awayTeamPowerUps; }
+        }
+
+        List<PowerUpAsset> allowedPowerUps = new List<PowerUpAsset>();
 
         float spawnRate = -1;
         float spawnElapsed = 0;
@@ -37,7 +54,10 @@ namespace WLL_NGO.Netcode
         // Start is called before the first frame update
         protected override void Awake()
         {
-            allowedPowerUps = new List<PowerUpType>(new PowerUpType[] { PowerUpType.ExplosiveCat, PowerUpType.Bazooka, PowerUpType.Pepper, PowerUpType.Shield });
+            base.Awake();
+
+
+            allowedPowerUps = Resources.LoadAll<PowerUpAsset>(PowerUpAsset.ResourceFolder).ToList();
         }
 
         // Update is called once per frame
@@ -88,14 +108,22 @@ namespace WLL_NGO.Netcode
             awayTeamPowerUps.OnListChanged -= HandleOnAwayTeamPowerUpListChanged;
         }
 
-        private void HandleOnHomeTeamPowerUpListChanged(NetworkListEvent<byte> changeEvent)
+        private void HandleOnHomeTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-            Debug.Log($"TEST - Home team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}");
+            Debug.Log($"TEST - Home team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}, type:{changeEvent.Type}, {changeEvent.PreviousValue}");
+            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
+                OnPowerUpPushed?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
+            else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
+                OnPowerUpPopped?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
         }
 
-        private void HandleOnAwayTeamPowerUpListChanged(NetworkListEvent<byte> changeEvent)
+        private void HandleOnAwayTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-
+            Debug.Log($"TEST - Away team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}");
+            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
+                OnPowerUpPushed?.Invoke(TeamController.AwayTeam, changeEvent.Value.ToString());
+            else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
+                OnPowerUpPopped?.Invoke(TeamController.AwayTeam, changeEvent.Value.ToString());
         }
 
 
@@ -132,7 +160,8 @@ namespace WLL_NGO.Netcode
             // Spawn sport bag
             SportBagType type = SportBagType.Home;
             var sb = Instantiate(sportBagPrefab);
-            sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[UnityEngine.Random.Range(0, allowedPowerUps.Count)]);
+            //sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[UnityEngine.Random.Range(0, allowedPowerUps.Count)]);
+            sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[0].name);
             sb.transform.position = GetRandomSpawnPoint();
             sb.transform.rotation = Quaternion.identity;
             sb.GetComponent<NetworkObject>().Spawn();
@@ -178,15 +207,40 @@ namespace WLL_NGO.Netcode
             return team.Home ? homeTeamPowerUps.Count >= MaxPowerUps : awayTeamPowerUps.Count >= MaxPowerUps;
         }
 
-        public async Task AddPowerUp(TeamController team, PowerUpType type)
+        public void Push(TeamController team, string powerUpName)
         {
+            if (!IsServer) return;
+
             if (HasReachedMaxPowerUps(team)) return;
 
             if (team.Home)
-                homeTeamPowerUps.Add((byte)type);
+                homeTeamPowerUps.Add((FixedString32Bytes)powerUpName);
             else
-                awayTeamPowerUps.Add((byte)type);
+                awayTeamPowerUps.Add((FixedString32Bytes)powerUpName);
+
+
         }
+
+        public void Pop(TeamController team)
+        {
+            if (!IsServer) return;
+
+            var l = team.Home ? homeTeamPowerUps : awayTeamPowerUps;
+
+            if (l.Count == 0)
+                return;
+
+            var id = l[0];
+            l.RemoveAt(0);
+        }
+
+        public PowerUpAsset GetPowerUpAssetByName(string name)
+        {
+            return allowedPowerUps.Find(p => p.name == name);
+        }
+
+      
     }
+
     
 }
