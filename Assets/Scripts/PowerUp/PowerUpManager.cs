@@ -111,7 +111,7 @@ namespace WLL_NGO.Netcode
         private void HandleOnHomeTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
             Debug.Log($"TEST - Home team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}, type:{changeEvent.Type}, {changeEvent.PreviousValue}");
-            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
+            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add) 
                 OnPowerUpPushed?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
             else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
                 OnPowerUpPopped?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());

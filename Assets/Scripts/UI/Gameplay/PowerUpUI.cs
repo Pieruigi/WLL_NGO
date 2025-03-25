@@ -16,7 +16,9 @@ namespace WLL_NGO.UI
         [SerializeField]
         List<PowerUpSlotUI> remoteSlots;
 
-        void Start()
+
+
+        void OnEnable()
         {
             if (MatchRuler.Instance.GameMode != GameMode.Powered)
             {
@@ -24,22 +26,53 @@ namespace WLL_NGO.UI
             }
             else
             {
-                
+
                 PowerUpManager.OnPowerUpPushed += HandleOnPowerUpPushed;
                 PowerUpManager.OnPowerUpPopped += HandleOnPowerUpPopped;
             }
+
+            // MatchRuler.OnSpawned += HandleOnMatchRulerSpawned;   
+            // MatchRuler.OnDespawned += HandleOnMatchRulerDespawned;   
         }
 
-        
-        void OnDestroy()
+
+        void OnDisable()
         {
             if (MatchRuler.Instance.GameMode == GameMode.Powered)
             {
+                Debug.Log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
                 PowerUpManager.OnPowerUpPushed -= HandleOnPowerUpPushed;
                 PowerUpManager.OnPowerUpPopped -= HandleOnPowerUpPopped;
             }
-
+            // MatchRuler.OnSpawned -= HandleOnMatchRulerSpawned;
+            // MatchRuler.OnDespawned -= HandleOnMatchRulerDespawned;   
         }
+
+        // private void HandleOnMatchRulerSpawned()
+        // {
+            
+        //     if (MatchRuler.Instance.GameMode != GameMode.Powered)
+        //     {
+        //         gameObject.SetActive(false);
+        //     }
+        //     else
+        //     {
+
+        //         PowerUpManager.OnPowerUpPushed += HandleOnPowerUpPushed;
+        //         PowerUpManager.OnPowerUpPopped += HandleOnPowerUpPopped;
+        //     }
+        // }
+
+        // private void HandleOnMatchRulerDespawned()
+        // {
+        //     if (MatchRuler.Instance.GameMode == GameMode.Powered)
+        //     {
+        //         Debug.Log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+        //         PowerUpManager.OnPowerUpPushed -= HandleOnPowerUpPushed;
+        //         PowerUpManager.OnPowerUpPopped -= HandleOnPowerUpPopped;
+        //     }
+           
+        // }
 
         private void HandleOnPowerUpPopped(TeamController team, string powerUpName)
         {
@@ -56,6 +89,8 @@ namespace WLL_NGO.UI
             var powers = team.Home ? PowerUpManager.Instance.HomeTeamPowerUps : PowerUpManager.Instance.AwayTeamPowerUps;
             var slots = team.Home ? localSlots : remoteSlots;
 
+            Debug.Log($"TEST - Refreshing power up ui:{team.gameObject.name}, powers:{powers.Count}");
+
             foreach (var slot in slots)
             {
                 // Set empty
@@ -66,7 +101,7 @@ namespace WLL_NGO.UI
             for (int i = 0; i < powers.Count; i++)
             {
                 var asset = PowerUpManager.Instance.GetPowerUpAssetByName(powers[i].ToString());
-
+                Debug.Log($"TEST - Getting asset:{asset.name}");
                 // Init slot image
                 slots[i].SetPower(asset.Icon);
             }

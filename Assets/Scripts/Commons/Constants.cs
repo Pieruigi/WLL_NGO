@@ -11,6 +11,8 @@ namespace WLL_NGO
         public const string ServerPortArg = "-port";
         public const string ServerAddressArg = "-ip";
         public const string RegionArg = "-region";
+
+        public const string GameModeArg = "-gameMode";
         
 
         public const int MatchmakerTimeout = 20000; // In millis

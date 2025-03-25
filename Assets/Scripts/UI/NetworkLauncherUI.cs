@@ -10,17 +10,19 @@ namespace WLL_NGO.UI
     {
         public void StartClient()
         {
+            MatchInfo.GameMode = GameMode.Powered;
 #if NO_MM
 
             NetworkLauncher.Instance.StartClient();
 
 #else
-            ClientMatchmaker.Instance.Play(GameMode.Classic);
+            ClientMatchmaker.Instance.Play();
 #endif
         }
 
         public void StartHost()
         {
+            MatchInfo.GameMode = GameMode.Powered;
             NetworkLauncher.Instance.StartHost();
         }
     }

@@ -12,6 +12,8 @@ namespace WLL_NGO
 {
     public class MatchRuler : SingletonNetwork<MatchRuler>
     {
+        public static UnityAction OnSpawned;
+        public static UnityAction OnDespawned;
 
         NetworkVariable<float> timer = new NetworkVariable<float>(0);
         public float Timer
@@ -19,10 +21,12 @@ namespace WLL_NGO
             get { return timer.Value; }
         }
 
-        GameMode gameMode = GameMode.Fast;
+        NetworkVariable<byte> gameMode = new NetworkVariable<byte>();
+
+        //GameMode gameMode = GameMode.Fast;
         public GameMode GameMode
         {
-            get{ return gameMode; }
+            get{ return (GameMode)gameMode.Value; }
         }
 
         [SerializeField]
@@ -72,11 +76,14 @@ namespace WLL_NGO
         {
             base.OnNetworkSpawn();
 
-            var gameMode = GameMode.Powered;
+            //var gameMode = GameMode.Powered;
+            gameMode.Value = (byte)MatchInfo.GameMode;
 
-            InitGameMode(gameMode);
+            InitGameMode();
 
             NetController.OnGoalScored += HandleOnGoalScored;
+
+            OnSpawned?.Invoke();
         }
 
         public override void OnNetworkDespawn()
@@ -84,6 +91,8 @@ namespace WLL_NGO
             base.OnNetworkDespawn();
 
             NetController.OnGoalScored -= HandleOnGoalScored;
+
+            OnDespawned?.Invoke();
         }
 
         protected virtual void HandleOnGoalScored(TeamController scorer)
@@ -107,11 +116,11 @@ namespace WLL_NGO
             return false;
         }
 
-        protected virtual void InitGameMode(GameMode gameMode)
+        protected virtual void InitGameMode()
         {
-            this.gameMode = gameMode;
+            //this.gameMode.Value = (byte)gameMode;
 
-            switch (gameMode)
+            switch ((GameMode)gameMode.Value)
             {
                 case GameMode.Fast:
                     useTimeLimit = true;

@@ -956,11 +956,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localSlots:
-  - {fileID: 1262093105954988842}
-  - {fileID: 5910540696613848289}
+  - {fileID: 6558982460194397249}
+  - {fileID: 7060304560992383155}
   remoteSlots:
-  - {fileID: 2716673496957933722}
-  - {fileID: 2441770890945349470}
+  - {fileID: 4510202810641806216}
+  - {fileID: 5866620977144991428}
 --- !u!1 &5090920999291292533
 GameObject:
   m_ObjectHideFlags: 0

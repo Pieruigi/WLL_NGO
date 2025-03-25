@@ -47,6 +47,24 @@ namespace WLL_NGO
             return 0;
         }
 
+        public static byte GetGameModeFromCommandLineArgs()
+        {
+#if !UNITY_EDITOR
+            string[] args = System.Environment.GetCommandLineArgs();
+#else
+            string[] args = ClonesManager.GetArgument().Split(" ");
+#endif
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (Constants.GameModeArg.Equals(args[i]) && args.Length > i + 1)
+                {
+                    return byte.Parse(args[i + 1]);
+                }
+            }
+
+            return 0;
+        }
 
         //public static Vector2 ToInputDirection(Vector3 worldDirection)
         //{

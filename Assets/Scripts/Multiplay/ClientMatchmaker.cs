@@ -44,14 +44,15 @@ namespace WLL_NGO.Multiplay
             
         }
 
-        public void Play(GameMode gameMode)
+        public void Play()
         {
+            //MatchInfo.GameMode = gameMode;
 #if NO_MM
             //BoltClientManager.Instance.StartClientNoMM();
             OnTicketAssigned?.Invoke(new MultiplayAssignment("no_mm", null, MultiplayAssignment.StatusOptions.Found, "127.0.0.1", Constants.NoMatchmakingTestingPort));
 #else
             string ticketName = "";
-            switch (gameMode)
+            switch (MatchInfo.GameMode)
             {
                 case GameMode.Powered:
                     ticketName = Constants.PoweredMatchQueueName;

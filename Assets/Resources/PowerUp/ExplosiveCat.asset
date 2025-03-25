@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27274601697057c45bd01d2a01576275, type: 3}
   m_Name: ExplosiveCat
   m_EditorClassIdentifier: 
-  icon: {fileID: 0}
-  gamePrefab: {fileID: 0}
+  icon: {fileID: 21300000, guid: 66431d32f7b4ecb48adfe1fe0566ab69, type: 3}
   pickUpClip: {fileID: 0}
+  gamePrefab: {fileID: 0}

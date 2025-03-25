@@ -92,8 +92,11 @@ namespace WLL_NGO.Netcode
         void HandleOnMatchmakerPayload(MatchmakingResults payload)
         {
             SetIpAndPort("0.0.0.0", Utility.GetPortFromCommandLineArgs());
+            MatchInfo.GameMode = (GameMode)Utility.GetGameModeFromCommandLineArgs();
             StartServer();
         }
+
+        
 
         void HandleOnServerStarted()
         {
