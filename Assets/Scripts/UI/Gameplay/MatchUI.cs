@@ -25,8 +25,8 @@ namespace WLL_NGO.UI
         // Start is called before the first frame update
         void Start()
         {
-            localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
-            remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
+            // localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+            // remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
    
         }
 
@@ -35,11 +35,35 @@ namespace WLL_NGO.UI
         {
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned) return;
 
+            if (!localTeam || !remoteTeam) return;
+
             // Show timer
             ShowTimer();
 
             // Update score
             UpdateScore();
+        }
+
+        void OnEnable()
+        {
+            PlayerInfo.OnInitializedChanged += HandleOnPlayerInitialized;
+        }
+
+        void OnDisable()
+        {
+            PlayerInfo.OnInitializedChanged -= HandleOnPlayerInitialized;
+        }
+
+        private void HandleOnPlayerInitialized(PlayerInfo player)
+        {
+            if (player.IsLocal && !player.Bot)
+            {
+                localTeam = player.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+            }
+            else
+            {
+                remoteTeam = player.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
+            }
         }
 
         void ShowTimer()

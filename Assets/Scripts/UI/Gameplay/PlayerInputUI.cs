@@ -53,6 +53,16 @@ namespace WLL_NGO.UI
             teamController = playerInfo.Home ? TeamController.HomeTeam : TeamController.AwayTeam;
         }
 
+        Vector2 AdjustJoystickDirection(Vector2 vector2)
+        {
+            Vector2 ret = vector2;
+            if (!teamController.Home)
+                ret *= -1;
+
+            return ret;
+
+        }
+
         void CheckInput()
         {
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned) return;
@@ -69,7 +79,7 @@ namespace WLL_NGO.UI
             {
                 case MatchState.Playing:
                     //ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
-                    ih.SetJoystick(joystick.Direction);
+                    ih.SetJoystick(AdjustJoystickDirection(joystick.Direction));
                     
                     //ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
                     ih.SetButton1(button1.GetButton());
@@ -79,7 +89,7 @@ namespace WLL_NGO.UI
 
 #if UNITY_EDITOR
                     if(joystick.Direction == Vector2.zero)
-                        ih.SetJoystick(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized);
+                        ih.SetJoystick(AdjustJoystickDirection(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized));
                     if(!button1.GetButton())
                         ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
                     if(!button2.GetButton())

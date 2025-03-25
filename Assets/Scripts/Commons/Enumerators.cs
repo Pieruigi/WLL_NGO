@@ -8,7 +8,9 @@ namespace WLL_NGO
 
     public enum PowerUpType {ExplosiveCat, Bazooka, Pepper, Shield}
 
-    public enum SportBagType {Local, Remote, Both}
+    public enum SportBagType {Home, Away, Both}
+
+    public enum SportBagState {NotReady, Ready, PickedUp}
 
     /// <summary>
     /// Normal: normal state, you can move, shoot, etc

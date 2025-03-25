@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7723290999578230292}
   - component: {fileID: 3703350645475148034}
   - component: {fileID: 7517585987768067040}
+  - component: {fileID: 355095143452221120}
   m_Layer: 0
   m_Name: SportBag
   m_TagString: Untagged
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 55013049
+  GlobalObjectIdHash: 1370466142
   InScenePlacedSourceGlobalObjectIdHash: 2090083149
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -72,3 +73,24 @@ MonoBehaviour:
   remoteMaterial: {fileID: 2100000, guid: de2dbf929fac4414f816859abfdaec6d, type: 2}
   bothMaterial: {fileID: 2100000, guid: 139758544463edc489e2c6f077eff6ac, type: 2}
   materialIndex: 0
+--- !u!135 &355095143452221120
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3805871090086612257}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
