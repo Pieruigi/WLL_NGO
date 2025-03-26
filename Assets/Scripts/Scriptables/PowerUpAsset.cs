@@ -25,10 +25,10 @@ namespace WLL_NGO.Scriptables
 #endif
 
         [SerializeField]
-        GameObject gamePrefab;
-        public GameObject GamePrefab
+        PowerUpController controllerPrefab;
+        public PowerUpController ControllerPrefab
         {
-            get { return gamePrefab; }
+            get { return controllerPrefab; }
         }
     }
         

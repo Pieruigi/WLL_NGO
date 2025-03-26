@@ -113,12 +113,12 @@ namespace WLL_NGO.AI
                 if (player.Role == PlayerRole.GK)
                     continue;
 
-                if (player.IsSelected)
-                {
-                    if (moveActions[player])
-                        moveActions[player].DestroyAction();
-                    continue;
-                }
+                // if (player.IsSelected)
+                // {
+                //     if (moveActions[player])
+                //         moveActions[player].DestroyAction();
+                //     continue;
+                // }
                     
 
                 ZoneTrigger trigger = TeamAI.WaitingZoneTriggers.Find(t=>t.Caretaker == player);

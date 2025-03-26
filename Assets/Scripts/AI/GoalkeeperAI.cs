@@ -388,7 +388,6 @@ namespace WLL_NGO.AI
        
         public void UpdateDive()
         {
- Debug.Log("TEST - Dive");
             if (!diving)
             {
                

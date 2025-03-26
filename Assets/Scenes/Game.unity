@@ -1047,7 +1047,7 @@ GameObject:
   - component: {fileID: 352566820}
   - component: {fileID: 352566819}
   - component: {fileID: 352566818}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (7)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -2456,7 +2456,7 @@ GameObject:
   - component: {fileID: 956098013}
   - component: {fileID: 956098012}
   - component: {fileID: 956098011}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (6)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -2639,7 +2639,7 @@ GameObject:
   - component: {fileID: 1093916578}
   - component: {fileID: 1093916577}
   - component: {fileID: 1093916576}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (5)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -2745,7 +2745,7 @@ GameObject:
   - component: {fileID: 1096382724}
   - component: {fileID: 1096382723}
   - component: {fileID: 1096382722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (3)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -3594,7 +3594,7 @@ GameObject:
   - component: {fileID: 1319781423}
   - component: {fileID: 1319781422}
   - component: {fileID: 1319781421}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (1)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -3805,7 +3805,7 @@ GameObject:
   - component: {fileID: 1426237008}
   - component: {fileID: 1426237007}
   - component: {fileID: 1426237006}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (2)
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -4864,7 +4864,7 @@ GameObject:
   - component: {fileID: 1953491676}
   - component: {fileID: 1953491675}
   - component: {fileID: 1953491674}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier
   m_TagString: Barrier
   m_Icon: {fileID: 0}
@@ -5278,7 +5278,7 @@ GameObject:
   - component: {fileID: 2052734436}
   - component: {fileID: 2052734435}
   - component: {fileID: 2052734434}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Barrier (4)
   m_TagString: Barrier
   m_Icon: {fileID: 0}

@@ -30,7 +30,7 @@ namespace WLL_NGO.AI
           
             // Create 
             var players = PlayerInfoManager.Instance.GetPlayerInfoAll();
-            Debug.Log("TEST - Players.Count:" + players.Count);
+           
             foreach (var player in players)
             {
                 InitFormationHelper(player.Home, "12");

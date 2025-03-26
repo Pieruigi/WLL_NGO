@@ -78,8 +78,6 @@ namespace WLL_NGO.Multiplay
 
         async void CreateTicket(string queueName)
         {
-            Debug.Log("TEST - Queue name:"+queueName);
-
             // Sign in
             await MultiplayUtilities.SignInAsync(HandleOnSignedIn, HandleOnSignInFailed);
 

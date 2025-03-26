@@ -63,6 +63,7 @@ namespace WLL_NGO.Netcode
         // Update is called once per frame
         void Update()
         {
+
             if (!IsSpawned || !IsServer) return;
 
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned) return;
@@ -79,6 +80,18 @@ namespace WLL_NGO.Netcode
                     SpawnRandomPackage();
                 }
             }
+
+#if UNITY_EDITOR
+            // TEST - 
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                UsePowerUp(TeamController.HomeTeam);
+            }   
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                SpawnRandomPackage();
+            }         
+#endif
         }
 
 
@@ -110,7 +123,7 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnHomeTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-            Debug.Log($"TEST - Home team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}, type:{changeEvent.Type}, {changeEvent.PreviousValue}");
+           
             if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add) 
                 OnPowerUpPushed?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
             else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
@@ -119,7 +132,7 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnAwayTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-            Debug.Log($"TEST - Away team power up list changed, changeEvent.index:{changeEvent.Index}, changeEvent.Value:{changeEvent.Value}");
+           
             if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
                 OnPowerUpPushed?.Invoke(TeamController.AwayTeam, changeEvent.Value.ToString());
             else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
@@ -155,13 +168,11 @@ namespace WLL_NGO.Netcode
         void SpawnRandomPackage()
         {
             if (!IsServer) return;
-            Debug.Log("TEST - Spawning a random package");
-
             // Spawn sport bag
             SportBagType type = SportBagType.Home;
             var sb = Instantiate(sportBagPrefab);
             //sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[UnityEngine.Random.Range(0, allowedPowerUps.Count)]);
-            sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[0].name);
+            sb.GetComponent<SportBag>().Initialize(type, allowedPowerUps[1].name);
             sb.transform.position = GetRandomSpawnPoint();
             sb.transform.rotation = Quaternion.identity;
             sb.GetComponent<NetworkObject>().Spawn();
@@ -174,7 +185,7 @@ namespace WLL_NGO.Netcode
         void SpawnPackage(TeamController team)
         {
             if (!IsServer) return;
-            Debug.Log($"TEST - Spawn package for team {team.gameObject.name}");
+            
         }
 
         Vector3 GetRandomSpawnPoint()
@@ -190,6 +201,21 @@ namespace WLL_NGO.Netcode
 
             return new Vector3(rx, 4f, ry);
 
+        }
+
+        string Pop(TeamController team)
+        {
+            if (!IsServer) return "";
+
+            var l = team.Home ? homeTeamPowerUps : awayTeamPowerUps;
+
+            if (l.Count == 0)
+                return "";
+
+            string name = l[0].ToString();
+            l.RemoveAt(0);
+
+            return name;
         }
 
         public void Initialize(float spawnRate)
@@ -221,25 +247,28 @@ namespace WLL_NGO.Netcode
 
         }
 
-        public void Pop(TeamController team)
-        {
-            if (!IsServer) return;
-
-            var l = team.Home ? homeTeamPowerUps : awayTeamPowerUps;
-
-            if (l.Count == 0)
-                return;
-
-            var id = l[0];
-            l.RemoveAt(0);
-        }
+        
 
         public PowerUpAsset GetPowerUpAssetByName(string name)
         {
             return allowedPowerUps.Find(p => p.name == name);
         }
 
-      
+        public void UsePowerUp(TeamController team)
+        {
+            // Pop the first power up
+            var powerName = Pop(team);
+
+            // Get the asset
+            var asset = GetPowerUpAssetByName(powerName);
+
+            // Spawn power up
+            var obj = Instantiate(asset.ControllerPrefab);
+            obj.Initialize(team.SelectedPlayer); // Initialize
+            obj.Launch();
+            //obj.GetComponent<NetworkObject>().Spawn();
+
+        }
     }
 
     

@@ -176,8 +176,6 @@ namespace WLL_NGO.Netcode
         /// </summary>
         public void CreateBot()
         {
-            Debug.Log("TEST - DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-            //players.Add(PlayerInfo.CreateBotPlayer());
             var p = Instantiate(playerInfoPrefab);
             p.GetComponent<PlayerInfo>().CreateBotPlayer();
             p.GetComponent<NetworkObject>().Spawn();

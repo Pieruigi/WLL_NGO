@@ -12,9 +12,7 @@ namespace WLL_NGO
         // Start is called before the first frame update
         void Start()
         {
-            //var lp = PlayerInfoManager.Instance.GetLocalPlayerInfo();
-            //Debug.Log($"TEST - Local player info:{lp}");
-
+        
         }
 
         // Update is called once per frame
@@ -35,8 +33,6 @@ namespace WLL_NGO
 
         private void HandleOnPlayerInitialized(PlayerInfo player)
         {
-            Debug.Log($"TEST - Camera, player:{player}");
-
             if (NetworkManager.Singleton.IsClient)
             {
             

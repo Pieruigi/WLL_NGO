@@ -112,22 +112,15 @@ namespace WLL_NGO
         {
             if (!NetworkManager.Singleton.IsServer) return;
 
-            Debug.Log($"TEST - Net trigger, is not client");
-
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned || MatchController.Instance.MatchState != MatchState.Playing) return;
 
-            Debug.Log($"TEST - Net trigger, MatchController initialized");
-
             if (other.gameObject != BallController.Instance.gameObject) return;
-
-            Debug.Log($"TEST - Net trigger, this is the ball");
 
             if (!triggered)
             {
 
                 triggered = true;
                 var scorer = home ? TeamController.AwayTeam : TeamController.HomeTeam;
-                Debug.Log($"TEST - Net trigger, scorer:{scorer.gameObject.name}");
                 OnGoalScored?.Invoke(scorer);
             }
         }

@@ -39,7 +39,6 @@ namespace WLL_NGO.Netcode
         /// <param name="player"></param>
         void HandleOnPlayerInitialized(PlayerInfo playerInfo)
         {
-            Debug.Log("TEST - EEEEEEEEEEEEEEEEEEE: " + playerInfo);
             // Spawn the team using the team roster
             for (int i = 0; i < MatchController.Instance.PlayerPerTeam; i++)
             {
