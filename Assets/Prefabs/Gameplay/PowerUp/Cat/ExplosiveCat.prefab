@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: -2508765711827771397}
   - component: {fileID: 2702281445435571613}
   - component: {fileID: 2642394895627202619}
-  m_Layer: 9
+  - component: {fileID: 5958930200749300016}
+  m_Layer: 10
   m_Name: ExplosiveCat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,6 +119,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modelPrefab: {fileID: 8004166270923610362, guid: 1ce2ed6499974b2459847de3b987a9ce,
     type: 3}
-  maxSpeed: 6
-  rotationSpeed: 10
-  force: 8
+  _collider: {fileID: -2508765711827771397}
+--- !u!135 &5958930200749300016
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5250058743408901169}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3
+  m_Center: {x: 0, y: 0, z: 0}

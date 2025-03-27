@@ -25,6 +25,12 @@ namespace WLL_NGO.AI
         {
             base.Loop();
 
+#if UNITY_EDITOR
+            // TEST - remove
+            return;
+
+#endif
+
             if (actionAI)
                 return;
             

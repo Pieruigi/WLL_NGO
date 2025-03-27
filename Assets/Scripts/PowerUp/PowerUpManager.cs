@@ -86,11 +86,21 @@ namespace WLL_NGO.Netcode
             if (Input.GetKeyDown(KeyCode.P))
             {
                 UsePowerUp(TeamController.HomeTeam);
-            }   
+            }
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 SpawnRandomPackage();
-            }         
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                PlayerController p = TeamController.HomeTeam.SelectedPlayer;
+                //p.SetPlayerStateInfo((byte)PlayerState.BlowingUp, 0, (byte)StunDetail.Front, 0);
+                p.GetComponent<Rigidbody>().AddForce(Vector3.up * 5 + Vector3.right * 5, ForceMode.VelocityChange);
+                //p.GetComponent<Animator>().SetInteger("Detail", 0);
+                //p.GetComponent<Animator>().SetTrigger("BlowUp");
+                p.SetBlowUpState(true);
+                
+            }   
 #endif
         }
 

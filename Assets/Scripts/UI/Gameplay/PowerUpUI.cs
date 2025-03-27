@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -110,3 +111,4 @@ namespace WLL_NGO.UI
     }
     
 }
+#endif
