@@ -58,6 +58,7 @@ namespace WLL_NGO.Netcode
             public bool button1;
             public bool button2;
             public bool button3;
+            public bool button4;
 
 
             public InputPayload(InputData inputData, int tick)
@@ -67,6 +68,7 @@ namespace WLL_NGO.Netcode
                 button1 = inputData.button1;
                 button2 = inputData.button2;
                 button3 = inputData.button3;
+                button4 = inputData.button4;
                 this.tick = tick;
             }
 
@@ -78,6 +80,7 @@ namespace WLL_NGO.Netcode
                 serializer.SerializeValue(ref button1);
                 serializer.SerializeValue(ref button2);
                 serializer.SerializeValue(ref button3);
+                serializer.SerializeValue(ref button4);
             }
 
 
@@ -160,6 +163,9 @@ namespace WLL_NGO.Netcode
         }
 
         [SerializeField]
+        float sprintMultiplier = 2f;
+
+        [SerializeField]
         float rotationSpeed = 480;
         public float RotationSpeed
         {
@@ -194,6 +200,11 @@ namespace WLL_NGO.Netcode
             set { rb.velocity = value; }
         }
 
+        NetworkVariable<float> stamina = new NetworkVariable<float>(100);
+
+        NetworkVariable<bool> sprinting = new NetworkVariable<bool>(false);
+
+
         #region action fields
         //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
         NetworkVariable<PlayerStateInfo> playerStateInfo = new NetworkVariable<PlayerStateInfo>(new PlayerStateInfo() { state = (byte)PlayerState.Normal, subState = 0, detail = 0 });
@@ -203,6 +214,18 @@ namespace WLL_NGO.Netcode
         float chargingSpeed = 1;
         float lightTackleChargeAmount = .2f;
         Vector3 lookDirection = Vector3.zero;
+
+        bool _button4 = false;
+        DateTime lastDownButton4;
+
+        float doubleTapRate = .5f;
+
+
+        float sprintDelay = .25f;
+        
+
+        float staminaSprintingRate = 10;
+
 
         float currentSpeed = 0;
         /// <summary>
@@ -217,7 +240,6 @@ namespace WLL_NGO.Netcode
         string diveAnimTrigger = "Dive";
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
-        string blowUpAnimParam = "BlowUp";
         string exitAnimParam = "Exit";
 
         float jumpHeightThreshold = 1.7f;
@@ -500,6 +522,99 @@ namespace WLL_NGO.Netcode
 
             button2LastValue = value;
         }
+
+        /// <summary>
+        /// Power up button
+        /// </summary>
+        /// <param name="inputPayload"></param>
+        /// <param name="client"></param>
+        void CheckButton3(InputPayload inputPayload, bool client)
+        {
+            if (!IsServer)
+                return;
+
+            // For power up    
+        }
+
+        /// <summary>
+        /// Tap screen (for both spint and dribbling)
+        /// </summary>
+        /// <param name="inputPayload"></param>
+        /// <param name="client"></param>
+
+        void CheckButton4(InputPayload inputPayload, bool client)
+        {
+            if (!IsServer)
+                return;
+
+            bool doubleTap = false;
+            bool sprinting = false;
+
+            bool value = inputPayload.button4;
+
+            if (!_button4 && value)
+            {
+                if ((DateTime.Now - lastDownButton4).TotalSeconds < doubleTapRate)
+                    doubleTap = true;
+
+                lastDownButton4 = DateTime.Now;
+
+            }
+
+            if (doubleTap)
+            {
+                // Do dribbling here
+                Debug.Log("TEST - Dribbling");
+            }
+            else
+            {
+                if (value)
+                {
+                    if ((DateTime.Now - lastDownButton4).TotalSeconds > sprintDelay)
+                    {
+                        // Do sprint
+                        Debug.Log("TEST - Sprinting");
+                        
+                        sprinting = true;
+                    }
+                }
+                else
+                {
+                    
+                    sprinting = false;
+                }
+
+            }
+
+            // Check stamina
+            if (sprinting)
+            {
+                if (staminaSprintingRate == 0)
+                {
+                    sprinting = false;
+                }
+                else
+                {
+                    var st = stamina.Value;
+                    st -= staminaSprintingRate * NetworkTimer.Instance.DeltaTick;
+                    if (st < 0)
+                    {
+                        sprinting = false;
+                        st = 0;
+                    }
+                    stamina.Value = st;
+                }
+            }
+
+            if (this.sprinting.Value != sprinting)
+                this.sprinting.Value = sprinting;
+
+            doubleTap = false;
+            _button4 = value;
+                
+            
+        }
+
 
         private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage, Vector2 passageDirection = default)
         {
@@ -1107,6 +1222,8 @@ namespace WLL_NGO.Netcode
                 //
                 CheckButton1(inputPayload, false);
                 CheckButton2(inputPayload, false);
+                CheckButton3(inputPayload, false);
+                CheckButton4(inputPayload, false);
 
 
                 //
@@ -1357,7 +1474,7 @@ namespace WLL_NGO.Netcode
 
                 transform.forward = Vector3.MoveTowards(transform.forward, lDir, rotationSpeed * NetworkTimer.Instance.DeltaTick);
 
-                targetVel = new Vector3(moveInput.x, 0f, moveInput.y) * maxSpeed;
+                targetVel = new Vector3(moveInput.x, 0f, moveInput.y) * maxSpeed * (sprinting.Value ? sprintMultiplier : 1f);
                 acc = acceleration;
             }
             else
@@ -1732,7 +1849,7 @@ namespace WLL_NGO.Netcode
         void CheckNotHumanInput()
         {
             InputData input = inputHandler.GetInput();
-            serverInputQueue.Enqueue(new InputPayload() { inputVector = input.joystick, button1 = input.button1, button2 = input.button2, button3 = input.button3, tick = NetworkTimer.Instance.CurrentTick });
+            serverInputQueue.Enqueue(new InputPayload() { inputVector = input.joystick, button1 = input.button1, button2 = input.button2, button3 = input.button3, button4 = input.button4, tick = NetworkTimer.Instance.CurrentTick });
         }
 
         /// <summary>

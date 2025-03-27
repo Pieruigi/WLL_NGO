@@ -20,7 +20,9 @@ namespace WLL_NGO
         [SerializeField]
         public bool button2;
         [SerializeField]
-        public bool button3;
+        public bool button3; // Power up
+        [SerializeField]
+        public bool button4; // Tap screen
 
 
         public InputData(PlayerController.InputPayload inputPayload)
@@ -29,6 +31,7 @@ namespace WLL_NGO
             button1 = inputPayload.button1;
             button2 = inputPayload.button2;
             button3 = inputPayload.button3;
+            button4 = inputPayload.button4;
         }
 
         public static Vector2 ToInputDirection(Vector3 worldDirection)
@@ -48,7 +51,7 @@ namespace WLL_NGO
     {
         Vector2 joystick;
 
-        bool button1, button2, button3;
+        bool button1, button2, button3, button4;
 
         public InputData GetInput()
         {
@@ -62,7 +65,8 @@ namespace WLL_NGO
                 joystick = this.joystick,
                 button1 = this.button1,
                 button2 = this.button2,
-                button3 = this.button3
+                button3 = this.button3,
+                button4 = this.button4
             };
         }
 
@@ -81,6 +85,11 @@ namespace WLL_NGO
             button3 = value;
         }
 
+        public void SetButton4(bool value)
+        {
+            button4 = value;
+        }
+
         public void SetJoystick(Vector2 value)
         {
             joystick = value;
@@ -89,47 +98,11 @@ namespace WLL_NGO
         public void ResetInput()
         {
             joystick = Vector2.zero;
-            button1 = button2 = button3 = false;
+            button1 = button2 = button3 = button4 = false;
         }
     }
 
-    // [System.Serializable]
-    // public class NotHumanInputHandler : IInputHandler
-    // {
-    //     Vector2 joystick;
-        
-    //     bool button1, button2, button3;
-
-    //     public InputData GetInput()
-    //     {
-    //         return new InputData()
-    //         {
-    //             joystick = this.joystick,
-    //             button1 = this.button1,
-    //             button2 = this.button2,
-    //             button3 = this.button3
-    //         };
-    //     }
-
-    //     public void SetJoystick(Vector2 value)
-    //     {
-    //         joystick = value;
-    //     }
-
-    //     public void SetButton1(bool value)
-    //     {
-    //         button1 = value;
-    //     }
-    //     public void SetButton2(bool value)
-    //     {
-    //         button2 = value;
-    //     }
-    //     public void SetButton3(bool value)
-    //     {
-    //         button3 = value;
-    //     }
-    // }
-
+    
     public class PlayerInputManager: Singleton<PlayerInputManager>
     {
        
@@ -146,22 +119,7 @@ namespace WLL_NGO
             //TeamController.OnSelectedPlayerChanged -= HandleOnSelectedPlayerChanged;
         }
 
-        // private void HandleOnSelectedPlayerChanged(TeamController team, PlayerController oldPlayer, PlayerController newPlayer)
-        // {
-        //     // Nothing to change on bots 
-        //     if (team.IsBot())
-        //         return;
-
-        //     if(oldPlayer != null)
-        //     {
-        //         oldPlayer.SetInputHandler(new NotHumanInputHandler());
-        //     }
-            
-        //     if(newPlayer != null)
-        //     {
-        //         newPlayer.SetInputHandler(new HumanInputHandler());
-        //     }
-        // }
+       
 
         /// <summary>
         /// TO REMOVE. We need to check the team for the selected player

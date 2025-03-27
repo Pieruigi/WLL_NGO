@@ -94,6 +94,7 @@ namespace WLL_NGO.UI
                         ih.SetButton1(Input.GetKey(KeyCode.Keypad1));
                     if(!button2.GetButton())
                         ih.SetButton2(Input.GetKey(KeyCode.Keypad2));
+                    ih.SetButton4(Input.GetKey(KeyCode.LeftShift));
 #endif
                     break;
                 case MatchState.KickOff:
