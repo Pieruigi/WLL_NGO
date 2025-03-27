@@ -223,7 +223,7 @@ namespace WLL_NGO.Netcode
         float jumpHeightThreshold = 1.7f;
         float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
 
-        int customTickDelay = 0;
+        int customTickTarget = 0;
 
         int role = -1;
         public PlayerRole Role
@@ -1274,9 +1274,9 @@ namespace WLL_NGO.Netcode
                 case (byte)PlayerState.Receiver:
                     UpdateReceiverMovement();
                     break;
-                case (byte)PlayerState.BlowingUp:
-                    UpdateBlowingUpMovement();
-                    break;
+                // case (byte)PlayerState.BlowingUp:
+                //     UpdateBlowingUpMovement();
+                //     break;
                 case (byte)PlayerState.Diving:
                     UpdateDiveMovement();
                     break;
@@ -1433,10 +1433,10 @@ namespace WLL_NGO.Netcode
             if (!IsServer) return;
 
             // Avoid checking player is grounded too soon
-            if (customTickDelay > NetworkTimer.Instance.CurrentTick)
+            if (customTickTarget > NetworkTimer.Instance.CurrentTick)
                 return;
 
-            customTickDelay = 0;
+            customTickTarget = 0;
 
             // Check if the player is grounded
             if (Physics.Raycast(Position + Vector3.up * 0.01f, Vector3.down, 0.01f, LayerMask.GetMask(new string[] { "Floor" })))// Is grounded
@@ -1499,7 +1499,41 @@ namespace WLL_NGO.Netcode
                     currentSpeed = 0;
                     rb.velocity = Vector3.zero;
                     break;
+                case (byte)StunType.BlowingUp:
+ // Avoid checking player is grounded too soon
+                    if (customTickTarget == 0 || customTickTarget > NetworkTimer.Instance.CurrentTick)
+                        break;
 
+
+                    Debug.Log($"TEST - Delay elapsed, current:{NetworkTimer.Instance.CurrentTick}, delay:{customTickTarget}");
+                    
+                    // Check if the player is grounded
+                    if (Physics.Raycast(Position + Vector3.up * 0.01f, Vector3.down, 0.01f, LayerMask.GetMask(new string[] { "Floor" })))// Is grounded
+                    {
+                        customTickTarget = 0;
+                        // Check the anim detail param
+                        int detail = playerStateInfo.Value.detail;
+
+                        if (detail == (byte)StunDetail.Front) // Front
+                        {
+                            animator.SetTrigger(exitAnimParam);
+                            //SetPlayerStateInfo((byte)PlayerState.Busy, 0, 0, 2.2f);
+                            playerStateCooldown = 2.2f;
+                            
+                        }
+                        else // Back
+                        {
+                            animator.SetTrigger(exitAnimParam);
+                            //SetPlayerStateInfo((byte)PlayerState.Busy, 0, 0, 2.2f);
+                            playerStateCooldown = 2.2f;
+                            
+                        }
+
+                        
+                        // Set stunned state
+                        //SetPlayerStateInfo(PlayerState.Stunned)
+                    }
+                    break;
             }
         }
 
@@ -1666,12 +1700,12 @@ namespace WLL_NGO.Netcode
                     animator.SetInteger(typeAnimParam, newState.subState);
                     animator.SetTrigger(diveAnimTrigger);
                     break;
-                case (byte)PlayerState.BlowingUp:
-                    // Disable ball handling trigger
-                    ballHandlingTrigger.SetEnable(false);
+                // case (byte)PlayerState.BlowingUp:
+                //     // Disable ball handling trigger
+                //     ballHandlingTrigger.SetEnable(false);
 
-                    // Set animation
-                    break;
+                //     // Set animation
+                //     break;
             }
         }
         #endregion
@@ -2024,15 +2058,19 @@ namespace WLL_NGO.Netcode
 
         public void SetBlowUpState(bool front)
         {
-            SetPlayerStateInfo((byte)PlayerState.BlowingUp, 0, 0, 0);
+            SetPlayerStateInfo((byte)PlayerState.Stunned, (byte)StunType.BlowingUp, front ? (byte)StunDetail.Front : (byte)StunDetail.Back, 0);
 
-            int detail = front ? 0 : 1;
-            animator.SetInteger(detailAnimParam, detail);
+            // int detail = front ? 0 : 1;
+            // animator.SetInteger(detailAnimParam, detail);
 
-            animator.SetTrigger(blowUpAnimParam);
+            // animator.SetTrigger(blowUpAnimParam);
+
+
 
             // Set the custom tick delay to avoid the is ground check for the first N ticks
-            customTickDelay = NetworkTimer.Instance.CurrentTick + 5;
+            customTickTarget = NetworkTimer.Instance.CurrentTick + 15;
+
+            Debug.Log($"TEST - Setting delay, curretn:{NetworkTimer.Instance.CurrentTick}, delay:{customTickTarget}");
         }
 
         #endregion

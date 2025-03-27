@@ -1320,8 +1320,11 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: BlowUp
+    m_ConditionEvent: Stun
     m_EventTreshold: 0
+  - m_ConditionMode: 6
+    m_ConditionEvent: Type
+    m_EventTreshold: 6
   - m_ConditionMode: 6
     m_ConditionEvent: Detail
     m_EventTreshold: 0
@@ -1641,8 +1644,11 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: BlowUp
+    m_ConditionEvent: Stun
     m_EventTreshold: 0
+  - m_ConditionMode: 6
+    m_ConditionEvent: Type
+    m_EventTreshold: 6
   - m_ConditionMode: 6
     m_ConditionEvent: Detail
     m_EventTreshold: 1
