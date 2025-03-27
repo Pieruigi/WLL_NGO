@@ -24,7 +24,6 @@ namespace WLL_NGO
         [SerializeField]
         public bool button4; // Tap screen
 
-
         public InputData(PlayerController.InputPayload inputPayload)
         {
             joystick = inputPayload.inputVector;

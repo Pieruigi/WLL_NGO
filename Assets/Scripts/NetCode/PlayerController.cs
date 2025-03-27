@@ -200,16 +200,23 @@ namespace WLL_NGO.Netcode
             set { rb.velocity = value; }
         }
 
+        float staminaMax = 100;
+        
+
         NetworkVariable<float> stamina = new NetworkVariable<float>(100);
 
         NetworkVariable<bool> sprinting = new NetworkVariable<bool>(false);
+
+        DateTime lastStaminaDecrease;
+        float replenishStaminaRate = 10;
+        float staminaReplenishDelay = 1f;
 
 
         #region action fields
         //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
         NetworkVariable<PlayerStateInfo> playerStateInfo = new NetworkVariable<PlayerStateInfo>(new PlayerStateInfo() { state = (byte)PlayerState.Normal, subState = 0, detail = 0 });
 
-
+       
         NetworkVariable<float> charge = new NetworkVariable<float>(0);
         float chargingSpeed = 1;
         float lightTackleChargeAmount = .2f;
@@ -222,10 +229,8 @@ namespace WLL_NGO.Netcode
 
 
         float sprintDelay = .25f;
-        
 
         float staminaSprintingRate = 10;
-
 
         float currentSpeed = 0;
         /// <summary>
@@ -589,20 +594,16 @@ namespace WLL_NGO.Netcode
             // Check stamina
             if (sprinting)
             {
-                if (staminaSprintingRate == 0)
+                if (stamina.Value == 0)
                 {
                     sprinting = false;
                 }
                 else
                 {
-                    var st = stamina.Value;
-                    st -= staminaSprintingRate * NetworkTimer.Instance.DeltaTick;
-                    if (st < 0)
-                    {
-                        sprinting = false;
-                        st = 0;
-                    }
-                    stamina.Value = st;
+                    var amount = staminaSprintingRate * NetworkTimer.Instance.DeltaTick;
+
+                    DecreaseStamina(amount);    
+                    
                 }
             }
 
@@ -1230,6 +1231,11 @@ namespace WLL_NGO.Netcode
                 // Check for ball handling eventually
                 //
                 CheckForBallHandling();
+
+                // 
+                // Check stamina
+                //
+                TryReplenishStamina();
 
             }
 
@@ -2056,6 +2062,43 @@ namespace WLL_NGO.Netcode
             charge.Value = 0;
         }
 
+        void DecreaseStamina(float amount)
+        {
+            if (amount <= 0 || stamina.Value == 0) return;
+            var s = stamina.Value;
+            s -= amount;
+            if (s < 0)
+                s = 0;
+            stamina.Value = s;
+            lastStaminaDecrease = DateTime.Now;
+        }
+
+        void IncreaseStamina(float amount)
+        {
+            if (amount <= 0 || stamina.Value == staminaMax) return;
+            var s = stamina.Value;
+            s += amount;
+            if (s > staminaMax)
+                s = staminaMax;
+            stamina.Value = s;
+        }
+
+        void TryReplenishStamina()
+        {
+            if (stamina.Value == staminaMax) return;
+
+            if ((DateTime.Now - lastStaminaDecrease).TotalSeconds < staminaReplenishDelay) return;
+
+            var s = stamina.Value;
+
+            s += replenishStaminaRate * NetworkTimer.Instance.DeltaTick;
+
+            if (s > staminaMax)
+                s = staminaMax;
+
+            stamina.Value = s;
+
+        }
 
         /// <summary>
         /// Called on this player when they are tackling.
