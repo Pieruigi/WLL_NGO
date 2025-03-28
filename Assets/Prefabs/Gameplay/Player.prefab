@@ -177,8 +177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2450753999
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 3652198747
+  InScenePlacedSourceGlobalObjectIdHash: 2450753999
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -199,6 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 3.5
+  sprintMultiplier: 2
   rotationSpeed: 720
   acceleration: 10
   deceleration: 10
@@ -220,6 +221,8 @@ MonoBehaviour:
   homeMaterial: {fileID: 2100000, guid: d84d4aade1dc6cf47946cca2beeb9b55, type: 2}
   awayMaterial: {fileID: 2100000, guid: 7ee20cdcce4ee344faf7f42ab4ac9747, type: 2}
   meshRenderer: {fileID: 4811291496623610298}
+  playerMarkerPrefab: {fileID: 9032315622784858668, guid: e8b35421cea7d4848a8c3f8f0d6a9126,
+    type: 3}
 --- !u!114 &5802882370175494855
 MonoBehaviour:
   m_ObjectHideFlags: 0

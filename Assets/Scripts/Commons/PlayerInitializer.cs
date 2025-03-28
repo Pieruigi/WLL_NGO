@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using WLL_NGO.AI;
 using WLL_NGO.Netcode;
+using WLL_NGO.UI;
 
 namespace WLL_NGO
 {
@@ -13,8 +14,14 @@ namespace WLL_NGO
         [SerializeField]
         Material homeMaterial, awayMaterial;
 
+
         [SerializeField]
         MeshRenderer meshRenderer;
+
+#if !UNITY_SERVER
+        [SerializeField]
+        GameObject playerMarkerPrefab;
+#endif
 
         private void OnEnable()
         {
@@ -29,7 +36,7 @@ namespace WLL_NGO
         void HandleOnPlayerSpawned(PlayerController playerController)
         {
             PlayerController pc = GetComponent<PlayerController>();
-            if(pc == playerController)
+            if (pc == playerController)
             {
                 InitPlayer(pc);
             }
@@ -51,7 +58,16 @@ namespace WLL_NGO
 
             // TODO: we could read the team roster and load character from addressables here
             meshRenderer.material = pc.PlayerInfo.Home ? homeMaterial : awayMaterial;
+
+// #if !UNITY_SERVER
+//             // Spawn marker
+//             GameObject pm = Instantiate(playerMarkerPrefab, transform);
+//             pm.transform.localPosition = Vector3.zero;
+//             pm.transform.localRotation = Quaternion.identity;
+//             pm.GetComponent<PlayerMarker>().Init(pc);
+// #endif
         }
+
     }
 
 }

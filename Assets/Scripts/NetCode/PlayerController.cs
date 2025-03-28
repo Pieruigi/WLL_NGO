@@ -201,9 +201,17 @@ namespace WLL_NGO.Netcode
         }
 
         float staminaMax = 100;
+        public float MaxStamina
+        {
+            get{ return staminaMax; }
+        }
         
 
         NetworkVariable<float> stamina = new NetworkVariable<float>(100);
+        public float CurrentStamina
+        {
+            get{ return stamina.Value; }
+        }
 
         NetworkVariable<bool> sprinting = new NetworkVariable<bool>(false);
 

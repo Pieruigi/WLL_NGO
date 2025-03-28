@@ -26,10 +26,8 @@ namespace WLL_NGO.UI
         // Start is called before the first frame update
         void Start()
         {
-            // localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
-            // remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
-            
-                
+            localTeam = PlayerInfoManager.Instance.GetLocalPlayerInfo().Home ? TeamController.HomeTeam : TeamController.AwayTeam;
+            remoteTeam = localTeam.Home ? TeamController.AwayTeam : TeamController.HomeTeam;
         }
 
         // Update is called once per frame

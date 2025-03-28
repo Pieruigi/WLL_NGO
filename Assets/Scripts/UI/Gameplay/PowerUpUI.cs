@@ -41,7 +41,6 @@ namespace WLL_NGO.UI
         {
             if (MatchRuler.Instance.GameMode == GameMode.Powered)
             {
-                Debug.Log("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
                 PowerUpManager.OnPowerUpPushed -= HandleOnPowerUpPushed;
                 PowerUpManager.OnPowerUpPopped -= HandleOnPowerUpPopped;
             }
