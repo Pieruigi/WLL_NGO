@@ -12,6 +12,9 @@ namespace WLL_NGO.AI
 
         protected override void Activate()
         {
+            CreateAction<WaitingActionAI>(Owner, this, true, conditionFunction: ()=> { return true; });
+            return;
+
             if (WaitingCondition())
                 CreateAction<WaitingActionAI>(Owner, this, true, conditionFunction: WaitingCondition);
             else

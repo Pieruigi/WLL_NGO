@@ -123,6 +123,9 @@ namespace WLL_NGO.Netcode
                     // Check the team who's going to kick off (only after a goal)
                     if (IsServer) // Last scorer is not null only on server
                     {
+                        if (!lastScorer)
+                            lastScorer = TeamController.AwayTeam; // Starting match 
+                            
                         if (lastScorer != null)
                         {
                             // List<Transform> homeSP = lastScorer == TeamController.HomeTeam ? PlayerSpawnPointManager.Instance.GetHomeSpawnPoints() : PlayerSpawnPointManager.Instance.GetKickOffHomeSpawnPoints();
@@ -141,7 +144,7 @@ namespace WLL_NGO.Netcode
 
                             // Reset the ball
                             BallController.Instance.ResetToKickOff();
-                            
+
                             lastScorer = null;
                         }
 

@@ -27,7 +27,7 @@ namespace WLL_NGO.AI
 
 #if UNITY_EDITOR
             // TEST - remove
-            return;
+            //return;
 
 #endif
 

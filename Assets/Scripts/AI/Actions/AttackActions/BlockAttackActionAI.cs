@@ -121,7 +121,7 @@ namespace WLL_NGO.AI
                         continue;
 
                     // Check if an action already exists for this player
-                        var moveAction = actions.Find(a => a.PlayerAI == player);
+                    var moveAction = actions.Find(a => a.PlayerAI == player);
 
                     if (!moveAction)
                     {

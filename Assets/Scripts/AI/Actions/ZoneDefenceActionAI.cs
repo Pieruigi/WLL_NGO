@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WLL_NGO.Netcode;
 
 namespace WLL_NGO.AI
 {
@@ -12,8 +13,8 @@ namespace WLL_NGO.AI
 
         [SerializeField]
         Dictionary<PlayerAI, ActionAI> moveActions = new Dictionary<PlayerAI, ActionAI>();
-        
-        
+
+
         protected override void Activate()
         {
             // Set triggers callbacks
@@ -33,7 +34,7 @@ namespace WLL_NGO.AI
             timer = loopTime;
         }
 
-        protected override void Release() 
+        protected override void Release()
         {
             ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
@@ -46,18 +47,18 @@ namespace WLL_NGO.AI
             {
                 if (moveActions[player])
                     moveActions[player].DestroyAction();
-                
+
             }
             moveActions.Clear();
         }
 
-                
+
 
         private void HandleOnOpponentPlayerEnter(ZoneTrigger trigger, PlayerAI player)
         {
             if (player.HasBall || !trigger.Caretaker.TargetPlayer || trigger.Caretaker.IsDoublingGuard)
                 trigger.Caretaker.TargetPlayer = player;
-            
+
         }
 
         private void HandleOnOpponentPlayerExit(ZoneTrigger trigger, PlayerAI player)
@@ -81,9 +82,9 @@ namespace WLL_NGO.AI
                     }
                     trigger.Caretaker.TargetPlayer = null;
                 }
-                
+
             }
-            
+
         }
 
         protected override void Loop()
@@ -104,51 +105,94 @@ namespace WLL_NGO.AI
 
         private void CheckTargets()
         {
-            
+
             foreach (PlayerAI player in TeamAI.Players)
             {
-                
+
 
                 // Not for the goalkeeper
                 if (player.Role == PlayerRole.GK)
                     continue;
 
-                // if (player.IsSelected)
-                // {
-                //     if (moveActions[player])
-                //         moveActions[player].DestroyAction();
-                //     continue;
-                // }
-                    
+                if (player.IsSelected && !TeamAI.TeamController.IsBot())
+                {
+                    // if (moveActions[player])
+                    //     moveActions[player].DestroyAction();
+                    continue;
+                }
 
-                ZoneTrigger trigger = TeamAI.WaitingZoneTriggers.Find(t=>t.Caretaker == player);
+
+                ZoneTrigger trigger = TeamAI.WaitingZoneTriggers.Find(t => t.Caretaker == player);
+
+                //player.TargetPlayer = null; //TEST - Remove
 
                 if (player.TargetPlayer) // We already have a target
                 {
 
+
+
                     Vector3 pos = Vector3.ProjectOnPlane(TeamAI.NetController.transform.position - player.TargetPlayer.Position, Vector3.up);
                     pos = pos.normalized * TeamAI.GetDefensiveDistance();
                     pos += player.TargetPlayer.Position;
+
+                    pos = player.TargetPlayer.Position;
+                    if (Vector3.Distance(player.Position, pos) < ReachDestinationActionParams.TolleranceDefault)
+                        continue;
+
+                    Debug.Log("TEST - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA player:" + player.gameObject.name);
                     if (!moveActions[player])
                     {
-                        
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = pos }, ()=> { return !player.IsSelected; });
+
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = pos }, () => { return (!player.IsSelected || TeamAI.TeamController.IsBot()); });
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
                     moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = pos });
                 }
                 else // We don't have any target yet 
                 {
-                    
+                    Vector3 destination = trigger.DefaultPosition;
+
+#if TEST_AI
+                    TestBallController ball = team.BallController;
+#else
+                    BallController ball = BallController.Instance;
+#endif
+
+                    // Check if the ball is over the defence line
+                    bool over = BallIsOverTheWaitingLine();
+                    Vector3 dist = Vector3.ProjectOnPlane(ball.Position - destination, Vector3.up);
+
+                    //destination += dist / 4f;
+                    if (Vector3.Distance(player.Position, destination) < ReachDestinationActionParams.TolleranceDefault)
+                        continue;
+
+
                     if (!moveActions[player])
                     {
-                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = trigger.DefaultPosition }, ()=> { return !player.IsSelected; }); ;
+                        moveActions[player] = CreateAction<ReachDestinationActionAI>(player, this, false, ActionUpdateFunction.Update, new ReachDestinationActionParams() { Destination = destination }, () => { return (!player.IsSelected || TeamAI.TeamController.IsBot()); }); ;
                         //moveActions[player].OnActionCompleted += HandleOnMoveActionCompleted;
                     }
-                    moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = trigger.DefaultPosition });
+                    moveActions[player].Initialize(new ReachDestinationActionParams() { Destination = destination });
                 }
             }
         }
+
+        bool BallIsOverTheWaitingLine()
+        {
+            TeamAI team = TeamAI;
+#if TEST_AI
+            TestBallController ball = team.BallController;
+#else
+            BallController ball = BallController.Instance;
+#endif
+            Vector3 ballDir = ball.Position - team.NetController.transform.position;
+
+
+            return ballDir.x < TeamAI.WaitingLine;
+        }
+        
+        
+
     }
 
 }
