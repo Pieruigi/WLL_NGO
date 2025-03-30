@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using WLL_NGO.Netcode;
 
@@ -10,6 +11,10 @@ namespace WLL_NGO.AI
     {
         float timer = 0;
         float loopTime = .5f;
+
+        float maxTargetDistance = 3f;
+
+        float minTargetDistance = 1f;
 
         [SerializeField]
         Dictionary<PlayerAI, ActionAI> moveActions = new Dictionary<PlayerAI, ActionAI>();
@@ -128,14 +133,25 @@ namespace WLL_NGO.AI
 
                 if (player.TargetPlayer) // We already have a target
                 {
+                    Vector3 pos = player.TargetPlayer.Position;
 
+                    // float dist = GetBallWaitingLineDistance();
+                    // if (dist > 0)
+                    // {
+                    //     // Keep distance
+                    //     float d = Mathf.Clamp(dist*.5f, minTargetDistance, maxTargetDistance);
+                    // }
+                    // else
+                    // {
+                    //     // Attack
+                    //     // Do something here if you want to adjust the target destination
+                    // }
 
+                    // Vector3 pos = Vector3.ProjectOnPlane(TeamAI.NetController.transform.position - player.TargetPlayer.Position, Vector3.up);
+                    // pos = pos.normalized * TeamAI.GetDefensiveDistance();
+                    // pos += player.TargetPlayer.Position;
 
-                    Vector3 pos = Vector3.ProjectOnPlane(TeamAI.NetController.transform.position - player.TargetPlayer.Position, Vector3.up);
-                    pos = pos.normalized * TeamAI.GetDefensiveDistance();
-                    pos += player.TargetPlayer.Position;
-
-                    pos = player.TargetPlayer.Position;
+                    //pos = player.TargetPlayer.Position;
                     if (Vector3.Distance(player.Position, pos) < ReachDestinationActionParams.TolleranceDefault)
                         continue;
 
@@ -158,9 +174,17 @@ namespace WLL_NGO.AI
                     BallController ball = BallController.Instance;
 #endif
 
+                     float dist = GetBallWaitingLineDistance();
+                    Debug.Log("AAAAAAAAAAAAAAAAAAAAAA balldist:" + dist);
+                    if (dist > 0)
+                    {
+                        float d = Mathf.Clamp(dist * .5f, minTargetDistance, maxTargetDistance);
+                        destination.x += dist * (TeamAI.Home ? 1f : -1);
+                    }
+
                     // Check if the ball is over the defence line
-                    bool over = BallIsOverTheWaitingLine();
-                    Vector3 dist = Vector3.ProjectOnPlane(ball.Position - destination, Vector3.up);
+                    // bool over = BallIsOverTheWaitingLine();
+                    // Vector3 dist = Vector3.ProjectOnPlane(ball.Position - destination, Vector3.up);
 
                     //destination += dist / 4f;
                     if (Vector3.Distance(player.Position, destination) < ReachDestinationActionParams.TolleranceDefault)
@@ -190,8 +214,24 @@ namespace WLL_NGO.AI
 
             return ballDir.x < TeamAI.WaitingLine;
         }
-        
-        
+
+        /// <summary>
+        /// Negative value means the ball is over the waiting line.
+        /// </summary>
+        /// <returns></returns>
+        float GetBallWaitingLineDistance()
+        {
+            TeamAI team = TeamAI;
+#if TEST_AI
+            TestBallController ball = team.BallController;
+#else
+            BallController ball = BallController.Instance;
+#endif
+            float dist = ball.Position.x - TeamAI.WaitingLine;
+
+            return dist * (team.Home ? 1f : -1f);
+
+        }
 
     }
 
