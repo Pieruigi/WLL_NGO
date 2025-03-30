@@ -12,6 +12,8 @@ namespace WLL_NGO.AI
         public static UnityAction<ZoneTrigger, PlayerAI> OnOpponentPlayerEnter;
         public static UnityAction<ZoneTrigger, PlayerAI> OnOpponentPlayerExit;
 
+        public static UnityAction<ZoneTrigger, PlayerAI> OnOpponentPlayerStay;
+
         public static List<ZoneTrigger> zoneTriggerList = new List<ZoneTrigger>();
 
         [SerializeField]
@@ -42,8 +44,14 @@ namespace WLL_NGO.AI
         [SerializeField]
         bool resizeEnabled = false;
 
+        //[SerializeField]
+        //bool moveOnResize = false;
         [SerializeField]
-        bool moveOnResize = false;
+        bool moveEnabled = false;
+
+
+
+
 
         bool activated = false;
 
@@ -91,6 +99,8 @@ namespace WLL_NGO.AI
                 return;
             PlayerAI player = other.GetComponent<PlayerAI>();
 
+            if (caretaker.IsTeammate(player)) return;
+
             if (inTriggerList.Contains(player)) // To be sure
                 return;
 
@@ -105,12 +115,33 @@ namespace WLL_NGO.AI
         }
 
 
+        private void OnTriggerStay(Collider other)
+        {
+            if (!other.CompareTag(Tags.Player))
+                return;
+            PlayerAI player = other.GetComponent<PlayerAI>();
+
+            if (caretaker.IsTeammate(player)) return;
+
+            if (!inTriggerList.Contains(player)) // To be sure
+                inTriggerList.Add(player); // We add any player
+
+            if (player.TeamAI != caretaker.TeamAI)
+            {
+                // We only report opponents
+                OnOpponentPlayerStay?.Invoke(this, player);
+            }
+
+        }
+
 
         private void OnTriggerExit(Collider other)
         {
             if (!other.CompareTag(Tags.Player))
                 return;
             PlayerAI player = other.GetComponent<PlayerAI>();
+
+            if (caretaker.IsTeammate(player)) return;
 
             inTriggerList.Remove(player);
 

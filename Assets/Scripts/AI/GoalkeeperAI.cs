@@ -161,7 +161,7 @@ namespace WLL_NGO.AI
 
         void UpdateNormal()
         {
-            if (player.IsSelected())
+            if (player.IsSelected() && !player.PlayerInfo.Bot)
                 return;
 
             if (player.GetState() != (byte)PlayerState.Normal) return;
@@ -171,50 +171,53 @@ namespace WLL_NGO.AI
 
             
             if (BallController.Instance.Owner != null) // The ball is controlled by someone 
+            {
+                if (BallController.Instance.Owner == player)// Goalkeeper is controlling the ball
                 {
-                    if (BallController.Instance.Owner == this)// Goalkeeper is controlling the ball
-                    {
-                        player.ResetLookDirection();
-                    }
-                    else // Someone else is controlling the ball
-                    {
-                        if (areaBounds.Contains(BallController.Instance.Position))
-                        {
-                            // The ball is inside the goalkeeper area...
-                            if (!player.IsTeammate(BallController.Instance.Owner))
-                            {
-                                // ... and controlled by an opponent player, so lets try to get it
-                                TakeBallFromOpponent(BallController.Instance.Owner);
-
-                            }
-                        }
-                        else
-                        {
-                            // Ball is out the goalkeeper area, just keep position
-                            KeepPosition();
-                        }
-                    }
-
+                    // Reset input
+                    player.ResetLookDirection();
+                    Debug.Log("TEST - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                    player.GetInputHandler().SetJoystick(Vector3.zero);
                 }
-                else // The ball is not controlled at all
+                else // Someone else is controlling the ball
                 {
-
-                    Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
-                    Vector3 ballDir = netCenter - BallController.Instance.Position;
-                    float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
-                    //if(ballVelNoEffect.magnitude == 0 || dot < 0) // The ball is going to the opponent goal line
-                    if (!IsBallMovingThisDirection() || !IsBallReachingTheNet() || !IsTimeToDive())
+                    if (areaBounds.Contains(BallController.Instance.Position))
                     {
+                        // The ball is inside the goalkeeper area...
+                        if (!player.IsTeammate(BallController.Instance.Owner))
+                        {
+                            // ... and controlled by an opponent player, so lets try to get it
+                            TakeBallFromOpponent(BallController.Instance.Owner);
+
+                        }
+                    }
+                    else
+                    {
+                        // Ball is out the goalkeeper area, just keep position
                         KeepPosition();
                     }
-                    else // Is coming
-                    {
-                        if (IsTimeToDive())
-                            StartDiving();
+                }
 
-                    }
+            }
+            else // The ball is not controlled at all
+            {
+
+                Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
+                Vector3 ballDir = netCenter - BallController.Instance.Position;
+                float dot = Vector3.Dot(Vector3.ProjectOnPlane(ballVelNoEffect, Vector3.up), Vector3.ProjectOnPlane(ballDir, Vector3.up));
+                //if(ballVelNoEffect.magnitude == 0 || dot < 0) // The ball is going to the opponent goal line
+                if (!IsBallMovingThisDirection() || !IsBallReachingTheNet() || !IsTimeToDive())
+                {
+                    KeepPosition();
+                }
+                else // Is coming
+                {
+                    if (IsTimeToDive())
+                        StartDiving();
 
                 }
+
+            }
 
            
         }
@@ -332,7 +335,7 @@ namespace WLL_NGO.AI
 
             if (ballOwner == null || player.IsTeammate(ballOwner))
                 return;
-
+           
          
             // Ball direction
             Vector3 ballDir = BallController.Instance.Position - player.Position;
@@ -346,10 +349,11 @@ namespace WLL_NGO.AI
             }
             else
             {
-                
+
                 //((NotHumanInputHandler)player.GetInputHandler()).SetJoystick(Vector2.zero);
                 // Hit the opponent
                 //if(player.sta)
+                //((InputHandler) player.GetInputHandler()).SetJoystick(Vector3.zero);
                 player.GiveSlap();
             }
             // Move towards the ball

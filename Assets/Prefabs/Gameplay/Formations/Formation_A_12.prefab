@@ -1359,7 +1359,7 @@ MonoBehaviour:
   caretaker: {fileID: 0}
   idlePoint: {fileID: 8602420583766997972}
   inTriggerList: []
-  resizeEnabled: 1
+  resizeEnabled: 0
   moveOnResize: 0
 --- !u!1 &1320760636839914581
 GameObject:
@@ -3716,7 +3716,7 @@ MonoBehaviour:
   caretaker: {fileID: 0}
   idlePoint: {fileID: 7577028211569946842}
   inTriggerList: []
-  resizeEnabled: 1
+  resizeEnabled: 0
   moveOnResize: 0
 --- !u!1 &3866399389838233650
 GameObject:
@@ -5820,7 +5820,7 @@ MonoBehaviour:
   caretaker: {fileID: 0}
   idlePoint: {fileID: 5891702329957127132}
   inTriggerList: []
-  resizeEnabled: 1
+  resizeEnabled: 0
   moveOnResize: 0
 --- !u!1 &6150331678846213005
 GameObject:

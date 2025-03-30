@@ -78,7 +78,7 @@ namespace WLL_NGO.AI
                     savedTarget = value;
                     return;
                 }
-                    
+                Debug.Log($"TEST - Setting target player for {gameObject.name} to {value}");    
                 targetPlayer = value; 
             }
         }
@@ -208,6 +208,7 @@ namespace WLL_NGO.AI
 
         void StopDoubleGuard()
         {
+          
             doubleGuard = false;
             targetPlayer = savedTarget;
 

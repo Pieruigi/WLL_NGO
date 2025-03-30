@@ -23,8 +23,10 @@ namespace WLL_NGO.AI
         protected override void Activate()
         {
             // Set triggers callbacks
+            //ZoneTrigger.OnOpponentPlayerEnter += HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerEnter += HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit += HandleOnOpponentPlayerExit;
+
             // Activate triggers
             foreach (ZoneTrigger zt in TeamAI.WaitingZoneTriggers)
                 zt.Activate(true);
@@ -41,6 +43,7 @@ namespace WLL_NGO.AI
 
         protected override void Release()
         {
+            //ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerEnter -= HandleOnOpponentPlayerEnter;
             ZoneTrigger.OnOpponentPlayerExit -= HandleOnOpponentPlayerExit;
 
@@ -71,7 +74,8 @@ namespace WLL_NGO.AI
             // We must check the waiting line too
             if (!player.HasBall)
             {
-                trigger.Caretaker.TargetPlayer = null;
+                if(player == trigger.Caretaker.TargetPlayer)
+                    trigger.Caretaker.TargetPlayer = null;
             }
             else
             {
@@ -85,6 +89,7 @@ namespace WLL_NGO.AI
                         trigger.Caretaker.StartDoubleGuard(player);
                         return;
                     }
+                    
                     trigger.Caretaker.TargetPlayer = null;
                 }
 
@@ -155,7 +160,6 @@ namespace WLL_NGO.AI
                     if (Vector3.Distance(player.Position, pos) < ReachDestinationActionParams.TolleranceDefault)
                         continue;
 
-                    Debug.Log("TEST - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA player:" + player.gameObject.name);
                     if (!moveActions[player])
                     {
 
@@ -179,7 +183,7 @@ namespace WLL_NGO.AI
                     if (dist > 0)
                     {
                         float d = Mathf.Clamp(dist * .5f, minTargetDistance, maxTargetDistance);
-                        destination.x += dist * (TeamAI.Home ? 1f : -1);
+                        //destination.x += dist * (TeamAI.Home ? 1f : -1);
                     }
 
                     // Check if the ball is over the defence line
