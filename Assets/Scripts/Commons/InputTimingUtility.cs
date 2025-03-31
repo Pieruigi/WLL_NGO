@@ -12,19 +12,19 @@ namespace WLL_NGO
         public const float PerfectTimingChargeLimit = .7f;
 
        
-        public static byte GetOnTheFlyTiming(float value)
+        public static ShotTiming GetOnTheFlyTiming(float value)
         {
 
             if (value < 0.25f)
-                return (byte)ShotTiming.Normal;
+                return ShotTiming.Normal;
             else if (value < 0.375f)
-                return (byte)ShotTiming.Good;
+                return ShotTiming.Good;
             else if (value < .625f)
-                return (byte)ShotTiming.Perfect;
+                return ShotTiming.Perfect;
             else if (value < .75f)
-                return (byte)ShotTiming.Good;
+                return ShotTiming.Good;
             else
-                return (byte)ShotTiming.Bad;
+                return ShotTiming.Bad;
 
 
         }
@@ -38,14 +38,14 @@ namespace WLL_NGO
             return lerp;
         }
 
-        public static byte GetShotTimingByCharge(float charge)
+        public static ShotTiming GetShotTimingByCharge(float charge)
         {
             if (charge <= GoodTimingChargeLimit)
-                return (byte)ShotTiming.Good;
+                return ShotTiming.Good;
             else if (charge <= PerfectTimingChargeLimit)
-                return (byte)ShotTiming.Perfect;
+                return ShotTiming.Perfect;
             else
-                return (byte)ShotTiming.Bad;
+                return ShotTiming.Bad;
                 
         }
 

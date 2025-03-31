@@ -229,6 +229,10 @@ namespace WLL_NGO.Netcode
 
        
         NetworkVariable<float> charge = new NetworkVariable<float>(0);
+        public float Charge
+        {
+            get{ return charge.Value; }
+        }
         float chargingSpeed = 1;
         float lightTackleChargeAmount = .2f;
         Vector3 lookDirection = Vector3.zero;
@@ -802,7 +806,7 @@ namespace WLL_NGO.Netcode
                 float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
                 // Shoot
-                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: true, isOnTheFly: false);
 
                 SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
                 // A bit of cooldown
@@ -861,7 +865,7 @@ namespace WLL_NGO.Netcode
 
                     //Debug.Log($"Shooting data - receiver:{receiver}, targetPosition:{targetPosition}, estimatedBallSpeed:{estBallSpeed}");
                     // Shoot
-                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: true, isOnTheFly: true);
 
                     SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
 
@@ -916,8 +920,9 @@ namespace WLL_NGO.Netcode
 
                 // Add some error depending on the shot timing
                 // AddError();
-                
-
+                ShotTiming timing = InputTimingUtility.GetShotTimingByCharge(charge.Value);
+                if (timing == ShotTiming.Bad)
+                    targetPosition += Vector3.up * UnityEngine.Random.Range(1f, 2f);
 
 
                 Debug.Log("Targeting the opponent net...");
@@ -938,7 +943,7 @@ namespace WLL_NGO.Netcode
             float speed = 30;
 
             // Shoot
-            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: false, isOnTheFly: false);
 
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
             // A bit of cooldown
@@ -1015,7 +1020,7 @@ namespace WLL_NGO.Netcode
             float speed = 30;
 
             // Shoot
-            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick);
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: false, isOnTheFly: true);
 
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
             // A bit of cooldown
@@ -1041,7 +1046,7 @@ namespace WLL_NGO.Netcode
                 ballPosition = BallController.Instance.Position;
             }
 
-            byte timing = InputTimingUtility.GetOnTheFlyTiming(InputTimingUtility.GetOnTheFlyNormalizedTimingValue(initialPosition, targetPosition, ballPosition));
+            byte timing = (byte)InputTimingUtility.GetOnTheFlyTiming(InputTimingUtility.GetOnTheFlyNormalizedTimingValue(initialPosition, targetPosition, ballPosition));
 
             return timing;
         }

@@ -69,11 +69,16 @@ namespace WLL_NGO.Netcode
             public int FinalTick; // The ball tick
             public PlayerController Shooter;
             public PlayerController Receiver; // Only for passage
-          
+
+            public ShotTiming Timing;
+
+            public bool IsPassage;
+
+            public bool IsOnTheFly;
 
             public override string ToString()
             {
-                return $"[ShootingData Position:{InitialPosition}, Target:{TargetPosition}, StraightVelocity:{Velocity}, InitialEffectVelocity:{InitialEffectVelocity}, CurrentEffectVelocity:{CurrentEffectVelocity}, EffectTime:{EffectTime}, CurrentEffectTime:{CurrentEffectTime}]";
+                return $"[ShootingData Position:{InitialPosition}, Target:{TargetPosition}, StraightVelocity:{Velocity}, InitialEffectVelocity:{InitialEffectVelocity}, CurrentEffectVelocity:{CurrentEffectVelocity}, EffectTime:{EffectTime}, CurrentEffectTime:{CurrentEffectTime}, Timing:{Timing}, IsPassage:{IsPassage}, IsOnTheFly:{IsOnTheFly}]";
             }
         }
 
@@ -538,21 +543,21 @@ namespace WLL_NGO.Netcode
         /// <param name="force"></param>
         /// <param name="tick"></param>
         [ClientRpc]
-        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, NetworkObjectReference receiverRef, Vector3 targetPosition, float speed, float effectSpeed, int tick)
+        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, NetworkObjectReference receiverRef, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPassage, bool isOnTheFly)
         {
             NetworkObject player = null;
             if(playerRef.TryGet(out player))
             {
                 NetworkObject receiver = null;
                 receiverRef.TryGet(out receiver);
-                ShootAtTick(player.GetComponent<PlayerController>(), receiver ? receiver.GetComponent<PlayerController>() : null, targetPosition, speed, effectSpeed, tick);
+                ShootAtTick(player.GetComponent<PlayerController>(), receiver ? receiver.GetComponent<PlayerController>() : null, targetPosition, speed, effectSpeed, tick, isPassage, isOnTheFly);
             }
             
         }
 
        
-
-        public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick)
+        // TODO: Add som IsPassage boolean parameter
+        public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPassage, bool isOnTheFly)
         {
            
             //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
@@ -562,7 +567,7 @@ namespace WLL_NGO.Netcode
             
             // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), receiver ? new NetworkObjectReference(receiver.NetworkObject) : default, targetPosition, speed, effectSpeed, tick);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), receiver ? new NetworkObjectReference(receiver.NetworkObject) : default, targetPosition, speed, effectSpeed, tick, isPassage, isOnTheFly);
             
             if(NetworkTimer.Instance.CurrentTick > tick)
             {
@@ -570,8 +575,22 @@ namespace WLL_NGO.Netcode
                 shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                 shootingData.Shooter = player;
                 shootingData.Receiver = receiver;
+                shootingData.IsPassage = isPassage;
+                shootingData.IsOnTheFly = isOnTheFly;
+                 if (!isPassage)
+                    {
+                        if (!isOnTheFly)
+                            shootingData.Timing = InputTimingUtility.GetShotTimingByCharge(player.Charge);
+                        else
+                            shootingData.Timing = InputTimingUtility.GetOnTheFlyTiming(player.Charge);
+                    }
+                    else
+                    {
+                        if (isOnTheFly)
+                            shootingData.Timing = InputTimingUtility.GetOnTheFlyTiming(player.Charge);
+                    }
                 // Adjust elapsed time
-                if(shootingData.EffectTime > 0)
+                if (shootingData.EffectTime > 0)
                     shootingData.CurrentEffectTime = (NetworkTimer.Instance.CurrentTick - tick) * NetworkTimer.Instance.DeltaTick;
     
 
@@ -590,6 +609,22 @@ namespace WLL_NGO.Netcode
                     shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                     shootingData.Shooter = player;
                     shootingData.Receiver = receiver;
+                    shootingData.IsPassage = isPassage;
+                    shootingData.IsOnTheFly = isOnTheFly;
+                    if (!isPassage)
+                    {
+                        if (!isOnTheFly)
+                            shootingData.Timing = InputTimingUtility.GetShotTimingByCharge(player.Charge);
+                        else
+                            shootingData.Timing = InputTimingUtility.GetOnTheFlyTiming(player.Charge);
+                    }
+                    else
+                    {
+                        if (isOnTheFly)
+                            shootingData.Timing = InputTimingUtility.GetOnTheFlyTiming(player.Charge);
+                    }
+                        
+                    
                     // Adjust elapsed time ( it should be the same tick at this point, but... who knows )
                     if (shootingData.EffectTime > 0)
                         shootingData.CurrentEffectTime = (NetworkTimer.Instance.CurrentTick - tick) * NetworkTimer.Instance.DeltaTick;
@@ -598,6 +633,8 @@ namespace WLL_NGO.Netcode
                 }
                 
             }
+
+            Debug.Log($"TEST - ShootingData:{shootingData}");
 
             OnShoot?.Invoke();
         }

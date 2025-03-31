@@ -49,8 +49,13 @@ namespace WLL_NGO
     public class InputHandler : IInputHandler
     {
         Vector2 joystick;
-
+        public Vector2 Joystick{ get{ return joystick; }}
+       
         bool button1, button2, button3, button4;
+        public bool Button1{ get{ return button1; }}
+        public bool Button2{ get{ return button2; }}
+        public bool Button3{ get{ return button3; }}
+        public bool Button4{ get{ return button4; }}
 
         public InputData GetInput()
         {

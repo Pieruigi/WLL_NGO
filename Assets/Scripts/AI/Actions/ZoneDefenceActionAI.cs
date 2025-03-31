@@ -178,8 +178,8 @@ namespace WLL_NGO.AI
                     BallController ball = BallController.Instance;
 #endif
 
-                     float dist = GetBallWaitingLineDistance();
-                    Debug.Log("AAAAAAAAAAAAAAAAAAAAAA balldist:" + dist);
+                    float dist = GetBallWaitingLineDistance();
+                    
                     if (dist > 0)
                     {
                         float d = Mathf.Clamp(dist * .5f, minTargetDistance, maxTargetDistance);
