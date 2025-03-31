@@ -200,14 +200,14 @@ namespace WLL_NGO.Netcode
             set { rb.velocity = value; }
         }
 
-        float staminaMax = 100;
+        float staminaMax = 3; // One for each step
         public float MaxStamina
         {
             get{ return staminaMax; }
         }
         
 
-        NetworkVariable<float> stamina = new NetworkVariable<float>(100);
+        NetworkVariable<float> stamina = new NetworkVariable<float>(3);
         public float CurrentStamina
         {
             get{ return stamina.Value; }
@@ -216,9 +216,12 @@ namespace WLL_NGO.Netcode
         NetworkVariable<bool> sprinting = new NetworkVariable<bool>(false);
 
         DateTime lastStaminaDecrease;
-        float replenishStaminaRate = 10;
+        float replenishStaminaRate = .2f;
         float staminaReplenishDelay = 1f;
 
+        float lightTackleStaminaCost = 1;
+
+        float heavyTackleStaminaCost = 2;
 
         #region action fields
         //NetworkVariable<byte> playerState = new NetworkVariable<byte>((byte)PlayerState.Normal);
@@ -676,14 +679,20 @@ namespace WLL_NGO.Netcode
                     var ps = playerStateInfo.Value;
                     if (charge.Value < lightTackleChargeAmount)
                     {
-                        //playerSubState.Value = (byte)TackleType.Slide;
-                        ps.subState = (byte)TackleType.Slide;
-                        //playerState.Value = ps;
+                        // Check stamina
+                        if (stamina.Value > lightTackleStaminaCost)
+                        {
+                            DecreaseStamina(lightTackleStaminaCost);
+                            ps.subState = (byte)TackleType.Slide;    
+                        }
                     }
                     else
                     {
-                        ps.subState = (byte)TackleType.Kick;
-                        //playerState.Value = ps; 
+                        if (stamina.Value > heavyTackleStaminaCost)
+                        {
+                            DecreaseStamina(heavyTackleStaminaCost);
+                            ps.subState = (byte)TackleType.Kick;
+                        }
                     }
                     charge.Value = 0;
                     ps.state = (byte)PlayerState.Tackling;
@@ -907,7 +916,7 @@ namespace WLL_NGO.Netcode
 
                 // Add some error depending on the shot timing
                 // AddError();
-
+                
 
 
 

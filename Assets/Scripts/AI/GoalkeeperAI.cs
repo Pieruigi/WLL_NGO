@@ -174,10 +174,10 @@ namespace WLL_NGO.AI
             {
                 if (BallController.Instance.Owner == player)// Goalkeeper is controlling the ball
                 {
+                    // TODO: we should set some ai here to let the goalkeeper play the ball
                     // Reset input
                     player.ResetLookDirection();
-                    Debug.Log("TEST - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                    player.GetInputHandler().SetJoystick(Vector3.zero);
+                    player.GetInputHandler().SetJoystick(Vector3.zero); 
                 }
                 else // Someone else is controlling the ball
                 {
