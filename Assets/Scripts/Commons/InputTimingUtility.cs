@@ -9,7 +9,7 @@ namespace WLL_NGO
     {
         public const float GoodTimingChargeLimit = 0.5f;
 
-        public const float PerfectTimingChargeLimit = .7f;
+        public const float PerfectTimingChargeLimit = .75f;
 
        
         public static ShotTiming GetOnTheFlyTiming(float value)

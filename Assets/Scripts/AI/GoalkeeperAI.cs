@@ -242,9 +242,7 @@ namespace WLL_NGO.AI
 
             Vector3 nextBallPos = BallController.Instance.Position + (ballVelNoEffect * projT) + (.5f * Physics.gravity.y * Mathf.Pow(projT, 2)) * Vector3.up;
 
-            Debug.Log($"GK - next ball pos:{nextBallPos}");
             Vector3 nextBallDir = Vector3.ProjectOnPlane(nextBallPos-player.Position, Vector3.up);
-            Debug.Log($"GK - positions:{BallController.Instance.Position}, nextPos:{nextBallPos}, playerPos:{player.Position}");
             Vector3 rgtProj = Vector3.Project(nextBallDir, transform.right);
             float cooldown = 1.5f;
             diveCooldown = cooldown;
@@ -259,7 +257,6 @@ namespace WLL_NGO.AI
 
             if (rgtProj.magnitude < .25f)
             {
-                Debug.Log("GK - dive center");
                 // Dive center
                 diveDir = Vector3.zero;
                 player.SetPlayerStateInfo((byte)PlayerState.Diving, (byte)DiveType.Center, (byte)DiveDetail.Middle, cooldown);
@@ -273,14 +270,12 @@ namespace WLL_NGO.AI
                 if(rgtDot < 0)
                 {
                     // Left
-                    Debug.Log("GK - dive left");
                     diveDir = nextBallDir.normalized;//-transform.right;
                     player.SetPlayerStateInfo((byte)PlayerState.Diving, (byte)DiveType.Left, (byte)DiveDetail.Middle, cooldown);
                 }
                 else
                 {
                     // Right
-                    Debug.Log("GK - dive right");
                     diveDir = nextBallDir.normalized;// transform.right;
                     player.SetPlayerStateInfo((byte)PlayerState.Diving, (byte)DiveType.Right, (byte)DiveDetail.Middle, cooldown);
                 }

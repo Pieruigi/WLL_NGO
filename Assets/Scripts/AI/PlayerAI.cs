@@ -78,7 +78,7 @@ namespace WLL_NGO.AI
                     savedTarget = value;
                     return;
                 }
-                Debug.Log($"TEST - Setting target player for {gameObject.name} to {value}");    
+              
                 targetPlayer = value; 
             }
         }

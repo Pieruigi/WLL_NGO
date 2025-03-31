@@ -707,6 +707,7 @@ namespace WLL_NGO.Netcode
 
         void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
         {
+            bool shoot = false;
             int state = GetButtonState(buttonValue, buttonLastValue);
             switch (state)
             {
@@ -719,15 +720,30 @@ namespace WLL_NGO.Netcode
                     break;
                 case (byte)ButtonState.Held:
                     IncreaseCharge(NetworkTimer.Instance.DeltaTick);
+                    if (charge.Value == 1)
+                        shoot = true;
+                        // if (isPassage)
+                        //     ProcessPassage(tick);
+                        // else
+                        //     ProcessShotOnGoal(tick);
+                    
                     break;
                 case (byte)ButtonState.Released:
-
-                    if (isPassage)
-                        ProcessPassage(tick);
-                    else
-                        ProcessShotOnGoal(tick);
+                    shoot = true;
+                    // if (isPassage)
+                    //     ProcessPassage(tick);
+                    // else
+                    //     ProcessShotOnGoal(tick);
 
                     break;
+            }
+
+            if (shoot)
+            {
+                if (isPassage)
+                    ProcessPassage(tick);
+                else
+                    ProcessShotOnGoal(tick);
             }
 
         }
