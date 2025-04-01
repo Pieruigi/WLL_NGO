@@ -254,6 +254,10 @@ namespace WLL_NGO.Netcode
         //NetworkVariable<byte> playerSubState = new NetworkVariable<byte>(0);
         //byte actionType = 0;
         float playerStateCooldown = 0; // Server only
+        public float StateCooldown
+        {
+            get{ return playerStateCooldown; }
+        }
         Animator animator;
         string tackleAnimTrigger = "Tackle";
         string stunAnimTrigger = "Stun";
@@ -261,6 +265,8 @@ namespace WLL_NGO.Netcode
         string typeAnimParam = "Type";
         string detailAnimParam = "Detail";
         string exitAnimParam = "Exit";
+
+        string loopAnimParam = "Loop";
 
         float jumpHeightThreshold = 1.7f;
         float passageTime = 1f; //UnityEngine.Random.Range(.8f, 1.2f);
@@ -722,19 +728,9 @@ namespace WLL_NGO.Netcode
                     IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     if (charge.Value == 1)
                         shoot = true;
-                        // if (isPassage)
-                        //     ProcessPassage(tick);
-                        // else
-                        //     ProcessShotOnGoal(tick);
-                    
                     break;
                 case (byte)ButtonState.Released:
                     shoot = true;
-                    // if (isPassage)
-                    //     ProcessPassage(tick);
-                    // else
-                    //     ProcessShotOnGoal(tick);
-
                     break;
             }
 
@@ -941,13 +937,10 @@ namespace WLL_NGO.Netcode
                     targetPosition += Vector3.up * UnityEngine.Random.Range(1f, 2f);
 
 
-                Debug.Log("Targeting the opponent net...");
-
             }
             else
             {
-                Debug.Log("Getting random target...");
-                targetPosition = Vector3.zero;
+                targetPosition = transform.position + transform.forward * 6 + transform.right * UnityEngine.Random.Range(-.5f,.5f) + transform.up * UnityEngine.Random.Range(.5f,1f);
             }
 
             int aheadTick = 0;
@@ -1859,6 +1852,7 @@ namespace WLL_NGO.Netcode
                 case (byte)PlayerState.Diving:
                     animator.SetInteger(detailAnimParam, newState.detail);
                     animator.SetInteger(typeAnimParam, newState.subState);
+                    animator.SetBool(loopAnimParam, true);
                     animator.SetTrigger(diveAnimTrigger);
                     break;
                 // case (byte)PlayerState.BlowingUp:
@@ -1903,7 +1897,8 @@ namespace WLL_NGO.Netcode
         {
             if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
             {
-                bool save = false;// UnityEngine.Random.Range(0,3) > 0;
+                //TODO: use evaluation function here
+                bool save = true;// UnityEngine.Random.Range(0,3) > 0;
                 if (save)
                     goalkeeperAI.BounceTheBallBack();
 

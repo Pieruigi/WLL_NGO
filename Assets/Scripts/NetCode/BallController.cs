@@ -489,6 +489,10 @@ namespace WLL_NGO.Netcode
         /// <param name="effectSpeed"></param>
         ShootingData ComputeVelocity(Vector3 targetPosition, float speed, float effectSpeed)
         {
+            if (speed > GlobalGameManager.Instance.MaxBallSpeed)
+                speed = GlobalGameManager.Instance.MaxBallSpeed;
+                
+
             ShootingData sData = default;
             //sData.InitialTick = NetworkTimer.Instance.CurrentTick;
             sData.InitialTick = NetworkTimer.Instance.CurrentTick;
@@ -530,6 +534,8 @@ namespace WLL_NGO.Netcode
             }
             
             sData.Velocity = velH + velY + velE;
+
+            
 
             // Apply shooting data
             return sData;

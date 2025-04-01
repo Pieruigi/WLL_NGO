@@ -51,7 +51,15 @@ namespace WLL_NGO.AI
         float diveTime = 0;
         //bool blockTheBall = false;
         float diveCooldown;
-        float ballHookLerpSpeed = 10; 
+        float ballHookLerpSpeed = 10;
+
+        bool checkLoop = false;
+
+        string loopAnimParam = "Loop";
+
+        Animator animator;
+
+        bool flying = false;
         
 
         private void Awake()
@@ -59,7 +67,7 @@ namespace WLL_NGO.AI
             player = GetComponent<PlayerController>();
             player.SetDiveUpdateFunction(UpdateDive);
             keepPositionTolleranceDefault = keepPositionTollerance;
-
+            animator = GetComponent<Animator>();
         }
 
         private void Start()
@@ -67,7 +75,7 @@ namespace WLL_NGO.AI
             Initialize();
         }
 
-       
+
 
 
         // Update is called once per frame
@@ -80,6 +88,8 @@ namespace WLL_NGO.AI
                 UpdateSuperShot();
             else
                 UpdateNormal();
+
+            //if (!superShot)
                 
         }
 
@@ -90,6 +100,8 @@ namespace WLL_NGO.AI
 
             //if(!superShot)
             //    CheckForBallBlocking();
+
+            CheckLoop();
         }
 
         private void OnEnable()
@@ -109,10 +121,66 @@ namespace WLL_NGO.AI
             MatchController.OnStateChanged -= HandleOnMatchStateChanged;
         }
 
+        void CheckLoop()
+        {
+            if (!checkLoop) return;
+
+            if (player.GetState() == (byte)PlayerState.Diving)
+            {
+                // Check if the gk is grounded
+                bool grounded = Physics.Raycast(player.Position + Vector3.up * 0.1f, Vector3.down, 0.1f, LayerMask.GetMask(new string[] { "Floor" }));
+                if (!grounded)
+                {
+                    if (!flying)
+                        flying = true;
+                }
+                else
+                {
+                    if (flying)
+                    {
+                        flying = false;
+                        checkLoop = false;
+                        animator.SetBool(loopAnimParam, false);
+                    }
+                }
+
+                if (checkLoop)
+                {
+                    if (player.StateCooldown < 0.2f) // Force
+                    {
+                        checkLoop = false;
+                        animator.SetBool(loopAnimParam, false);
+                    }
+                }
+            }
+            
+
+            // if (animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_CL_Loop") || animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_RM_Loop") ||
+            //         animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_LM_Loop"))
+            // {
+            //     if (player.GetState() != (byte)PlayerState.Diving)
+            //     {
+            //         checkLoop = false;
+            //         animator.SetBool(loopAnimParam, false);
+            //     }
+            //     else // Diving state
+            //     {
+            //         if (player.StateCooldown < 0.5f)
+            //         {
+            //             checkLoop = false;
+            //             animator.SetBool(loopAnimParam, false);
+            //         }
+            //     }
+            // }
+
+
+
+        }
+
         private void HandleOnMatchStateChanged(int oldState, int newState)
         {
-            
-            
+
+
         }
 
         void HandleOnBallSpawned()
@@ -242,32 +310,49 @@ namespace WLL_NGO.AI
 
             Vector3 nextBallPos = BallController.Instance.Position + (ballVelNoEffect * projT) + (.5f * Physics.gravity.y * Mathf.Pow(projT, 2)) * Vector3.up;
 
-            Vector3 nextBallDir = Vector3.ProjectOnPlane(nextBallPos-player.Position, Vector3.up);
+            //Vector3 nextBallDir = Vector3.ProjectOnPlane(nextBallPos-player.Position, Vector3.up);
+            Vector3 nextBallDir = nextBallPos - player.Position;
             Vector3 rgtProj = Vector3.Project(nextBallDir, transform.right);
+
             float cooldown = 1.5f;
             diveCooldown = cooldown;
             diveHigh = 0;
             diving = false;
             diveTime = projT;
             
+
+            diveSpeed = (nextBallPos - (player.Position + Vector3.up*player.PlayerHeight*0.5f)).magnitude / projT;
+            diveSpeed = Mathf.Clamp(diveSpeed, 0, diveSpeedMax);
+
+            var vSpeed = (diveSpeed * nextBallDir.normalized).y;
+            if (vSpeed > 0)
+                diveCooldown = 2f * vSpeed / Mathf.Abs(Physics.gravity.y);
+            else
+                diveCooldown = 1f;
+
+            Debug.Log($"TEST - Dive time:{diveTime}");
+            Debug.Log($"TEST - Dive cooldown:{diveCooldown}");
             //blockTheBall = true;
             //player.DisableBallHandlingTrigger();
             isBouncingTheBallBack.Value = true;
 
+            checkLoop = true;
+            
 
             if (rgtProj.magnitude < .25f)
             {
                 // Dive center
-                diveDir = Vector3.zero;
+                diveDir = nextBallDir.normalized;
                 player.SetPlayerStateInfo((byte)PlayerState.Diving, (byte)DiveType.Center, (byte)DiveDetail.Middle, cooldown);
+
             }
             else
             {
-                
-                diveSpeed = (nextBallPos - player.Position).magnitude / projT;
-                diveSpeed = Mathf.Clamp(diveSpeed, 0, diveSpeedMax);
+
+                // diveSpeed = (nextBallPos - player.Position).magnitude / projT;
+                // diveSpeed = Mathf.Clamp(diveSpeed, 0, diveSpeedMax);
                 float rgtDot = Vector3.Dot(rgtProj, transform.right);
-                if(rgtDot < 0)
+                if (rgtDot < 0)
                 {
                     // Left
                     diveDir = nextBallDir.normalized;//-transform.right;
@@ -384,28 +469,33 @@ namespace WLL_NGO.AI
                 ((InputHandler)player.GetInputHandler()).SetJoystick(Vector3.zero);
             }
         }
-       
+
         public void UpdateDive()
         {
             if (!diving)
             {
-               
-                
+                Debug.Log($"TEST - Dive direction:{diveDir.normalized}");
+
                 player.Velocity = diveDir.normalized * diveSpeed + player.Velocity.y * Vector3.up;
                 diving = true;
             }
             else
             {
-                if(diveTime > 0)
+                if (diveTime > 0)
                 {
+                  
+
                     diveTime -= NetworkTimer.Instance.DeltaTick;
-                    if(diveTime < 0)
+                    if (diveTime < 0)
                     {
                         player.Velocity = Vector3.zero + player.Velocity.y * Vector3.up;
                         //diving = false;
                     }
                 }
             }
+            
+          
+            
             
         }
 

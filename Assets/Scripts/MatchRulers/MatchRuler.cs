@@ -141,7 +141,7 @@ namespace WLL_NGO
                     if (IsServer)
                     {
                         GameObject go = Instantiate(powerUpManagerPrefab);
-                        go.GetComponent<PowerUpManager>().Initialize(10);
+                        go.GetComponent<PowerUpManager>().Initialize(30);
                         go.GetComponent<NetworkObject>().Spawn();
                     }
                     break;

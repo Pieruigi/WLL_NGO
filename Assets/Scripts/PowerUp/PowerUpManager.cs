@@ -35,13 +35,13 @@ namespace WLL_NGO.Netcode
         [SerializeField] NetworkList<FixedString32Bytes> homeTeamPowerUps = new NetworkList<FixedString32Bytes>();
         public NetworkList<FixedString32Bytes> HomeTeamPowerUps
         {
-            get{ return homeTeamPowerUps; }
+            get { return homeTeamPowerUps; }
         }
 
         [SerializeField] NetworkList<FixedString32Bytes> awayTeamPowerUps = new NetworkList<FixedString32Bytes>();
         public NetworkList<FixedString32Bytes> AwayTeamPowerUps
         {
-            get{ return awayTeamPowerUps; }
+            get { return awayTeamPowerUps; }
         }
 
         List<PowerUpAsset> allowedPowerUps = new List<PowerUpAsset>();
@@ -99,8 +99,8 @@ namespace WLL_NGO.Netcode
                 //p.GetComponent<Animator>().SetInteger("Detail", 0);
                 //p.GetComponent<Animator>().SetTrigger("BlowUp");
                 p.SetBlowUpState(true);
-                
-            }   
+
+            }
 #endif
         }
 
@@ -133,8 +133,8 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnHomeTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-           
-            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add) 
+
+            if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
                 OnPowerUpPushed?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
             else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
                 OnPowerUpPopped?.Invoke(TeamController.HomeTeam, changeEvent.Value.ToString());
@@ -142,7 +142,7 @@ namespace WLL_NGO.Netcode
 
         private void HandleOnAwayTeamPowerUpListChanged(NetworkListEvent<FixedString32Bytes> changeEvent)
         {
-           
+
             if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.Add)
                 OnPowerUpPushed?.Invoke(TeamController.AwayTeam, changeEvent.Value.ToString());
             else if (changeEvent.Type == NetworkListEvent<FixedString32Bytes>.EventType.RemoveAt)
@@ -195,7 +195,7 @@ namespace WLL_NGO.Netcode
         void SpawnPackage(TeamController team)
         {
             if (!IsServer) return;
-            
+
         }
 
         Vector3 GetRandomSpawnPoint()
@@ -257,7 +257,7 @@ namespace WLL_NGO.Netcode
 
         }
 
-        
+
 
         public PowerUpAsset GetPowerUpAssetByName(string name)
         {
@@ -278,6 +278,11 @@ namespace WLL_NGO.Netcode
             obj.Launch();
             //obj.GetComponent<NetworkObject>().Spawn();
 
+        }
+
+        public void DespawnPackage(SportBag package)
+        {
+            package.GetComponent<NetworkObject>().Despawn(true);
         }
     }
 

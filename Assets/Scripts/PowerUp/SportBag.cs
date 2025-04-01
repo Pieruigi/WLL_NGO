@@ -7,6 +7,7 @@ using Unity.Barracuda;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 namespace WLL_NGO.Netcode
@@ -39,6 +40,22 @@ namespace WLL_NGO.Netcode
         NetworkVariable<FixedString32Bytes> powerUpName = new NetworkVariable<FixedString32Bytes>(default);
 
         NetworkVariable<byte> state = new NetworkVariable<byte>((byte)SportBagState.NotReady);
+
+        float lifeTime = 10f;
+
+        void Update()
+        {
+            if (!IsSpawned) return;
+
+            if (lifeTime > 0)
+            {
+                lifeTime -= Time.deltaTime;
+                if (lifeTime <= 0)
+                {
+                    PowerUpManager.Instance.DespawnPackage(this);
+                }
+            }   
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -80,7 +97,7 @@ namespace WLL_NGO.Netcode
             state.OnValueChanged += HandleOnStateChanged;
 
             GetComponent<Collider>().enabled = false; // No trigger while falling down
-            
+
 
             if (IsServer)
             {
