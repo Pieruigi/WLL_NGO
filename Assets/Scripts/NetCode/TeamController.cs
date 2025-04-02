@@ -59,13 +59,31 @@ namespace WLL_NGO.Netcode
 
         }
 
+        void Update()
+        {
+            if (!IsSpawned) return;
+            if (!MatchController.Instance || !MatchController.Instance.IsSpawned) return;
 
+            if (MatchController.Instance.MatchState == MatchState.Playing)
+            {
+                // Only control gk when has or is receiving the ball
+                var gk = GetPlayers()[0];
+
+                if (gk.IsSelected() && !gk.HasBall && gk.GetState() != (byte)PlayerState.Receiver)
+                {
+                    // Select another player 
+                    SelectClosestPlayerToBall(goalkeeperAllowed: false);
+                }
+
+            }
+        }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
             selectedPlayerRef.OnValueChanged += HandleOnSelectedPlayerRefValueChanged;
+            MatchController.OnStateChanged += HandleOnMatchStateChanged;
 
             OnTeamControllerSpawned?.Invoke(this);
         }
@@ -73,7 +91,13 @@ namespace WLL_NGO.Netcode
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
+            MatchController.OnStateChanged -= HandleOnMatchStateChanged;
             OnTeamControllerDespawned?.Invoke(this);
+        }
+
+        private void HandleOnMatchStateChanged(int oldState, int newState)
+        {
+
         }
 
         private void HandleOnSelectedPlayerRefValueChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
@@ -100,7 +124,7 @@ namespace WLL_NGO.Netcode
                 selectedPlayer = newNetObj.GetComponent<PlayerController>();
             else
                 selectedPlayer = null;
-                
+
 
             OnSelectedPlayerChanged?.Invoke(this, preNetObject ? preNetObject.GetComponent<PlayerController>() : null, selectedPlayer);
 
@@ -140,10 +164,10 @@ namespace WLL_NGO.Netcode
         /// <returns></returns>
         public List<PlayerController> GetPlayers()
         {
-            List<PlayerController> ret = new List <PlayerController>();
-            foreach(PlayerController player in PlayerControllerManager.Instance.PlayerControllers)
+            List<PlayerController> ret = new List<PlayerController>();
+            foreach (PlayerController player in PlayerControllerManager.Instance.PlayerControllers)
             {
-                if(player.PlayerInfo.Home == home)
+                if (player.PlayerInfo.Home == home)
                     ret.Add(player);
             }
 
@@ -157,7 +181,7 @@ namespace WLL_NGO.Netcode
         public void SetPlayerSelected(PlayerController player)
         {
             //Debug.Log($"Selecting a new player:{player?.name}");
-            if(!IsServer) return;
+            if (!IsServer) return;
 
             if (player == selectedPlayer)
                 return;
@@ -166,6 +190,30 @@ namespace WLL_NGO.Netcode
                 selectedPlayerRef.Value = new NetworkObjectReference(player.NetworkObject);
             else
                 selectedPlayerRef.Value = default;
+        }
+
+        public void SelectClosestPlayerToBall(bool goalkeeperAllowed = false)
+        {
+            List<PlayerController> players = GetPlayers().FindAll(p => p.GetState() == (byte)PlayerState.Normal && (p.Role != PlayerRole.GK || goalkeeperAllowed));
+            if (players == null) // No players in normal state, check from all players
+            {
+                players = GetPlayers().FindAll(p => p.Role != PlayerRole.GK || goalkeeperAllowed);
+            }
+            // Get the closest one
+            float minDist = 0;
+            PlayerController select = null;
+            foreach (var player in players)
+            {
+                var dist = Vector3.Distance(player.Position, BallController.Instance.Position);
+                if (!select || dist < minDist)
+                {
+                    select = player;
+                    minDist = dist;
+                }
+            }
+
+            // Set player selected
+            SetPlayerSelected(select);
         }
     }
 

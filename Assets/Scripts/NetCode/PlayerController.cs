@@ -799,12 +799,12 @@ namespace WLL_NGO.Netcode
                 if (charge.Value > 0.5f)
                 {
                     // High passage
-                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(4f, 7f);
+                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(receiver.PlayerHeight*1.5f, receiver.PlayerHeight*2f);
                 }
                 else
                 {
                     // Low passage
-                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, 1.8f);
+                    targetPosition = receiver.rb.position + Vector3.up * UnityEngine.Random.Range(0.5f, receiver.PlayerHeight);
 
                 }
 

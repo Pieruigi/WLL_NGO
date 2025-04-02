@@ -43,7 +43,7 @@ namespace WLL_NGO.AI
         
         float takeTheBallRange = 2f;
         bool diving = false;
-        float diveSpeedMax = 8;
+        float diveSpeedMax = 5;
         float diveTolleranceTime = .8f;
         Vector3 diveDir = Vector3.zero;
         int diveHigh = 0; // -1: low, 0: middle, 1: high
@@ -110,6 +110,7 @@ namespace WLL_NGO.AI
             BallController.OnBallSpawned += HandleOnBallSpawned;
             BallController.OnOwnerChanged += HandleOnOwnerChanged;
             MatchController.OnStateChanged += HandleOnMatchStateChanged;
+            
         }
 
 
@@ -128,11 +129,13 @@ namespace WLL_NGO.AI
             if (player.GetState() == (byte)PlayerState.Diving)
             {
                 // Check if the gk is grounded
-                bool grounded = Physics.Raycast(player.Position + Vector3.up * 0.1f, Vector3.down, 0.1f, LayerMask.GetMask(new string[] { "Floor" }));
+                bool grounded = Physics.Raycast(player.Position + Vector3.up * 0.1f, Vector3.down, 0.15f, LayerMask.GetMask(new string[] { "Floor" }));
                 if (!grounded)
                 {
                     if (!flying)
                         flying = true;
+
+                    Debug.Log("TEST - Not grounded");
                 }
                 else
                 {
@@ -153,26 +156,13 @@ namespace WLL_NGO.AI
                     }
                 }
             }
-            
+            else
+            {
+                checkLoop = false;
+                animator.SetBool(loopAnimParam, false);
+            }
 
-            // if (animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_CL_Loop") || animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_RM_Loop") ||
-            //         animator.GetCurrentAnimatorStateInfo(0).IsName("Dive_LM_Loop"))
-            // {
-            //     if (player.GetState() != (byte)PlayerState.Diving)
-            //     {
-            //         checkLoop = false;
-            //         animator.SetBool(loopAnimParam, false);
-            //     }
-            //     else // Diving state
-            //     {
-            //         if (player.StateCooldown < 0.5f)
-            //         {
-            //             checkLoop = false;
-            //             animator.SetBool(loopAnimParam, false);
-            //         }
-            //     }
-            // }
-
+          
 
 
         }
