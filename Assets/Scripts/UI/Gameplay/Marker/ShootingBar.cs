@@ -57,7 +57,7 @@ namespace WLL_NGO.UI
 
             ResetTriggers();
 
-            if (!teamController.SelectedPlayer || teamController.SelectedPlayer.GetState() != (byte)PlayerState.Normal || !teamController.SelectedPlayer.HasBall)
+            if (!teamController.SelectedPlayer || teamController.SelectedPlayer.GetState() != (byte)PlayerState.Normal || !teamController.SelectedPlayer.HasBall || teamController.SelectedPlayer.UseGoalkeeperBallHook)
             {
                 if (!animator.IsInTransition(0) && !animator.GetCurrentAnimatorStateInfo(0).IsName("Hide"))
                     animator.SetTrigger("Hide");

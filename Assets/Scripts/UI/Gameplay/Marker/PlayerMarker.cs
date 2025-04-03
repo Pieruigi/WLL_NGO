@@ -82,7 +82,7 @@ namespace WLL_NGO.UI
             Color color = localColor;
             if (!playerInfo.IsLocal || playerInfo.Bot)
                 color = remoteColor;
-
+            
             bottom.GetComponent<SpriteRenderer>().color = color;
         }
     }

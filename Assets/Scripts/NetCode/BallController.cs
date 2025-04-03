@@ -281,7 +281,7 @@ namespace WLL_NGO.Netcode
 
             if(owner != null)
             {
-                if(owner.Role != PlayerRole.GK || owner.GetState() != (byte)PlayerState.Diving || !owner.GetComponent<GoalkeeperAI>().IsBouncingTheBallBack)
+                if(owner.Role != PlayerRole.GK || /*owner.GetState() != (byte)PlayerState.Diving ||*/ !owner.GetComponent<GoalkeeperAI>().IsBouncingTheBallBack)
                 {
                     // NB: if we set the ball kinematic the player's handling trigger will call a ball exit event, so we don't use kinematic unless we set 
                     // useTrigger to false in the handling trigger.
@@ -310,6 +310,23 @@ namespace WLL_NGO.Netcode
             {
                 oldOwner = player.GetComponent<PlayerController>();
                 oldOwner.GetComponent<PlayerController>().StopHandlingTheBall();
+            }
+
+            // If one of opponent team players was waiting the ball (for example during a pass) we better try to select another player
+            if (owner)
+            {
+                var opponentTeam = TeamController.GetOpponentTeam(owner);
+
+                var receiver = opponentTeam.GetPlayers().Find(p => p.IsReceivingPassage());
+                if (receiver)
+                {
+                    // Try to set the receiver to normal 
+                    if (receiver.Position.y < 0.1f)
+                        receiver.SetPlayerStateInfo((byte)PlayerState.Normal, 0, 0, 0);
+
+                    opponentTeam.SelectClosestPlayerToBall(goalkeeperAllowed: false);    
+                }
+                
             }
                 
 
@@ -549,21 +566,21 @@ namespace WLL_NGO.Netcode
         /// <param name="force"></param>
         /// <param name="tick"></param>
         [ClientRpc]
-        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, NetworkObjectReference receiverRef, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPassage, bool isOnTheFly)
+        private void ShootAtTickClientRpc(NetworkObjectReference playerRef, NetworkObjectReference receiverRef, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPass, bool isOnTheFly)
         {
             NetworkObject player = null;
             if(playerRef.TryGet(out player))
             {
                 NetworkObject receiver = null;
                 receiverRef.TryGet(out receiver);
-                ShootAtTick(player.GetComponent<PlayerController>(), receiver ? receiver.GetComponent<PlayerController>() : null, targetPosition, speed, effectSpeed, tick, isPassage, isOnTheFly);
+                ShootAtTick(player.GetComponent<PlayerController>(), receiver ? receiver.GetComponent<PlayerController>() : null, targetPosition, speed, effectSpeed, tick, isPass, isOnTheFly);
             }
             
         }
 
        
         // TODO: Add som IsPassage boolean parameter
-        public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPassage, bool isOnTheFly)
+        public async void ShootAtTick(PlayerController player, PlayerController receiver, Vector3 targetPosition, float speed, float effectSpeed, int tick, bool isPass, bool isOnTheFly)
         {
            
             //Vector3 velocity = (targetPosition - rb.position).normalized * speed;
@@ -573,7 +590,7 @@ namespace WLL_NGO.Netcode
             
             // If we are not playng singleplayer we need to tell the other clients that the player is going to shoot
             if(IsServer && !IsHost)
-                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), receiver ? new NetworkObjectReference(receiver.NetworkObject) : default, targetPosition, speed, effectSpeed, tick, isPassage, isOnTheFly);
+                ShootAtTickClientRpc(new NetworkObjectReference(player.NetworkObject), receiver ? new NetworkObjectReference(receiver.NetworkObject) : default, targetPosition, speed, effectSpeed, tick, isPass, isOnTheFly);
             
             if(NetworkTimer.Instance.CurrentTick > tick)
             {
@@ -581,9 +598,9 @@ namespace WLL_NGO.Netcode
                 shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                 shootingData.Shooter = player;
                 shootingData.Receiver = receiver;
-                shootingData.IsPassage = isPassage;
+                shootingData.IsPassage = isPass;
                 shootingData.IsOnTheFly = isOnTheFly;
-                 if (!isPassage)
+                 if (!isPass)
                     {
                         if (!isOnTheFly)
                             shootingData.Timing = InputTimingUtility.GetShotTimingByCharge(player.Charge);
@@ -615,9 +632,9 @@ namespace WLL_NGO.Netcode
                     shootingData = ComputeVelocity(targetPosition, speed, effectSpeed);
                     shootingData.Shooter = player;
                     shootingData.Receiver = receiver;
-                    shootingData.IsPassage = isPassage;
+                    shootingData.IsPassage = isPass;
                     shootingData.IsOnTheFly = isOnTheFly;
-                    if (!isPassage)
+                    if (!isPass)
                     {
                         if (!isOnTheFly)
                             shootingData.Timing = InputTimingUtility.GetShotTimingByCharge(player.Charge);

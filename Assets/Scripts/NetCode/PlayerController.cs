@@ -298,6 +298,12 @@ namespace WLL_NGO.Netcode
         Transform ballHook;
         Transform ballHookDefault;
 
+        NetworkVariable<bool> useGoalkeeperBallHook = new NetworkVariable<bool>(false);
+        public bool UseGoalkeeperBallHook
+        {
+            get{ return useGoalkeeperBallHook.Value; }
+        }
+
         public bool HasBall
         {
             get { return BallController.Instance.Owner == this; }
@@ -449,6 +455,8 @@ namespace WLL_NGO.Netcode
 
             // Player state changed event handler
             playerStateInfo.OnValueChanged += HandleOnPlayerStateInfoChanged;
+            // Ball hook variable
+            useGoalkeeperBallHook.OnValueChanged += HandleOnUseGoalkeeperBallHookChanged;
 
             NetworkTimer.Instance.OnTimeToTick += HandleOnTimeToTick;
 
@@ -456,6 +464,8 @@ namespace WLL_NGO.Netcode
 
 
         }
+
+        
 
         public override void OnNetworkDespawn()
         {
@@ -476,6 +486,7 @@ namespace WLL_NGO.Netcode
 
             // Both
             CheckForBallHandling();
+
         }
 
         private void HandleOnMatchStateChanged(int oldValue, int newValue)
@@ -499,9 +510,18 @@ namespace WLL_NGO.Netcode
 
         }
 
+        private void HandleOnUseGoalkeeperBallHookChanged(bool previousValue, bool newValue)
+        {
+            if (newValue)
+                ballHook = goalkeeperAI.GetBallHook();
+            else
+                ballHook = ballHookDefault;
+        }
+
         #region buttons
         /// <summary>
         /// Called on both client and server
+        /// Pass.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="tick"></param>
@@ -521,15 +541,20 @@ namespace WLL_NGO.Netcode
                 MatchController.Instance.SetMatchState(MatchState.Playing);
 
             if (handlingTheBall)
-                CheckForShootingInput(value, button1LastValue, inputPayload.tick, true);
+                CheckForShootingInput(value, button1LastValue, inputPayload.tick, isPass:true);
             else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
-                CheckForShootingInputAsReceiver(value, button1LastValue, inputPayload.tick, true, inputPayload.inputVector);
+                CheckForShootingInputAsReceiver(value, button1LastValue, inputPayload.tick, isPass: true, passDirection: inputPayload.inputVector);
             else
                 CheckForTacklingInput(value, button1LastValue, inputPayload.tick);
 
             button1LastValue = value;
         }
 
+        /// <summary>
+        /// Shoot on goal.
+        /// </summary>
+        /// <param name="inputPayload"></param>
+        /// <param name="client"></param>
         void CheckButton2(InputPayload inputPayload, bool client)
         {
 
@@ -539,12 +564,20 @@ namespace WLL_NGO.Netcode
 
             bool value = inputPayload.button2;
 
-            if (handlingTheBall)
-                CheckForShootingInput(value, button2LastValue, inputPayload.tick, false);
-            else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
-                CheckForShootingInputAsReceiver(value, button2LastValue, inputPayload.tick, false);
-            //else
-            //    CheckForTacklingInput(value, button1LastValue, tick); // Check for switching player
+            if (Role == PlayerRole.GK && handlingTheBall && useGoalkeeperBallHook.Value) // Goalkeeper handling the ball
+            {
+                CheckForBallRelease(value, button2LastValue, inputPayload.tick);
+            }
+            else
+            {
+                if (handlingTheBall)
+                    CheckForShootingInput(value, button2LastValue, inputPayload.tick, isPass: false);
+                else if (playerStateInfo.Value.state == (byte)PlayerState.Receiver)
+                    CheckForShootingInputAsReceiver(value, button2LastValue, inputPayload.tick, isPass: false);
+                else
+                    CheckForSwitchingInput(value, button1LastValue, inputPayload.tick); // Check for switching player    
+            }
+            
 
             button2LastValue = value;
         }
@@ -638,7 +671,7 @@ namespace WLL_NGO.Netcode
         }
 
 
-        private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPassage, Vector2 passageDirection = default)
+        private void CheckForShootingInputAsReceiver(bool buttonValue, bool buttonLastValue, int tick, bool isPass, Vector2 passDirection = default)
         {
             if (playerStateInfo.Value.state != (byte)PlayerState.Receiver)
                 return;
@@ -657,8 +690,8 @@ namespace WLL_NGO.Netcode
                     IncreaseCharge(NetworkTimer.Instance.DeltaTick);
                     break;
                 case (byte)ButtonState.Released:
-                    if (isPassage)
-                        ProcessPassage(tick, passageDirection);
+                    if (isPass)
+                        ProcessPass(tick, passDirection);
                     else
                         ProcessShotOnGoal(tick);
                     break;
@@ -711,7 +744,43 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick, bool isPassage)
+        void CheckForSwitchingInput(bool buttonValue, bool buttonLastValue, int tick)
+        {
+            int state = GetButtonState(buttonValue, buttonLastValue);
+
+            switch (state)
+            {
+                case (byte)ButtonState.None:
+                    break;
+                case (byte)ButtonState.Pressed:
+                    TeamController.GetPlayerTeam(this).SwitchPlayer();
+                    break;
+                case (byte)ButtonState.Held:
+                case (byte)ButtonState.Released:
+                    break;
+                
+            }
+        }
+
+        void CheckForBallRelease(bool buttonValue, bool buttonLastValue, int tick)
+        {
+            int state = GetButtonState(buttonValue, buttonLastValue);
+            switch (state)
+            {
+                 case (byte)ButtonState.None:
+                    break;
+                case (byte)ButtonState.Pressed:
+                    break;
+                case (byte)ButtonState.Held:
+                    break;
+                case (byte)ButtonState.Released:
+                    // Release the ball
+                    useGoalkeeperBallHook.Value = false;
+                    break;
+            }
+        }
+
+        void CheckForShootingInput(bool buttonValue, bool buttonLastValue, int tick, bool isPass)
         {
             bool shoot = false;
             int state = GetButtonState(buttonValue, buttonLastValue);
@@ -736,8 +805,8 @@ namespace WLL_NGO.Netcode
 
             if (shoot)
             {
-                if (isPassage)
-                    ProcessPassage(tick);
+                if (isPass)
+                    ProcessPass(tick);
                 else
                     ProcessShotOnGoal(tick);
             }
@@ -765,7 +834,7 @@ namespace WLL_NGO.Netcode
         }
 
 
-        void ProcessPassage(int tick, Vector2 passageDirection = default)
+        void ProcessPass(int tick, Vector2 passDirection = default)
         {
 
             // You can only pass the ball if you are in the normal or receiver state
@@ -779,7 +848,7 @@ namespace WLL_NGO.Netcode
                 }
                 else // Receiver
                 {
-                    PassTheBallOnTheFly(tick, passageDirection);
+                    PassTheBallOnTheFly(tick, passDirection);
                 }
 
             }
@@ -818,11 +887,11 @@ namespace WLL_NGO.Netcode
                 float speed = Vector3.Distance(estimatedBallPos, targetPosition) / passageTime;
 
                 // Shoot
-                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: true, isOnTheFly: false);
+                BallController.Instance.ShootAtTick(this, receiver, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPass: true, isOnTheFly: false);
 
                 SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
                 // A bit of cooldown
-                playerStateCooldown = .5f;
+                playerStateCooldown = .1f;
 
             }
             else
@@ -832,7 +901,7 @@ namespace WLL_NGO.Netcode
             }
         }
 
-        async void PassTheBallOnTheFly(int tick, Vector2 passageDirection)
+        async void PassTheBallOnTheFly(int tick, Vector2 passDirection)
         {
             // Disable the handling trigger 
             ballHandlingTrigger.SetEnable(false);
@@ -849,7 +918,7 @@ namespace WLL_NGO.Netcode
                 // We must check for an available teammate depending on the player input
 
                 PlayerController receiver = null;
-                if (TryGetAvailableReceiver(out receiver, passageDirection))
+                if (TryGetAvailableReceiver(out receiver, passDirection))
                 {
 
                     // Get the target 
@@ -877,7 +946,7 @@ namespace WLL_NGO.Netcode
 
                     //Debug.Log($"Shooting data - receiver:{receiver}, targetPosition:{targetPosition}, estimatedBallSpeed:{estBallSpeed}");
                     // Shoot
-                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: true, isOnTheFly: true);
+                    BallController.Instance.ShootAtTick(this, receiver, targetPosition, estBallSpeed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPass: true, isOnTheFly: true);
 
                     SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
 
@@ -952,11 +1021,11 @@ namespace WLL_NGO.Netcode
             float speed = 30;
 
             // Shoot
-            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: false, isOnTheFly: false);
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPass: false, isOnTheFly: false);
 
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
             // A bit of cooldown
-            playerStateCooldown = .5f;
+            playerStateCooldown = .1f;
         }
 
         async Task OnTheFlyJumpAsync(int tick)
@@ -1029,11 +1098,11 @@ namespace WLL_NGO.Netcode
             float speed = 30;
 
             // Shoot
-            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPassage: false, isOnTheFly: true);
+            BallController.Instance.ShootAtTick(this, receiver: null, targetPosition, speed, 0, NetworkTimer.Instance.CurrentTick + aheadTick, isPass: false, isOnTheFly: true);
 
             SetPlayerStateInfo(new PlayerStateInfo() { state = (byte)PlayerState.Shooting });
             // A bit of cooldown
-            playerStateCooldown = .5f;
+            playerStateCooldown = .1f;
         }
 
         /// <summary>
@@ -1268,6 +1337,7 @@ namespace WLL_NGO.Netcode
                 //
                 TryReplenishStamina();
 
+                
             }
 
             if (bufferIndex == -1) return; // No data
@@ -1802,6 +1872,12 @@ namespace WLL_NGO.Netcode
         {
             if (oldState == newState) return;
 
+            // if (oldState.state == (byte)PlayerState.Receiver && newState.state != (byte)PlayerState.Shooting && !HasBall)
+            // {
+            //     // For example, when an opponent intercepts the ball during a pass. In this case is better select the closest player
+            //     TeamController.GetPlayerTeam(this).SelectClosestPlayerToBall(goalkeeperAllowed: false);
+
+            // }
 
             switch (newState.state)
             {
@@ -1840,6 +1916,9 @@ namespace WLL_NGO.Netcode
                         animator.SetInteger(typeAnimParam, newState.subState);
                         animator.SetTrigger(stunAnimTrigger);
 
+                        // Select another player
+                        TeamController.GetPlayerTeam(this).SelectClosestPlayerToBall(goalkeeperAllowed: false);
+
                     }
 
                     break;
@@ -1855,12 +1934,12 @@ namespace WLL_NGO.Netcode
                     animator.SetBool(loopAnimParam, true);
                     animator.SetTrigger(diveAnimTrigger);
                     break;
-                // case (byte)PlayerState.BlowingUp:
-                //     // Disable ball handling trigger
-                //     ballHandlingTrigger.SetEnable(false);
+                    // case (byte)PlayerState.BlowingUp:
+                    //     // Disable ball handling trigger
+                    //     ballHandlingTrigger.SetEnable(false);
 
-                //     // Set animation
-                //     break;
+                    //     // Set animation
+                    //     break;
             }
         }
         #endregion
@@ -1895,12 +1974,18 @@ namespace WLL_NGO.Netcode
         /// </summary>
         private void HandleOnBallEnter()
         {
-            if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving && goalkeeperAI.IsBouncingTheBallBack)
+            if (Role == PlayerRole.GK && GetState() == (byte)PlayerState.Diving)// && goalkeeperAI.IsBouncingTheBallBack)
             {
                 //TODO: use evaluation function here
-                bool save = true;// UnityEngine.Random.Range(0,3) > 0;
+                bool save = goalkeeperAI.TrySave();
                 if (save)
-                    goalkeeperAI.BounceTheBallBack();
+                {
+                    if (!goalkeeperAI.IsBouncingTheBallBack)
+                        BallController.Instance.BallEnterTheHandlingTrigger(this);
+                    else
+                        goalkeeperAI.BounceTheBallBack();
+                }
+                    
 
             }
             else
@@ -1937,9 +2022,16 @@ namespace WLL_NGO.Netcode
             handlingTheBall = true;
 
             if (Role == PlayerRole.GK && playerStateInfo.Value.state == (byte)PlayerState.Diving)
+            {
+                useGoalkeeperBallHook.Value = true;
                 ballHook = goalkeeperAI.GetBallHook();
+            }
             else
+            {
+                useGoalkeeperBallHook.Value = false;
                 ballHook = ballHookDefault;
+            }
+                
 
             // Set the player who owns the ball as the selected one
             TeamController.GetPlayerTeam(this).SetPlayerSelected(this);

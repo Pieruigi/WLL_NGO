@@ -49,6 +49,11 @@ namespace WLL_NGO.Netcode
             set { score.Value = value; }
         }
 
+        float playerSwitchRate = .25f;
+
+        DateTime lastPlayerSwitch;
+        
+
         private void Awake()
         {
             if (home)
@@ -59,7 +64,7 @@ namespace WLL_NGO.Netcode
 
         }
 
-        void Update()
+        void FixedUpdate()
         {
             if (!IsSpawned) return;
             if (!MatchController.Instance || !MatchController.Instance.IsSpawned) return;
@@ -211,8 +216,36 @@ namespace WLL_NGO.Netcode
                     minDist = dist;
                 }
             }
-
+            Debug.Log($"TEST - Select:{select.gameObject.name}");
             // Set player selected
+            SetPlayerSelected(select);
+        }
+
+        public void SwitchPlayer()
+        {
+
+            if (selectedPlayer.HasBall) return; // You can not unselect the ball owner
+
+            if ((DateTime.Now - lastPlayerSwitch).TotalSeconds < playerSwitchRate) return;
+
+            lastPlayerSwitch = DateTime.Now;
+
+            // Select the closest player to the ball different from the current selected one
+            List<PlayerController> players = GetPlayers().FindAll(p => p.Role != PlayerRole.GK && p.GetState() == (byte)PlayerState.Normal && p != selectedPlayer);
+
+            float minDist = 0;
+            PlayerController select = null;
+            foreach (var player in players)
+            {
+                var dist = Vector3.Distance(player.Position, BallController.Instance.Position);
+                if (!select || dist < minDist)
+                {
+                    select = player;
+                    minDist = dist;
+                }
+            }
+
+            Debug.Log($"TEST - Switching player:{select.gameObject}");
             SetPlayerSelected(select);
         }
     }

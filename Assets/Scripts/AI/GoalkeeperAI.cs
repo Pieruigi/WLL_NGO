@@ -10,7 +10,7 @@ namespace WLL_NGO.AI
 {
     public class GoalkeeperAI : NetworkBehaviour
     {
-        
+
         [SerializeField]
         Transform handBallHook;
 
@@ -34,13 +34,13 @@ namespace WLL_NGO.AI
         Vector3 netCenter;
         float netWidth, netHeight;
         Bounds areaBounds;
-        
-        
+
+
         float keepPositionTolleranceDefault;
         bool superShot = false;
         //BallController ball;
-        
-        
+
+
         float takeTheBallRange = 2f;
         bool diving = false;
         float diveSpeedMax = 5;
@@ -60,7 +60,7 @@ namespace WLL_NGO.AI
         Animator animator;
 
         bool flying = false;
-        
+
 
         private void Awake()
         {
@@ -90,7 +90,7 @@ namespace WLL_NGO.AI
                 UpdateNormal();
 
             //if (!superShot)
-                
+
         }
 
         private void FixedUpdate()
@@ -110,7 +110,7 @@ namespace WLL_NGO.AI
             BallController.OnBallSpawned += HandleOnBallSpawned;
             BallController.OnOwnerChanged += HandleOnOwnerChanged;
             MatchController.OnStateChanged += HandleOnMatchStateChanged;
-            
+
         }
 
 
@@ -162,7 +162,7 @@ namespace WLL_NGO.AI
                 animator.SetBool(loopAnimParam, false);
             }
 
-          
+
 
 
         }
@@ -180,11 +180,11 @@ namespace WLL_NGO.AI
 
         private void HandleOnOwnerChanged(PlayerController oldOwner, PlayerController newOwner)
         {
-        
+
             if (player.Role != PlayerRole.GK)
                 return;
 
-           
+
             if (newOwner == player)
             {
                 //player.SetInputHandler(new HumanInputHandler());
@@ -203,10 +203,10 @@ namespace WLL_NGO.AI
             netCenter.y = 0f;
             netWidth = net.Width;
             netHeight = net.Height;
-            
+
             float areaHeight = 10f;
             areaBounds.center = new Vector3(net.Position.x + (team.Home ? 1f : -1f) * GameFieldInfo.GetAreaLength() / 2f, areaHeight / 2f, 0f);
-            areaBounds.extents = new Vector3(GameFieldInfo.GetAreaLength()/2f, areaHeight/2f, GameFieldInfo.GetAreaWidth()/2f);
+            areaBounds.extents = new Vector3(GameFieldInfo.GetAreaLength() / 2f, areaHeight / 2f, GameFieldInfo.GetAreaWidth() / 2f);
 
             keepPositionDistance = GameFieldInfo.GetAreaLength() / 2f;
 
@@ -227,7 +227,7 @@ namespace WLL_NGO.AI
             if (BallController.Instance == null)
                 return;
 
-            
+
             if (BallController.Instance.Owner != null) // The ball is controlled by someone 
             {
                 if (BallController.Instance.Owner == player)// Goalkeeper is controlling the ball
@@ -235,7 +235,7 @@ namespace WLL_NGO.AI
                     // TODO: we should set some ai here to let the goalkeeper play the ball
                     // Reset input
                     player.ResetLookDirection();
-                    player.GetInputHandler().SetJoystick(Vector3.zero); 
+                    player.GetInputHandler().SetJoystick(Vector3.zero);
                 }
                 else // Someone else is controlling the ball
                 {
@@ -277,9 +277,9 @@ namespace WLL_NGO.AI
 
             }
 
-           
+
         }
-        
+
         //void CheckForBallBlocking()
         //{
         //    if (!isBouncingTheBallBack.Value)
@@ -290,7 +290,7 @@ namespace WLL_NGO.AI
 
         void StartDiving()
         {
-            
+
             Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
             //Vector3 nextBallPos = ball.Position + ballVelNoEffect * diveTolleranceTime;
 
@@ -309,9 +309,9 @@ namespace WLL_NGO.AI
             diveHigh = 0;
             diving = false;
             diveTime = projT;
-            
 
-            diveSpeed = (nextBallPos - (player.Position + Vector3.up*player.PlayerHeight*0.5f)).magnitude / projT;
+
+            diveSpeed = (nextBallPos - (player.Position + Vector3.up * player.PlayerHeight * 0.5f)).magnitude / projT;
             diveSpeed = Mathf.Clamp(diveSpeed, 0, diveSpeedMax);
 
             var vSpeed = (diveSpeed * nextBallDir.normalized).y;
@@ -324,10 +324,10 @@ namespace WLL_NGO.AI
             Debug.Log($"TEST - Dive cooldown:{diveCooldown}");
             //blockTheBall = true;
             //player.DisableBallHandlingTrigger();
-            isBouncingTheBallBack.Value = true;
+            //isBouncingTheBallBack.Value = true;
 
             checkLoop = true;
-            
+
 
             if (rgtProj.magnitude < .25f)
             {
@@ -355,7 +355,7 @@ namespace WLL_NGO.AI
                     player.SetPlayerStateInfo((byte)PlayerState.Diving, (byte)DiveType.Right, (byte)DiveDetail.Middle, cooldown);
                 }
             }
-            
+
         }
 
         bool IsTimeToDive()
@@ -367,19 +367,19 @@ namespace WLL_NGO.AI
             // Get the ball position in X secs
             float time = diveTolleranceTime;
             Vector3 nextBallPos = BallController.Instance.Position + ballVelNoEffect * time;
-            
+
             ballDir = Vector3.ProjectOnPlane(nextBallPos - player.Position, Vector3.up);
             float dotAfter = Vector3.Dot(ballDir, transform.forward);
             //Debug.Log($"GK - Dot after:{dotAfter}");
             if (Mathf.Sign(dotAfter) != Mathf.Sign(dotBefore))
                 return true;
-            else 
+            else
                 return false;
         }
 
         bool IsBallReachingTheNet()
         {
-            
+
             // How much time it will take for the ball to reach the net line ( computing velocity along the X axis )
             Vector3 ballVelNoEffect = BallController.Instance.GetVelocityWithoutEffect();
             Vector3 ballDir = netCenter - BallController.Instance.Position;
@@ -399,23 +399,23 @@ namespace WLL_NGO.AI
             return ballVelNoEffect.magnitude > 0 && dot > 0;
         }
 
-      
+
         private void TakeBallFromOpponent(PlayerController ballOwner)
         {
 
             if (ballOwner == null || player.IsTeammate(ballOwner))
                 return;
-           
-         
+
+
             // Ball direction
             Vector3 ballDir = BallController.Instance.Position - player.Position;
             Vector3 ballSpeed = BallController.Instance.Velocity;
 
-            if(ballDir.magnitude > takeTheBallRange)
+            if (ballDir.magnitude > takeTheBallRange)
             {
-                
+
                 player.SetLookDirection(ballDir);
-                ((InputHandler) player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
+                ((InputHandler)player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(ballDir));
             }
             else
             {
@@ -427,7 +427,7 @@ namespace WLL_NGO.AI
                 player.GiveSlap();
             }
             // Move towards the ball
-            
+
         }
 
         void KeepPosition()
@@ -441,15 +441,15 @@ namespace WLL_NGO.AI
 
             // Compute the goalkeeper target position
             Vector3 targetPosition = netCenter + direction.normalized * keepPositionDistance;
-            
-            if(Vector3.Distance(player.Position, targetPosition) > keepPositionTollerance)
+
+            if (Vector3.Distance(player.Position, targetPosition) > keepPositionTollerance)
             {
                 //Debug.Log($"GK - move {gameObject.name} from {player.Position} to target position:{targetPosition}");
 
                 keepPositionTollerance = keepPositionTolleranceDefault / 3f;
                 Vector3 worldDirecton = targetPosition - player.Position;
                 worldDirecton.y = 0;
-            
+
                 ((InputHandler)player.GetInputHandler()).SetJoystick(InputData.ToInputDirection(worldDirecton));
             }
             else
@@ -473,7 +473,7 @@ namespace WLL_NGO.AI
             {
                 if (diveTime > 0)
                 {
-                  
+
 
                     diveTime -= NetworkTimer.Instance.DeltaTick;
                     if (diveTime < 0)
@@ -483,13 +483,13 @@ namespace WLL_NGO.AI
                     }
                 }
             }
-            
-          
-            
-            
+
+
+
+
         }
 
-     
+
         public Transform GetBallHook()
         {
             Debug.Log("Getting ball hook");
@@ -500,10 +500,36 @@ namespace WLL_NGO.AI
         {
             Debug.Log("Bouncing the ball back...");
 
-            //isBouncingTheBallBack.Value = false;
+            isBouncingTheBallBack.Value = true;
             BallController.Instance.Velocity = -BallController.Instance.Velocity;
             //ball.Position += transform.forward * 2f;
         }
+
+        public void BlockTheBall()
+        {
+            Debug.Log("Blocking the ball...");
+            isBouncingTheBallBack.Value = false;
+            //BallController.Instance.Kinematic = true;
+            BallController.Instance.GetComponent<Rigidbody>().isKinematic = true;
+            BallController.Instance.Velocity = Vector3.zero;
+            BallController.Instance.Position = transform.position + Vector3.up * .5f;
+        }
+
+        public bool TrySave()
+        {
+            // Evaluate
+            bool save = true;
+            
+            if (save)
+            {
+                isBouncingTheBallBack.Value = false; // Or true, it depends
+                
+            }
+
+            return save;
+        }
+
+
     }
 
 }
