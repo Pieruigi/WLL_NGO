@@ -1,0 +1,2576 @@
+{
+    "code": 200,
+    "success": true,
+    "data": {
+        "teamRoster": [
+            {
+                "ItemId": "Player1",
+                "ItemInstanceId": "222410E1388E4139",
+                "DisplayName": "Edward Stevens"
+            },
+            {
+                "ItemId": "Player2",
+                "ItemInstanceId": "D5820F74CBAAE54A",
+                "DisplayName": "James G. Wells"
+            },
+            {
+                "ItemId": "Player3",
+                "ItemInstanceId": "B68B7CF25FF82F27",
+                "DisplayName": "Mark Williams"
+            },
+            {
+                "ItemId": "Player4",
+                "ItemInstanceId": "A8DD31758610B5C0",
+                "DisplayName": "Travis Fisher"
+            }
+        ],
+        "inventory": [
+            {
+                "ItemId": "Pepper",
+                "ItemInstanceId": "5DD476E56CDBA703",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-25T21:52:13.58Z",
+                "RemainingUses": 3,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Super Speed",
+                "UnitCurrency": "GE",
+                "UnitPrice": 5
+            },
+            {
+                "ItemId": "Shield",
+                "ItemInstanceId": "A46A45E2795EF607",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-25T21:38:37.785Z",
+                "RemainingUses": 3,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Shield",
+                "UnitCurrency": "GE",
+                "UnitPrice": 5
+            },
+            {
+                "ItemId": "Bazooka",
+                "ItemInstanceId": "958796D9EE4D4E59",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-25T14:25:10.883Z",
+                "RemainingUses": 3,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bazooka",
+                "UnitCurrency": "GE",
+                "UnitPrice": 5
+            },
+            {
+                "ItemId": "SuperShot",
+                "ItemInstanceId": "4135EE6AB59BE644",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-24T22:24:17.375Z",
+                "RemainingUses": 9,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Super Shot",
+                "UnitCurrency": "GE",
+                "UnitPrice": 5
+            },
+            {
+                "ItemId": "SuperCat",
+                "ItemInstanceId": "B43A5D4DD8344179",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-23T16:10:24.469Z",
+                "RemainingUses": 3,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Explosive Kitten",
+                "UnitCurrency": "GE",
+                "UnitPrice": 10
+            },
+            {
+                "ItemId": "DoubleGoal",
+                "ItemInstanceId": "EC2BF491BD99743E",
+                "ItemClass": "superpower",
+                "PurchaseDate": "2025-02-22T16:56:26.985Z",
+                "RemainingUses": 2,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Goal x2",
+                "UnitCurrency": "GE",
+                "UnitPrice": 5
+            },
+            {
+                "ItemId": "AdsFree",
+                "ItemInstanceId": "9D4D2FFA2DF5CF6C",
+                "ItemClass": "ads_free",
+                "PurchaseDate": "2025-02-13T13:56:26.771Z",
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "270DB655309DE9AB",
+                "DisplayName": "Ads Free",
+                "UnitPrice": 0
+            },
+            {
+                "ItemId": "Health1",
+                "ItemInstanceId": "FB5ABA0939DE326F",
+                "ItemClass": "Health",
+                "PurchaseDate": "2025-01-30T09:31:36.261Z",
+                "RemainingUses": 21,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "31CB8E25976F0F89",
+                "DisplayName": "Energy Drink",
+                "UnitPrice": 0
+            },
+            {
+                "ItemId": "Streaming",
+                "ItemInstanceId": "B5D52F371AFD9A0E",
+                "ItemClass": "FeatureItem",
+                "PurchaseDate": "2025-01-23T14:28:52.676Z",
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Streaming",
+                "UnitPrice": 0
+            },
+            {
+                "ItemId": "Play With Friends",
+                "ItemInstanceId": "4119DF45803E20DE",
+                "ItemClass": "FeatureItem",
+                "PurchaseDate": "2024-11-18T13:05:22.255Z",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Play With Friends",
+                "UnitPrice": 0
+            },
+            {
+                "ItemId": "player15_1_nft",
+                "ItemInstanceId": "5839A46AA6875AC6",
+                "ItemClass": "SoccerNftPlayerInfo",
+                "PurchaseDate": "2023-10-23T14:41:49.642Z",
+                "Annotation": "0x2c4a11659aca0f5875e374c9059d45dc7a0d1b37/48",
+                "CatalogVersion": "NFT_Season_2022",
+                "DisplayName": "Bruce Jung",
+                "UnitPrice": 0,
+                "CustomData": {}
+            },
+            {
+                "ItemId": "Team5",
+                "ItemInstanceId": "E0A8B3962F4C2736",
+                "ItemClass": "TeamInfo",
+                "PurchaseDate": "2023-08-01T09:03:09.451Z",
+                "RemainingUses": 3,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "FC Utrecht",
+                "UnitPrice": 0,
+                "BundleContents": [
+                    "Player17",
+                    "Player18",
+                    "Player19",
+                    "Player20"
+                ]
+            },
+            {
+                "ItemId": "Player12Dummy1",
+                "ItemInstanceId": "9FB611A984CDC43B",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-07-14T15:16:23.014Z",
+                "RemainingUses": 81,
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Kenny Alvarez",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player6Dummy1",
+                "ItemInstanceId": "CA2A4D3300937F6B",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-07-14T14:50:43.556Z",
+                "RemainingUses": 96,
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Joe Fontana",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player1Dummy1",
+                "ItemInstanceId": "AFEE7F68674379D",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-07-14T14:02:02.604Z",
+                "RemainingUses": 96,
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Edward Stevens",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player15Dummy1",
+                "ItemInstanceId": "204EE78DAD31EA38",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-07-14T09:32:09.728Z",
+                "RemainingUses": 86,
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bruce Jung",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player22",
+                "ItemInstanceId": "AC763628FCC1B692",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-07-14T08:39:56.941Z",
+                "RemainingUses": 46,
+                "Annotation": "Granted via Game Manager",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Arat",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3",
+                    "Condition": "80",
+                    "Happiness": "89",
+                    "Focus": "94",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player17",
+                "ItemInstanceId": "1D8629EB9E86F502",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-29T14:52:49.552Z",
+                "RemainingUses": 59,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Fabian de Keijzer",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3",
+                    "Condition": "55",
+                    "Happiness": "96",
+                    "Focus": "96",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player18",
+                "ItemInstanceId": "6147D3BA8288AB54",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-29T14:52:01.919Z",
+                "RemainingUses": 49,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Mike van der Hoorn",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3",
+                    "Condition": "55",
+                    "Happiness": "96",
+                    "Focus": "96",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player10",
+                "ItemInstanceId": "25774DB02477017D",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-29T14:49:10.049Z",
+                "RemainingUses": 67,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "26746AA9F254F5E0",
+                "DisplayName": "Doug Hughes",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player12",
+                "ItemInstanceId": "7B24A7F110DBEFB1",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-29T14:49:10.049Z",
+                "RemainingUses": 72,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "26746AA9F254F5E0",
+                "DisplayName": "Kenny Alvarez",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player11",
+                "ItemInstanceId": "F71E254DF32A576C",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-14T14:17:30.136Z",
+                "RemainingUses": 88,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "David Stancil",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "1"
+                }
+            },
+            {
+                "ItemId": "Player19",
+                "ItemInstanceId": "E0F8F949A4783CD4",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-06-14T14:16:55.35Z",
+                "RemainingUses": 44,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bart Ramselaar",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "4",
+                    "Condition": "55",
+                    "Happiness": "96",
+                    "Focus": "96",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player20",
+                "ItemInstanceId": "4FB0EDF011F783EC",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-27T15:43:28.727Z",
+                "RemainingUses": 69,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Tasos Douvikas",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "4",
+                    "Condition": "55",
+                    "Happiness": "96",
+                    "Focus": "96",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player9",
+                "ItemInstanceId": "243D0227C8E1F3CF",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-27T15:41:22.618Z",
+                "RemainingUses": 43,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Steve Larinore",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "4"
+                }
+            },
+            {
+                "ItemId": "Player14",
+                "ItemInstanceId": "57F5690FA7471F5D",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-18T07:57:17.847Z",
+                "RemainingUses": 102,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "AF01A1E439A90571",
+                "DisplayName": "Jae Park",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3"
+                }
+            },
+            {
+                "ItemId": "Player13",
+                "ItemInstanceId": "586FFB1EAA54D465",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-18T07:57:17.847Z",
+                "RemainingUses": 72,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "AF01A1E439A90571",
+                "DisplayName": "Joe Lee",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "2",
+                    "Condition": "95",
+                    "Happiness": "100",
+                    "Focus": "100",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player15",
+                "ItemInstanceId": "7CB726185AD9323A",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-18T07:57:17.847Z",
+                "RemainingUses": 102,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "AF01A1E439A90571",
+                "DisplayName": "Bruce Jung",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "2"
+                }
+            },
+            {
+                "ItemId": "Team4",
+                "ItemInstanceId": "AF01A1E439A90571",
+                "ItemClass": "TeamInfo",
+                "PurchaseDate": "2023-04-18T07:57:17.847Z",
+                "RemainingUses": 2,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Flaming Dragons",
+                "UnitPrice": 0,
+                "BundleContents": [
+                    "Player13",
+                    "Player14",
+                    "Player15",
+                    "Player16"
+                ]
+            },
+            {
+                "ItemId": "Player16",
+                "ItemInstanceId": "F4080F44A4DFA15E",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-04-18T07:57:17.847Z",
+                "RemainingUses": 82,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "AF01A1E439A90571",
+                "DisplayName": "Kento Noda",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "2"
+                }
+            },
+            {
+                "ItemId": "Team2",
+                "ItemInstanceId": "260437BF367B05AF",
+                "ItemClass": "TeamInfo",
+                "PurchaseDate": "2023-03-21T16:22:42.884Z",
+                "RemainingUses": 2,
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Cereal Killers",
+                "UnitPrice": 0,
+                "BundleContents": [
+                    "Player5",
+                    "Player6",
+                    "Player7",
+                    "Player8"
+                ]
+            },
+            {
+                "ItemId": "Player5",
+                "ItemInstanceId": "69496617825297D4",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-21T16:22:42.884Z",
+                "RemainingUses": 52,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "260437BF367B05AF",
+                "DisplayName": "James Daniels",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3"
+                }
+            },
+            {
+                "ItemId": "Player6",
+                "ItemInstanceId": "8CBF28CF1B708132",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-21T16:22:42.884Z",
+                "RemainingUses": 77,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "260437BF367B05AF",
+                "DisplayName": "Joe Fontana",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3"
+                }
+            },
+            {
+                "ItemId": "Player7",
+                "ItemInstanceId": "94C305BE3767533C",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-21T16:22:42.884Z",
+                "RemainingUses": 122,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "260437BF367B05AF",
+                "DisplayName": "Jason Stewart",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3"
+                }
+            },
+            {
+                "ItemId": "Player8",
+                "ItemInstanceId": "FA62CF8905C0A72E",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-21T16:22:42.884Z",
+                "RemainingUses": 72,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "260437BF367B05AF",
+                "DisplayName": "Jason Legend",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "2"
+                }
+            },
+            {
+                "ItemId": "Play With Friends",
+                "ItemInstanceId": "5546FB3A689F9559",
+                "ItemClass": "FeatureItem",
+                "PurchaseDate": "2023-03-21T16:22:41.393Z",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Play With Friends",
+                "UnitPrice": 0
+            },
+            {
+                "ItemId": "Team1",
+                "ItemInstanceId": "108F897D5A3F45D9",
+                "ItemClass": "TeamInfo",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "RemainingUses": 1,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "B1EB59B609300BC8",
+                "DisplayName": "Worchester United",
+                "UnitPrice": 0,
+                "BundleContents": [
+                    "Player1",
+                    "Player2",
+                    "Player3",
+                    "Player4"
+                ]
+            },
+            {
+                "ItemId": "Player1",
+                "ItemInstanceId": "222410E1388E4139",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "RemainingUses": 66,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "108F897D5A3F45D9",
+                "DisplayName": "Edward Stevens",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "4",
+                    "Condition": "100",
+                    "Happiness": "86",
+                    "Focus": "89",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player4",
+                "ItemInstanceId": "A8DD31758610B5C0",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "RemainingUses": 495,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "108F897D5A3F45D9",
+                "DisplayName": "Travis Fisher",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "10",
+                    "Condition": "25",
+                    "Happiness": "86",
+                    "Focus": "89",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "StartingFC2",
+                "ItemInstanceId": "B1EB59B609300BC8",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Starter Pack Version 2",
+                "UnitPrice": 0,
+                "BundleContents": [
+                    "Team1"
+                ]
+            },
+            {
+                "ItemId": "Player3",
+                "ItemInstanceId": "B68B7CF25FF82F27",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "RemainingUses": 56,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "108F897D5A3F45D9",
+                "DisplayName": "Mark Williams",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "4",
+                    "Condition": "80",
+                    "Happiness": "86",
+                    "Focus": "89",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            },
+            {
+                "ItemId": "Player2",
+                "ItemInstanceId": "D5820F74CBAAE54A",
+                "ItemClass": "SoccerPlayerInfo",
+                "PurchaseDate": "2023-03-17T16:41:37.288Z",
+                "RemainingUses": 56,
+                "CatalogVersion": "MainCatalogV2",
+                "BundleParent": "108F897D5A3F45D9",
+                "DisplayName": "James G. Wells",
+                "UnitPrice": 0,
+                "CustomData": {
+                    "Level": "3",
+                    "Condition": "90",
+                    "Happiness": "86",
+                    "Focus": "89",
+                    "Determination": "100",
+                    "Resilience": "100"
+                }
+            }
+        ],
+        "accountInfo": {
+            "PlayFabId": "45496E6EAF3CD9E4",
+            "Created": "2023-03-17T16:41:36.063Z",
+            "TitleInfo": {
+                "DisplayName": "Pierpiero",
+                "Origination": "CustomId",
+                "Created": "2023-03-17T16:41:36.063Z",
+                "LastLogin": "2025-04-03T14:55:02.247Z",
+                "FirstLogin": "2023-03-17T16:41:36.063Z",
+                "isBanned": false,
+                "AvatarUrl": "10",
+                "TitlePlayerAccount": {
+                    "Id": "12AD2AFB16934BA0",
+                    "Type": "title_player_account",
+                    "TypeString": "title_player_account"
+                }
+            },
+            "PrivateInfo": {
+                "Email": "pierluigi.zomparelli@gmail.com"
+            },
+            "CustomIdInfo": {
+                "CustomId": "WLL-826b6914-7911-4869-a595-6583397b45fc"
+            }
+        },
+        "catalog": [
+            {
+                "ItemId": "StartingFC",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Starter Pack",
+                "Description": "4 teams just to start",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Team4",
+                        "Team3",
+                        "Team2",
+                        "Team1"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "LootBox0",
+                "ItemClass": "LootBox",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bronze Lootbox",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsageCount": 1
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "LootBox1",
+                "ItemClass": "LootBox",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Silver Lootbox",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsageCount": 1
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "LootBox2",
+                "ItemClass": "LootBox",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Gold Lootbox",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsageCount": 1
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "LootBox3",
+                "ItemClass": "LootBox",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Black Lootbox",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsageCount": 1
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_coins0",
+                "ItemClass": "store_coins",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "150 coins",
+                "Description": "{\"image\": \"coins0\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 20
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 150
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_coins1",
+                "ItemClass": "store_coins",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "400 coins",
+                "Description": "{\"image\": \"coins1\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 50
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 400
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_coins2",
+                "ItemClass": "store_coins",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "1200 coins",
+                "Description": "{\"special\": \"25% extra\",\n\"image\": \"coins2\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 140
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 1200
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_coins3",
+                "ItemClass": "store_coins",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "2600 coins",
+                "Description": "{\"image\": \"coins3\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 280
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 2600
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_lootboxes0",
+                "ItemClass": "store_lootboxes",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bronze Lootbox",
+                "Description": "{\"image\": \"lootbox0\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 10
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "LootBox0"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_lootboxes1",
+                "ItemClass": "store_lootboxes",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Silver Lootbox",
+                "Description": "{\"image\": \"lootbox1\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 20
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "LootBox1"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_lootboxes2",
+                "ItemClass": "store_lootboxes",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Gold Lootbox",
+                "Description": "{\"image\": \"lootbox2\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 60
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "LootBox2"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "store_lootboxes3",
+                "ItemClass": "store_lootboxes",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Black Lootbox",
+                "Description": "{\"image\": \"lootbox3\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 120
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "LootBox3"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Play With Friends",
+                "ItemClass": "FeatureItem",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Play With Friends",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "ItemImageUrl": "images/pwf.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Streaming",
+                "ItemClass": "FeatureItem",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Streaming",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "ItemImageUrl": "images/pwf.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems00",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "30 gems",
+                "Description": "{\"image\": \"gems0\"}",
+                "VirtualCurrencyPrices": {
+                    "RM": 199
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 30
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems01",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "80 gems",
+                "Description": "{\n\"image\": \"gems1\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 499
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 80
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems02",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "170 gems",
+                "Description": "{\n\"image\": \"gems2\",\n\"special\": \"Popular\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 170
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems03",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "360 gems",
+                "Description": "{\n\"image\": \"gems3\",\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 1999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 360
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems04",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "950 gems",
+                "Description": "{\n\"image\": \"gems4\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 4999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 950
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems05",
+                "ItemClass": "",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "2000 gems",
+                "Description": "{\n\"image\": \"gems5\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 9999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 2000
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "FCUtrechtStartPack",
+                "ItemClass": "store_specialpack",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Starter FC Utrecht Fan Pack",
+                "Description": "{\"image\": \"FCUtrechtStarterPack\",\"size\":\"half\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 30
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"items\":[\"Fabian de Keijzer\",\"Mike van der Hoorn\",\"Bart Ramselaar\",\"Tasos Douvikas\"]}",
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 1000
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "FCUtrechtStartPack2",
+                "ItemClass": "store_specialpack",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "FC Utrecht Definitive Fan Pack",
+                "Description": "{\"image\": \"FCUtrechtDefinitivePack\",\"size\":\"full\"}",
+                "VirtualCurrencyPrices": {
+                    "GE": 170
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "Team5"
+                    ],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 1000,
+                        "GE": 30
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Streaming_Vip",
+                "ItemClass": "FeatureItem",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Streaming Vip",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "ItemImageUrl": "images/pwf.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems000",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "30 gems",
+                "Description": "{\"image\": \"gems0\"}",
+                "VirtualCurrencyPrices": {
+                    "RM": 199
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 30
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems001",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "80 gems",
+                "Description": "{\n\"image\": \"gems1\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 499
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 80
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems002",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "170 gems",
+                "Description": "{\n\"image\": \"gems2\",\n\"special\": \"Popular\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 170
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems003",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "360 gems",
+                "Description": "{\n\"image\": \"gems3\",\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 1999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 360
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems004",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "950 gems",
+                "Description": "{\n\"image\": \"gems4\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 4999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 950
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "iap_store_gems005",
+                "ItemClass": "store_gems",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "2000 gems",
+                "Description": "{\n\"image\": \"gems5\",\n\"special\": \"Best value\"\n}",
+                "VirtualCurrencyPrices": {
+                    "RM": 9999
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GE": 2000
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "StartingFC2",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Starter Pack Version 2",
+                "Description": "4 teams just to start",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Team1"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Team1",
+                "ItemClass": "TeamInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Worchester United",
+                "Description": "{\"imageTR\":\"images/teamspreview/wu256.png\", \"teamRosterDescription\": \"Worchester United plays with heart and hustle! These gritty underdogs from England prove you don’t need glitz to be champions. With their no-nonsense style, they'll surprise everyone and show that true winners come from the unlikeliest places!\"}",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"firstUniform\":\"images/TeamUniform/wujs1.png\",\"secondUniform\":\"images/TeamUniform/wujs2.png\",\"TeamID\":\"0\",\"TeamKeeperID\":\"0\",\"Team2ID\":\"1\",\"TeamKeeper2ID\":\"1\",\"Team1ID\":\"0\"}",
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Player1",
+                        "Player2",
+                        "Player3",
+                        "Player4"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "images/TeamIcons/worchesterunited.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Edward Stevens",
+                "Description": "Making the switch from hockey to football as a teenager, Stevens brings a fearless attitude developed on the ice, and puts his body on the line, every time.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Edward\",\"Surname\":\"\",\"Lastname\":\"Stevens\",\"spType\":0},\"levels\":{\"sp\":[58,60,62,64,66,68,70,72,74,76],\"db\":[30,32,34,36,38,40,42,44,46,48],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[44,47,50,53,56,59,62,65,68,71],\"gk\":[40,45,50,55,60,65,70,75,80,85]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/edwardstevens.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player2",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "James G. Wells",
+                "Description": "Elite defending masterclasses are standard for James Wells. Silky, unfazed, and near unbeatable for pace, Wells is a defensive rock, a natural winner, and thrives under pressure.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"James\",\"Surname\":\"G.\",\"Lastname\":\"Wells\",\"spType\":1,\"Speed\":90,\"Dribling\":90,\"Power\":70,\"Tackling\":90,\"Goalkeeping\":20},\"levels\":{\"sp\":[65,67,69,71,73,75,77,79,81,83],\"db\":[44,47,50,53,56,59,62,65,68,71],\"pw\":[25,26,27,28,29,30,31,32,33,34],\"tk\":[43,47,51,55,59,63,67,71,75,79],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/jamesgwells.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player3",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Mark Williams",
+                "Description": "A midfield engine, Williams is a motor-racing enthusiast but knows there’s more to life than speed. Mark makes teams purr, keeping it simple with short, simple passes.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Mark\",\"Surname\":\"\",\"Lastname\":\"Williams\",\"spType\":2},\"levels\":{\"sp\":[73,76,79,82,85,88,91,94,97,100],\"db\":[40,43,46,49,52,55,58,61,64,67],\"pw\":[25,27,29,31,33,35,37,39,41,43],\"tk\":[33,34,35,36,37,38,39,40,41,42],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/markwilliams.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player4",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Travis Fisher",
+                "Description": "For Travis, football is played in the mind. A rapid dribbler who loves to nibble at the opposition, Travis winds up defenders into making a mistake, then punishes them for it.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Travis\",\"Surname\":\"\",\"Lastname\":\"Fisher\",\"spType\":3},\"levels\":{\"sp\":[71,74,77,80,83,86,89,92,95,98],\"db\":[32,34,36,38,40,42,44,46,48,50],\"pw\":[49,53,57,61,65,69,73,77,81,85],\"tk\":[35,36,37,38,39,40,41,42,43,44],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/travisfisher.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Team2",
+                "ItemClass": "TeamInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Cereal Killers",
+                "Description": "{\"imageTR\":\"images/teamspreview/ck256.png\", \"teamRosterDescription\": \"The Cereal Killers are here to crunch the competition! Armed with killer skills and spoonfuls of talent, they'll pour on the pressure with cornflake kicks and milk-splash passes. Don't expect them to play nice—they're hungry for victory!\"}",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"firstUniform\":\"images/TeamUniform/ckjs1.png\",\"secondUniform\":\"images/TeamUniform/ckjs2.png\",\"TeamID\":\"1\",\"TeamKeeperID\":\"2\",\"Team2ID\":\"3\",\"TeamKeeper2ID\":\"3\",\"Team1ID\":\"2\"}",
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Player5",
+                        "Player6",
+                        "Player7",
+                        "Player8"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "images/TeamIcons/cereal.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player6",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Joe Fontana",
+                "Description": "Big Slick, Joe Fontana is a hit with teammates and the ladies. Opponents? Not so much. Heavy challenges and fast feet, Joe loves to leave an impression, often getting a booking.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Joe\",\"Lastname\":\"Fontana\",\"spType\":1},\"levels\":{\"sp\":[58,60,62,64,66,68,70,72,74,76],\"db\":[44,47,50,53,56,59,62,65,68,71],\"pw\":[25,26,27,28,29,30,31,32,33,34],\"tk\":[45,49,53,57,61,65,69,73,77,81],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Cereal-Killers/joefontana.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player5",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "James Daniels",
+                "Description": "A leader at the back, and a sweeper keeper at heart, James is flashy, loud, and loves playing mind games with attacking players.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"James\",\"Surname\":\"\",\"Lastname\":\"Daniels\",\"spType\":0},\"levels\":{\"sp\":[62,64,66,68,70,72,74,76,78,80],\"db\":[31,33,35,37,39,41,43,45,47,49],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[41,44,47,50,53,56,59,62,65,68],\"gk\":[43,48,53,58,63,68,73,78,83,88]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Cereal-Killers/jamesdaniels.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player8",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Jason Legend",
+                "Description": "Quick and confident, James prefers pace to dribbling, playing off the shoulder with killer runs that beg for an inch-perfect through ball. Get it wrong and you can be sure you’ll know about it.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Jason\",\"Lastname\":\"Legend\",\"spType\":3},\"levels\":{\"sp\":[76,79,82,85,88,91,94,97,100,100],\"db\":[26,28,30,32,34,36,38,40,42,44],\"pw\":[44,48,52,56,60,64,68,72,76,80],\"tk\":[27,28,29,30,31,32,33,34,35,36],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Cereal-Killers/jameslegend.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player7",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Jason Stewart",
+                "Description": "Proud Scot Stewart a is tough, rough, midfield destroyer who takes no prisoners in the centre of the park. Shinpads? What are ye, soft?",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Jason\",\"Lastname\":\"Stewart\",\"spType\":2},\"levels\":{\"sp\":[70,73,76,79,82,85,88,91,94,97],\"db\":[46,49,52,55,58,61,64,67,70,73],\"pw\":[32,34,36,38,40,42,44,46,48,50],\"tk\":[35,36,37,38,39,40,41,42,43,44],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Cereal-Killers/jasonstewart.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player9",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Steve Larinore",
+                "Description": "With incredible reactions and a vice-like grip from working construction with his father as a boy, legend has it Steve hasn't dropped a football in his life. Rock-solid at the back.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Steve\",\"Surname\":\"\",\"Lastname\":\"Larinore\",\"spType\":0},\"levels\":{\"sp\":[62,64,66,68,70,72,74,76,78,80],\"db\":[33,35,37,39,41,43,45,47,49,51],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[48,51,54,57,60,63,66,69,72,75],\"gk\":[48,53,58,63,68,73,78,83,88,93]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/NewYork-Boomers/stevelarinore.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player10",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Doug Hughes",
+                "Description": "Hailing from London, UK, Hughes is a manager’s dream. No nonsense defending and a strong all-round game, Doug is good in the tackle, holds the ball well, and leads when it matters.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Doug\",\"Surname\":\"\",\"Lastname\":\"Hughes\",\"spType\":1},\"levels\":{\"sp\":[65,67,69,71,73,75,77,79,81,83],\"db\":[44,47,50,53,56,59,62,65,68,71],\"pw\":[30,31,32,33,34,35,36,37,38,39],\"tk\":[46,50,54,58,62,66,70,74,78,82],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/NewYork-Boomers/doughuges.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player11",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "David Stancil",
+                "Description": "Hailing from Texas, to Stancil football is entertainment. Slow paced but fast footed, with an even faster mind, Stancil loves to humiliate teams. Welcome to the rainbow flick rodeo, y’all.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"David\",\"Surname\":\"\",\"Lastname\":\"Stancil\",\"spType\":2},\"levels\":{\"sp\":[80,83,86,89,92,95,98,100,100,100],\"db\":[46,49,52,55,58,61,64,67,70,73],\"pw\":[27,29,31,33,35,37,39,41,43,45],\"tk\":[30,31,32,33,34,35,36,37,38,39],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/NewYork-Boomers/davidstancil.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player12",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Kenny Alvarez",
+                "Description": "A role model to kids around the world, Alvarez overcame obstacles to become one of the best forwards in football, while fighting for issues close to his heart. All hail King Kenny.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Kenny\",\"Surname\":\"\",\"Lastname\":\"Alvarez\",\"spType\":3},\"levels\":{\"sp\":[74,77,80,83,86,89,92,95,98,100],\"db\":[34,36,38,40,42,44,46,48,50,52],\"pw\":[50,54,58,62,66,70,74,78,82,86],\"tk\":[25,26,27,28,29,30,31,32,33,34],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/NewYork-Boomers/kennyalvarez.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Team3",
+                "ItemClass": "TeamInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "New York Boomers",
+                "Description": "{\"imageTR\":\"images/teamspreview/nb256.png\", \"teamRosterDescription\": \"Get ready for explosive action with the New York Boomers! These powerhouse players deliver booming shots and thunderous tackles, driven by the Big Apple’s energy. With skyscraper-sized ambition, they’re set to shake up the competition!\"}",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"firstUniform\":\"images/TeamUniform/nybjs1.png\",\"secondUniform\":\"images/TeamUniform/nybjs2.png\",\"TeamID\":\"2\",\"TeamKeeperID\":\"4\",\"Team2ID\":\"5\",\"TeamKeeper2ID\":\"5\",\"Team1ID\":\"4\"}",
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Player9",
+                        "Player10",
+                        "Player11",
+                        "Player12"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "images/TeamIcons/nybom.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player13",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Joe Lee",
+                "Description": "Young but wise, Lee is the keeper’s keeper - quiet, strong, analytical, and a master of positioning. You don’t need speed if you’re already in the right place.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Joe\",\"Surname\":\"\",\"Lastname\":\"Lee\",\"spType\":0},\"levels\":{\"sp\":[57,59,61,63,65,67,69,71,73,75],\"db\":[28,30,32,34,36,38,40,42,44,46],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[45,48,51,54,57,60,63,66,69,72],\"gk\":[42,47,52,57,62,67,72,77,82,87]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Flaming-Dragons/joelee.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player14",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Jae Park",
+                "Description": "The world’s fastest defender, Jae Park often gives his opponents a head start just to make life interesting. Adored by fans, and tolerated by coaches, just don’t ask him to tackle.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Jae\",\"Surname\":\"\",\"Lastname\":\"Park\",\"spType\":1},\"levels\":{\"sp\":[61,63,65,67,69,71,73,75,77,79],\"db\":[48,51,54,57,60,63,66,69,72,75],\"pw\":[28,29,30,31,32,33,34,35,36,37],\"tk\":[40,44,48,52,56,60,64,68,72,76],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Flaming-Dragons/jaepark.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player15",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bruce Jung",
+                "Description": "A midfield maestro, incredible with the ball at his feet and an uncanny ability to read the game. Bruce was born to evade a press and play a defence-splitting ball.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Bruce\",\"Surname\":\"\",\"Lastname\":\"Jung\",\"spType\":2},\"levels\":{\"sp\":[76,79,82,85,88,91,94,97,100,100],\"db\":[47,50,53,56,59,62,65,68,71,74],\"pw\":[31,33,35,37,39,41,43,45,47,49],\"tk\":[31,32,33,34,35,36,37,38,39,40],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Flaming-Dragons/brucejung.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player16",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Kento Noda",
+                "Description": "Using his low centre of gravity to twist and turn, Noda’s devastating combo of pace and power leaves regularly leaves helpless defenders in a tangled heap on the grass.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Kento\",\"Surname\":\"\",\"Lastname\":\"Noda\",\"spType\":3},\"levels\":{\"sp\":[70,73,76,79,82,85,88,91,94,97],\"db\":[26,28,30,32,34,36,38,40,42,44],\"pw\":[46,50,54,58,62,66,70,74,78,82],\"tk\":[32,33,34,35,36,37,38,39,40,41],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Flaming-Dragons/kentonoda.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Team4",
+                "ItemClass": "TeamInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Flaming Dragons",
+                "Description": "{\"imageTR\":\"images/teamspreview/fd256_2.png\", \"teamRosterDescription\": \"The Flaming Dragons bring the heat! This fiery squad lights up every match with blazing speed and fierce determination. Their dragon-like intensity and hunger for victory will scorch the competition and leave rivals in ashes!\"}",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"firstUniform\":\"images/TeamUniform/fdjs1.png\",\"secondUniform\":\"images/TeamUniform/fdjs2.png\",\"TeamID\":\"3\",\"TeamKeeperID\":\"6\",\"Team2ID\":\"7\",\"TeamKeeper2ID\":\"7\",\"Team1ID\":\"6\"}",
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Player13",
+                        "Player14",
+                        "Player15",
+                        "Player16"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "images/TeamIcons/dragons.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Team5",
+                "ItemClass": "TeamInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "FC Utrecht",
+                "Description": "{\"imageTR\":\"images/teamspreview/fcutrechtUnlock.png\", \"teamRosterDescription\": \"From the Netherlands, FC Utrecht brings Dutch precision and fearless play to the field! With rock-solid defense and game-changing moves, they keep fans on the edge. When Utrecht’s in action, expect thrilling and intense matches!\"}",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\"firstUniform\":\"images/TeamUniform/ckjs1.png\",\"secondUniform\":\"images/TeamUniform/ckjs2.png\",\"TeamID\":\"4\",\"TeamKeeperID\":\"10\",\"Team2ID\":\"9\",\"TeamKeeper2ID\":\"11\",\"Team1ID\":\"8\"}",
+                "Consumable": {},
+                "Bundle": {
+                    "BundledItems": [
+                        "Player17",
+                        "Player18",
+                        "Player19",
+                        "Player20"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "images/TeamIcons/fcutrecht.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player17",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Fabian de Keijzer",
+                "Description": "The Dutch Devil, de Keijzer rules his box with incredible power and athleticism, inspiring fear in opposing teams. Famous for spectacular dives and lightning reflexes.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Fabian\",\"Surname\":\"\",\"Lastname\":\"de Keijzer\",\"spType\":0},\"levels\":{\"sp\":[58,60,62,64,66,68,70,72,74,76],\"db\":[26,28,30,32,34,36,38,40,42,44],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[49,52,55,58,61,64,67,70,73,76],\"gk\":[47,52,57,62,67,72,77,82,87,92]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/FCUtrecth/keijzer_posa3.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player18",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Mike van der Hoorn",
+                "Description": "The big brother of the squad and a team player through and through, softly spoken Mike prefers to listen to his teammates, support them, and do his talking on the pitch.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Mike\",\"Surname\":\"\",\"Lastname\":\"van der Hoorn \",\"spType\":1},\"levels\":{\"sp\":[61,63,65,67,69,71,73,75,77,79],\"db\":[48,51,54,57,60,63,66,69,72,75],\"pw\":[32,33,34,35,36,37,38,39,40,41],\"tk\":[50,54,58,62,66,70,74,78,82,86],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/FCUtrecth/vanderhoorn.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player19",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bart Ramselaar",
+                "Description": "A Swiss army knife in the middle of the park, Ramselaar’s versatility means he can play any position and thrive, even between the posts if necessary.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Bart\",\"Surname\":\"\",\"Lastname\":\"Ramselaar\",\"spType\":2},\"levels\":{\"sp\":[80,83,86,89,92,95,98,100,100,100],\"db\":[46,49,52,55,58,61,64,67,70,73],\"pw\":[27,29,31,33,35,37,39,41,43,45],\"tk\":[30,31,32,33,34,35,36,37,38,39],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/FCUtrecth/ramselaar.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player20",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Tasos Douvikas",
+                "Description": "A strong, aggressive attacker, Tasos lives for roaring crowds flashing cameras. A superstar in waiting and he knows it, Tasos won't let anyone stand in the way of his dreams.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Tasos\",\"Surname\":\"\",\"Lastname\":\"Douvikas\",\"spType\":3},\"levels\":{\"sp\":[74,77,80,83,86,89,92,95,98,100],\"db\":[25,27,29,31,33,35,37,39,41,43],\"pw\":[43,47,51,55,59,63,67,71,75,79],\"tk\":[25,26,27,28,29,30,31,32,33,34],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/FCUtrecth/douvikas.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player0",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Mark Anthony",
+                "Description": "",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0",
+                    "nodrop"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Mark\",\"Surname\":\"\",\"Lastname\":\"Anthony\",\"spType\":0,\"Speed\":70,\"Dribling\":60,\"Power\":90,\"Tackling\":80,\"Goalkeeping\":85},\"gfx\":{\"body\":[{\"type\":0,\"Material\":0},{\"type\":1,\"Material\":8},{\"type\":2,\"Material\":0}],\"hair\":{\"type\":14,\"Material\":0},\"eyebrows\":{\"type\":8,\"Material\":0},\"eyes\":{\"type\":0,\"Material\":12},\"mouth\":{\"type\":0,\"Material\":7},\"beard\":{\"type\":10,\"Material\":0},\"number\":{\"type\":-1,\"Material\":0},\"brand\":{\"type\":0,\"Material\":10},\"tatoos\":{\"type\":-1,\"Material\":0},\"nameProp\":{\"type\":-1,\"Material\":0},\"gloves\":{\"type\":0,\"Material\":3},\"Sleeves\":{\"type\":0,\"Material\":10}},\"levels\":{\"sp\":[72,73,75,75,77,77,79,80,82],\"db\":[62,64,66,68,70,72,75,77,79],\"pw\":[90,90,90,90,90,92,92,93,94],\"tk\":[80,82,82,84,84,86,86,88,88],\"gk\":[87,87,88,88,90,90,93,95,96]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/markanthony.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player21",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero",
+                "Description": "World Cup Winner. Icon. Legend. Del Piero is a devastating deep-lying forward who’s seen, done, and won it all.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Alessandro\",\"Surname\":\"\",\"Lastname\":\" Del Piero\",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[80,82,85,88,90,93,96,98,99,100],\"tk\":[70,72,74,76,78,80,82,84,86,88],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delpierocard.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player21Dummy1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero",
+                "Description": "Legend",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Alessandro\",\"Surname\":\"\",\"Lastname\":\" Del Piero\",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[80,82,85,88,90,93,96,98,99,100],\"tk\":[70,72,74,76,78,80,82,84,86,88],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delpcrown.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player21Dummy2",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero",
+                "Description": "Legend",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Alessandro\",\"Surname\":\"\",\"Lastname\":\" Del Piero\",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[80,82,85,88,90,93,96,98,99,100],\"tk\":[70,72,74,76,78,80,82,84,86,88],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delpBowTie.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player21Dummy4",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero",
+                "Description": "Legend",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Alessandro\",\"Surname\":\"\",\"Lastname\":\" Del Piero\",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[80,82,85,88,90,93,96,98,99,100],\"tk\":[70,72,74,76,78,80,82,84,86,88],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delpkick.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player21Dummy3",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero",
+                "Description": "Legend",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Alessandro\",\"Surname\":\"\",\"Lastname\":\" Del Piero\",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[80,82,85,88,90,93,96,98,99,100],\"tk\":[70,72,74,76,78,80,82,84,86,88],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delph.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player22",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Arat",
+                "Description": "A wunderkind wizard with the ball - and the world - at his feet, Arat dazzles his opponents with his tricks, speed, skill, and accuracy. A bright future awaits.",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity3",
+                    "nodrop"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Arat\",\"Surname\":\"\",\"Lastname\":\" \",\"spType\":3},\"levels\":{\"sp\":[100,100,100,100,100,100,100,100,100,100],\"db\":[100,100,100,100,100,100,100,100,100,100],\"pw\":[60,61,62,63,65,66,67,68,70,72],\"tk\":[50,51,52,53,54,55,56,57,58,60],\"gk\":[20,20,20,20,20,20,20,20,20,20]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/delpierocard.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player15Dummy1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bruce Jung",
+                "Description": "Flaming Dragon - MF",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Bruce\",\"Surname\":\"\",\"Lastname\":\"Jung\",\"spType\":2},\"levels\":{\"sp\":[76,79,82,85,88,91,94,97,100,100],\"db\":[47,50,53,56,59,62,65,68,71,74],\"pw\":[31,33,35,37,39,41,43,45,47,49],\"tk\":[31,32,33,34,35,36,37,38,39,40],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/cardPirate.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player1Dummy1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Edward Stevens",
+                "Description": "Worchester United - GK",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Edward\",\"Surname\":\"\",\"Lastname\":\"Stevens\",\"spType\":0},\"levels\":{\"sp\":[58,60,62,64,66,68,70,72,74,76],\"db\":[30,32,34,36,38,40,42,44,46,48],\"pw\":[0,0,0,0,0,0,0,0,0,0],\"tk\":[44,47,50,53,56,59,62,65,68,71],\"gk\":[40,45,50,55,60,65,70,75,80,85]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Worchester-United/edwardstevens.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player6Dummy1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Joe Fontana",
+                "Description": "Cereal Killers - DF",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Joe\",\"Lastname\":\"Fontana\",\"spType\":1},\"levels\":{\"sp\":[58,60,62,64,66,68,70,72,74,76],\"db\":[44,47,50,53,56,59,62,65,68,71],\"pw\":[25,26,27,28,29,30,31,32,33,34],\"tk\":[45,49,53,57,61,65,69,73,77,81],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/Cereal-Killers/joefontana.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Player12Dummy1",
+                "ItemClass": "SoccerPlayerInfo",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Kenny Alvarez",
+                "Description": "New York Boomers - AT",
+                "VirtualCurrencyPrices": {
+                    "GD": 500
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [
+                    "Rarity0",
+                    "nodrop",
+                    "hideteamroster",
+                    "skin"
+                ],
+                "CustomData": "{\"stats\":{\"Name\":\"Kenny\",\"Surname\":\"\",\"Lastname\":\"Alvarez\",\"spType\":3},\"levels\":{\"sp\":[72,75,78,81,84,87,90,93,96,99],\"db\":[34,36,38,40,42,44,46,48,50,52],\"pw\":[50,54,58,62,66,70,74,78,82,86],\"tk\":[25,26,27,28,29,30,31,32,33,34],\"gk\":[0,0,0,0,0,0,0,0,0,0]}}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "Figures/NewYork-Boomers/kennyalvarez.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Health1",
+                "ItemClass": "Health",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Energy Drink",
+                "Description": "",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\n\"Condition\": 25\n}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Health2",
+                "ItemClass": "Health",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Protein Bar",
+                "Description": "",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "CustomData": "{\n\"Condition\": 50\n}",
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "SmallHealthPack",
+                "ItemClass": "store_health",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Small Health Pack",
+                "Description": "{\n\"image\": \"health1\",\n\"quantity\":\"x5\",\n\"amount\":25\n}",
+                "VirtualCurrencyPrices": {
+                    "GD": 45
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "Health1",
+                        "Health1",
+                        "Health1",
+                        "Health1",
+                        "Health1"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "BigHealthPack",
+                "ItemClass": "store_health",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Big Health Pack",
+                "Description": "{\n\"image\": \"health2\",\n\"quantity\":\"x10\",\n\"amount\":50\n}",
+                "VirtualCurrencyPrices": {
+                    "GE": 24
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2",
+                        "Health2"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "adp_bundle",
+                "ItemClass": "store_adp",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Alessandro Del Piero Bundle",
+                "Description": "{\n\"SmallHealthPack\":3,\n\"BigHealthPack\":2,\n\"GD\":1500,\n\"Player21\":1,\n\"PremiumPass\":1\n}",
+                "VirtualCurrencyPrices": {
+                    "GE": 300
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "SmallHealthPack",
+                        "SmallHealthPack",
+                        "SmallHealthPack",
+                        "BigHealthPack",
+                        "BigHealthPack",
+                        "Player21"
+                    ],
+                    "BundledResultTables": [],
+                    "BundledVirtualCurrencies": {
+                        "GD": 1500
+                    }
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "AdsFree",
+                "ItemClass": "ads_free",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Ads Free",
+                "Description": "",
+                "VirtualCurrencyPrices": {},
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "AdsFreeBundle",
+                "ItemClass": "store_ads_free",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Ads Free",
+                "Description": "{\n\"image\": \"adsFree\"\n}",
+                "VirtualCurrencyPrices": {
+                    "GE": 60
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {
+                    "UsagePeriod": 3
+                },
+                "Bundle": {
+                    "BundledItems": [
+                        "AdsFree"
+                    ],
+                    "BundledResultTables": []
+                },
+                "CanBecomeCharacter": false,
+                "IsStackable": false,
+                "IsTradable": false,
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "InGameHealth",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Heal",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/health.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "DoubleGoal",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Goal x2",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/2xball.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "GameTime",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "10+ Seconds",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/+10SEC.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "SuperCat",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Explosive Kitten",
+                "VirtualCurrencyPrices": {
+                    "GE": 10
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/cat.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Bazooka",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Bazooka",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/bazooka.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "SuperShot",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Super Shot",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/goal.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Shield",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Power Shield",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/shield.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            },
+            {
+                "ItemId": "Pepper",
+                "ItemClass": "superpower",
+                "CatalogVersion": "MainCatalogV2",
+                "DisplayName": "Super Speed",
+                "VirtualCurrencyPrices": {
+                    "GE": 5
+                },
+                "RealCurrencyPrices": {},
+                "Tags": [],
+                "Consumable": {},
+                "CanBecomeCharacter": false,
+                "IsStackable": true,
+                "IsTradable": false,
+                "ItemImageUrl": "SuperPowers/pepper.png",
+                "IsLimitedEdition": false,
+                "InitialLimitedEditionCount": 0
+            }
+        ],
+        "tags": [],
+        "tagStatus": "noRelatedTag"
+    }
+}
