@@ -800,7 +800,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: NO_MM;_USE_LOBBY_SCENE;_TEST_AI;DOTWEEN
+    Android: ENABLE_PLAYFABSERVER_API;NO_MM;_USE_LOBBY_SCENE;_TEST_AI;DOTWEEN
     EmbeddedLinux: DOTWEEN
     GameCoreScarlett: DOTWEEN
     GameCoreXboxOne: DOTWEEN
